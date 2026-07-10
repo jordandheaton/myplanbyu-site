@@ -1,0 +1,10 @@
+# Secrets -- never commit your Pinecone API key
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Large generated data (optional: comment out if you want catalog.json tracked)
+# data/catalog.json

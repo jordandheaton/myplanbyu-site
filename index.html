@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>myplanBYU — Degree Sequence Optimizer</title>
+  <meta name="description" content="myplanBYU: a multi-objective degree-sequencing optimizer for BYU students. Pick a major, up to two minors, and certificates — a constraint solver builds the semester plan around your life." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ================= TOP BAR ================= -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="byu">BYU</span><span class="divider">|</span><span class="app">myplanBYU</span>
+      <span class="tagline">degree sequence optimizer</span>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-link" id="topbarChatBtn" title="Ask the AI Advisor"><i class="fas fa-comments"></i> AI Advisor</button>
+      <span class="topbar-user"><i class="fas fa-circle-user"></i> Student</span>
+    </div>
+  </header>
+
+  <!-- ================= NAV TABS ================= -->
+  <nav class="tabs">
+    <a href="#" class="tab active"><i class="fas fa-map-location-dot"></i> My Plan</a>
+    <a href="#" class="tab" id="navPriorities"><i class="fas fa-sliders"></i> Priorities &amp; Constraints</a>
+    <a href="#" class="tab" id="navHow"><i class="fas fa-circle-question"></i> How it works</a>
+  </nav>
+
+  <!-- ================= NOTICE ================= -->
+  <div class="notice">
+    Welcome to <b>myplanBYU</b>! Courses and program requirements come from the official BYU catalog
+    (auto-generated from catalog.byu.edu data) — always verify against official MyMAP and your advisor before registering.
+  </div>
+
+  <!-- ================= STUDENT BAND ================= -->
+  <div class="student-band" id="studentBand"></div>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <main class="layout">
+
+    <!-- Progress report (left) -->
+    <aside class="panel panel-left">
+      <div class="panel-head">
+        <h2>Draft Progress Report</h2>
+        <button class="btn primary sm" id="refreshBtn"><i class="fas fa-rotate"></i> Re-optimize</button>
+      </div>
+      <div class="panel-scroll">
+        <div id="progressBody"></div>
+        <div class="flag-sec">
+          <h3><i class="fas fa-flag"></i> Insights &amp; warnings</h3>
+          <div id="flagList"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Draft plan board (center) -->
+    <section class="board-wrap">
+      <div class="board-head">
+        <div>
+          <h1>Draft Plan</h1>
+          <div class="board-sub"><span id="planTitleName"></span></div>
+        </div>
+        <div class="board-tip">Tip: drag a class card to another semester — the solver validates every move against prerequisites, availability, and credit caps.</div>
+        <div class="board-actions">
+          <button class="btn ghost sm" id="prioritiesBtn"><i class="fas fa-sliders"></i> Priorities</button>
+          <button class="btn primary sm" id="planOptionsBtn">Plan Options <i class="fas fa-chevron-down"></i></button>
+        </div>
+      </div>
+      <div class="board" id="board"></div>
+    </section>
+
+    <!-- Saved plans (right) -->
+    <aside class="panel panel-right">
+      <div class="panel-head">
+        <h2>My Plans &amp; Drafts</h2>
+        <button class="btn primary sm" id="newPlanBtn"><i class="fas fa-plus"></i> New plan</button>
+      </div>
+      <div class="panel-scroll" id="plansList"></div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    myplanBYU is an independent student project — not affiliated with BYU or MyMAP.
+    Requirements shown are illustrative snapshots; official sources govern.
+  </footer>
+
+  <!-- ================= WIZARD MODAL ================= -->
+  <div class="modal" id="wizardModal">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <h2><i class="fas fa-wand-magic-sparkles"></i> New plan</h2>
+        <button class="modal-x" data-close="#wizardModal">&times;</button>
+      </div>
+      <div class="wiz-steps" id="wizSteps"></div>
+      <div class="modal-body" id="wizBody"></div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="wizBack"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn primary" id="wizNext">Next <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COURSE MODAL ================= -->
+  <div class="modal" id="courseModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2><i class="fas fa-book-open"></i> Class details</h2>
+        <button class="modal-x" data-close="#courseModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= PRIORITIES MODAL ================= -->
+  <div class="modal" id="prioModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2><i class="fas fa-sliders"></i> Priorities &amp; constraints</h2>
+        <button class="modal-x" data-close="#prioModal">&times;</button>
+      </div>
+      <div class="modal-body" id="prioBody"></div>
+      <div class="modal-foot">
+        <button class="btn ghost" data-close="#prioModal">Cancel</button>
+        <button class="btn primary" id="prioApply"><i class="fas fa-wand-magic-sparkles"></i> Apply &amp; re-optimize</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HOW IT WORKS MODAL ================= -->
+  <div class="modal" id="howModal">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <h2><i class="fas fa-circle-question"></i> How myplanBYU works</h2>
+        <button class="modal-x" data-close="#howModal">&times;</button>
+      </div>
+      <div class="modal-body how">
+        <p><b>myplanBYU</b> treats your degree as a <i>constrained set-cover and sequencing problem</i>.
+        Unlike a static checklist, it generates an optimized multi-semester sequence around your actual life.</p>
+
+        <h4>1 · Requirement buckets, not hardcoded lists</h4>
+        <p>Every program (major, minor, certificate, University Core) is a set of <b>buckets</b> — “3 credits
+        tagged <code>GE-Arts</code>”, “all of the IS Junior Core”, “6 credits of technique courses”. Courses carry
+        <b>tags</b> and can fill multiple buckets at once (double-counting), up to a global credit cap. Programs
+        without hand-entered detail generate realistic placeholder chains, so every one of the 170+ catalog
+        programs is plannable today and refinable tomorrow.</p>
+
+        <h4>2 · Hard constraints (never violated)</h4>
+        <ul>
+          <li>Prerequisite chains &amp; repeatable-course sequencing</li>
+          <li>Season availability (Fall-only, Winter-only, rare offerings)</li>
+          <li>Per-term credit caps, full-time minimums for scholarships</li>
+          <li>Cohort blocks — e.g. the IS Junior Core moves as one Fall block, then one Winter block</li>
+          <li>Program gates — e.g. MISM application prerequisites before the deadline semester</li>
+          <li>Your pins — “IS 303 in Winter 2027” stays exactly there</li>
+        </ul>
+
+        <h4>3 · Weighted priorities (your dials)</h4>
+        <p>The solver seeds a schedule greedily along the critical path, then runs ~1,600 rounds of
+        hill-climbing: random legal moves are kept only if your weighted objective improves.
+        <b>Speed</b> minimizes semesters; <b>Cost</b> packs the flat-tuition band, counts Spring/Summer tuition,
+        and knows a 12-month lease makes Spring housing free; <b>GPA protection</b> refuses to stack 3+
+        historically hard classes; <b>Workload</b> balances real time-cost (a 1-credit technique class ≠ 1 credit
+        of time); <b>Life</b> penalizes crammed terms, heavy streaks, and uneven religion pacing.</p>
+
+        <h4>4 · Honest flags</h4>
+        <p>Plans aren't just feasible — they're annotated: bottleneck courses vs. your registration priority,
+        single-point-of-failure offerings, AP/CLEP test-out suggestions, finals-week collision risk, and
+        scholarship full-time warnings.</p>
+
+        <h4>Under the hood</h4>
+        <p>100% client-side JavaScript (solves in ~10–50 ms for a full double-degree). The repo includes an
+        <code>OR-Tools CP-SAT</code> reference architecture (<code>docs/solver_reference.py</code>) for a future
+        server-side V2 with section-level time conflicts.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <!-- ================= AI ADVISOR CHAT ================= -->
+  <button class="chat-fab" id="chatFab" title="Ask the AI Advisor">
+    <i class="fas fa-comments"></i><span>Ask the AI Advisor</span>
+  </button>
+
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-head">
+      <div class="chat-title">
+        <i class="fas fa-graduation-cap"></i>
+        <div>
+          <b>AI Advisor</b>
+          <span class="chat-sub">grounded in live BYU data</span>
+        </div>
+      </div>
+      <button class="chat-x" id="chatClose">&times;</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-compose">
+      <div class="chat-quick" id="chatQuick">
+        <button data-q="Critique my current semester plan. Point out anything unrealistic about the pacing, sequencing, or course load, and what you'd change.">✦ Critique my plan</button>
+        <button data-q="Does my current plan satisfy all of my program requirements? List anything I'm still missing.">Am I missing requirements?</button>
+        <button data-q="What scholarships, clubs, or study abroad programs fit my majors and minors?">Opportunities for me</button>
+      </div>
+      <label class="chat-share"><input type="checkbox" id="chatSharePlan" checked>
+        Share my current plan with the advisor</label>
+      <div class="chat-inrow">
+        <textarea id="chatInput" rows="1" placeholder="Ask about requirements, deadlines, scholarships, your plan..."></textarea>
+        <button class="btn primary sm" id="chatSend"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/catalog_data.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/solver.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chat.js"></script>
+  <script>document.getElementById("topbarChatBtn").addEventListener("click", () => Chat.toggle(true));</script>
+</body>
+</html>

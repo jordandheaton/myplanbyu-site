@@ -1,0 +1,2266 @@
+{
+  "Accounting (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          },
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          },
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "ACC 310",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ACC 401",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 403",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 410",
+            "credits": 1.5
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "ACC 402",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 411",
+            "credits": 1.5
+          },
+          {
+            "code": "FIN 402",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ACC 408",
+            "credits": 1.5
+          },
+          {
+            "code": "ACC 409",
+            "credits": 1.5
+          },
+          {
+            "code": "ACC 406",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 504",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 571",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "ACC 405",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 407",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "ACC 241",
+            "credits": 3.0
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Complete junior year, fall envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "ACC 408",
+          "ACC 409",
+          "ACC 406",
+          "ACC 504"
+        ]
+      },
+      {
+        "label": "Complete junior year, winter envelope",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "ACC 405",
+          "ACC 407"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/acc/wp-content/uploads/sites/27/Acc_Flowchart_2026_web.pdf"
+  },
+  "Finance (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 180",
+            "credits": 0.5
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "FIN 400",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 326",
+            "credits": 2.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "FIN 410",
+            "credits": 3.0
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Junior Core Fall Envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "FIN 400",
+          "FIN 326"
+        ]
+      },
+      {
+        "label": "Junior Core Winter Envelope",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "FIN 410"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/bsfin/wp-content/uploads/sites/17/Fin_Flowchart_2026_web.pdf"
+  },
+  "Global Supply Chain Management (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
+          },
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          },
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          },
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": []
+      },
+      {
+        "year": 1,
+        "season": "Sp",
+        "courses": []
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          },
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "GSCM 326",
+            "credits": 1.0
+          },
+          {
+            "code": "GSCM 402",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 401",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 403",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 404",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 429",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 380",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "GSCM 412",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 414",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 411",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 419",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "GSCM 585R",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 410",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 512",
+            "credits": 3.0
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Complete junior year, fall envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "GSCM 326",
+          "GSCM 402",
+          "GSCM 401",
+          "GSCM 403",
+          "GSCM 404",
+          "GSCM 429",
+          "GSCM 380"
+        ]
+      },
+      {
+        "label": "Complete two courses during winter semesters",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "GSCM 412",
+          "GSCM 414",
+          "GSCM 411",
+          "GSCM 419"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/gscm/wp-content/uploads/sites/45/GSC_Flowchart_2026_web.pdf"
+  },
+  "Marketing (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": []
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MKTG 326",
+            "credits": 1.0
+          },
+          {
+            "code": "MKTG 402",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 403",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 401",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 325",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 380",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MKTG 429",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Complete junior year, fall envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "MKTG 326",
+          "MKTG 402",
+          "MKTG 403",
+          "MKTG 401",
+          "MSB 325"
+        ]
+      },
+      {
+        "label": "Complete junior year, winter course",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "MKTG 429"
+        ]
+      },
+      {
+        "label": "Complete senior year, fall course",
+        "year": 4,
+        "season": "F",
+        "courses": [
+          "MKTG 380"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/mktg/wp-content/uploads/sites/46/Mktg_Flowchart_2026_web.pdf"
+  },
+  "Entrepreneurial Management (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 113",
+            "credits": 1.0
+          },
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
+          },
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          },
+          {
+            "code": "ENT 302",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ENT 326",
+            "credits": 1.0
+          },
+          {
+            "code": "ENT 401",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 325",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 478",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 432",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 381",
+            "credits": 1.0
+          },
+          {
+            "code": "ENT 382",
+            "credits": 1.0
+          },
+          {
+            "code": "MSB 342",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "ENT 402",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 411",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 436",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 434R",
+            "credits": 3.0
+          },
+          {
+            "code": "ENT 437",
+            "credits": 3.0
+          },
+          {
+            "code": "GCI 381R",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": []
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": []
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Complete junior year, fall courses",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "ENT 326",
+          "ENT 401",
+          "MSB 325",
+          "ENT 478",
+          "ENT 432",
+          "ENT 381",
+          "ENT 382",
+          "MSB 342"
+        ]
+      },
+      {
+        "label": "Complete junior year, winter courses",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "ENT 402",
+          "ENT 411",
+          "ENT 436",
+          "ENT 434R",
+          "ENT 437",
+          "GCI 381R"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/ent/wp-content/uploads/sites/44/Ent_Flowchart_2026_web.pdf"
+  },
+  "Human Resource Management (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 300",
+            "credits": 2.0
+          },
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          },
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
+          },
+          {
+            "code": "MSB 380",
+            "credits": 1.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "HRM 401",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 326",
+            "credits": 2.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MSB 325",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 411",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 402",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 412",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "HRM 421",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 413",
+            "credits": 3.0
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Junior Year, Fall Envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "HRM 401",
+          "HRM 326"
+        ]
+      },
+      {
+        "label": "Junior Year, Winter Envelope",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "MSB 325",
+          "HRM 411",
+          "HRM 402",
+          "HRM 412"
+        ]
+      },
+      {
+        "label": "Senior Year, Fall Envelope",
+        "year": 4,
+        "season": "F",
+        "courses": [
+          "HRM 421",
+          "MSB 413"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/hrm/wp-content/uploads/sites/47/HR_Flowchart_2026_web.pdf"
+  },
+  "Experience Design & Management (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          },
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          },
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "EXDM 300",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
+          },
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          },
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EXDM 495",
+            "credits": 1.5
+          },
+          {
+            "code": "EXDM 405",
+            "credits": 3.0
+          },
+          {
+            "code": "EXDM 404",
+            "credits": 3.0
+          },
+          {
+            "code": "EXDM 423",
+            "credits": 3.0
+          },
+          {
+            "code": "EXDM 422",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "EXDM 416",
+            "credits": 3.0
+          },
+          {
+            "code": "EXDM 415",
+            "credits": 3.0
+          },
+          {
+            "code": "EXDM 418",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EXDM 496R",
+            "credits": 1.5
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Complete junior year, fall courses",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "EXDM 405",
+          "EXDM 404",
+          "EXDM 423",
+          "EXDM 422"
+        ]
+      },
+      {
+        "label": "Complete junior year, winter courses",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "EXDM 416",
+          "EXDM 415",
+          "EXDM 418"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/exdm/wp-content/uploads/sites/48/ExDM_Flowchart_2026_web.pdf"
+  },
+  "Electrical Engineering (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "CS 111",
+            "credits": 3
+          },
+          {
+            "code": "PHSCS 121",
+            "credits": 3
+          },
+          {
+            "code": "MATH 112",
+            "credits": 4
+          },
+          {
+            "code": "CHEM 105",
+            "credits": 4
+          },
+          {
+            "code": "WRTG 312",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 191",
+            "credits": 0.5
+          },
+          {
+            "code": "EC EN 192",
+            "credits": 1
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "PHSCS 220",
+            "credits": 3
+          },
+          {
+            "code": "MATH 113",
+            "credits": 4
+          },
+          {
+            "code": "MATH 213",
+            "credits": 2
+          },
+          {
+            "code": "MATH 215",
+            "credits": 1
+          },
+          {
+            "code": "EC EN 224",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 225",
+            "credits": 1
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MATH 334",
+            "credits": 3
+          },
+          {
+            "code": "STAT 201",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MATH 314",
+            "credits": 3
+          },
+          {
+            "code": "CS 235",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EC EN 240",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 340",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 330",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 380",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 391",
+            "credits": 0.5
+          },
+          {
+            "code": "EC EN 475",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 450",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 452",
+            "credits": 1
+          },
+          {
+            "code": "EC EN 462",
+            "credits": 2
+          },
+          {
+            "code": "EC EN 485",
+            "credits": 4
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "EC EN 320",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 360",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 390",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 476",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 446",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 487",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 466",
+            "credits": 2
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EC EN 445",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 433",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 483",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 464",
+            "credits": 2
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "EC EN 427",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 423",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 471",
+            "credits": 4
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Fall Envelope (Junior Core)",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "EC EN 240",
+          "EC EN 340",
+          "EC EN 330",
+          "EC EN 380",
+          "EC EN 391"
+        ]
+      },
+      {
+        "label": "Winter Envelope (Junior Core)",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "EC EN 320",
+          "EC EN 360",
+          "EC EN 390"
+        ]
+      }
+    ],
+    "_src": "https://ece.byu.edu/0000019e-2348-dcaa-a5ff-637967ba0001/ee-flowchart-26-27"
+  },
+  "Computer Engineering (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "CS 111",
+            "credits": 3
+          },
+          {
+            "code": "MATH 112",
+            "credits": 4
+          },
+          {
+            "code": "PHY 121",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 191",
+            "credits": 0.5
+          },
+          {
+            "code": "EC EN 192",
+            "credits": 1
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "CS 235",
+            "credits": 3
+          },
+          {
+            "code": "MATH 113",
+            "credits": 4
+          },
+          {
+            "code": "WRTG 312",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EC EN 224",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 225",
+            "credits": 1
+          },
+          {
+            "code": "CHEM 105",
+            "credits": 4
+          },
+          {
+            "code": "CS 236",
+            "credits": 3
+          },
+          {
+            "code": "MATH 213",
+            "credits": 2
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "EC EN 240",
+            "credits": 4
+          },
+          {
+            "code": "PHY 220",
+            "credits": 3
+          },
+          {
+            "code": "MATH 215",
+            "credits": 1
+          },
+          {
+            "code": "STAT 201",
+            "credits": 3
+          },
+          {
+            "code": "CS 240",
+            "credits": 4
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EC EN 340",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 380",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 330",
+            "credits": 4
+          },
+          {
+            "code": "MATH 334",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 475",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 391",
+            "credits": 0.5
+          },
+          {
+            "code": "EC EN 445",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 450",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 452",
+            "credits": 1
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "EC EN 320",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 390",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 476",
+            "credits": 3
+          },
+          {
+            "code": "EC EN 360",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 446",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 487",
+            "credits": 4
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "EC EN 433",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 483",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 485",
+            "credits": 4
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "EC EN 427",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 423",
+            "credits": 4
+          },
+          {
+            "code": "EC EN 471",
+            "credits": 4
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Junior Core Fall Envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "EC EN 340",
+          "EC EN 380",
+          "EC EN 330",
+          "EC EN 475",
+          "EC EN 391",
+          "EC EN 445",
+          "EC EN 450",
+          "EC EN 452"
+        ]
+      },
+      {
+        "label": "Junior Core Winter Envelope",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "EC EN 320",
+          "EC EN 390",
+          "EC EN 476",
+          "EC EN 360",
+          "EC EN 446",
+          "EC EN 487"
+        ]
+      }
+    ],
+    "_src": "https://ece.byu.edu/0000019e-2349-df27-a1de-ebfd387e0000/cpe-flowchart-26-27"
+  },
+  "Mechanical Engineering (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MATH 112",
+            "credits": 4
+          },
+          {
+            "code": "PHSCS 121",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 191",
+            "credits": 0.5
+          },
+          {
+            "code": "MEEN 101",
+            "credits": 3
+          },
+          {
+            "code": "UNIV 101",
+            "credits": 2
+          },
+          {
+            "code": "CCE 203",
+            "credits": 3
+          },
+          {
+            "code": "CS 110",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MATH 113",
+            "credits": 4
+          },
+          {
+            "code": "CHEM 105",
+            "credits": 4
+          },
+          {
+            "code": "MEEN 204",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 250",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 272",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MATH 302",
+            "credits": 4
+          },
+          {
+            "code": "PHSCS 123",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 275",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 335",
+            "credits": 3
+          },
+          {
+            "code": "WRTG 316",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MATH 303",
+            "credits": 4
+          },
+          {
+            "code": "ECEN 301",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 321",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 382",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MEEN 231",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 312",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 330",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 362",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MEEN 340",
+            "credits": 3
+          },
+          {
+            "code": "MEEN 372",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MEEN 475",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MEEN 476",
+            "credits": 3
+          }
+        ]
+      }
+    ],
+    "cohorts": [],
+    "_src": "https://www.me.byu.edu/0000019e-fa6b-dde1-a5ff-fb6b58130000/updated-me-flowchart-2026-2027"
+  },
+  "Information Technology (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IT&C 101",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 210A",
+            "credits": 2
+          },
+          {
+            "code": "CS 111",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 124",
+            "credits": 3
+          },
+          {
+            "code": "MATH 112",
+            "credits": 4
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IT&C 210B",
+            "credits": 2
+          },
+          {
+            "code": "CS 235",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 252",
+            "credits": 3
+          },
+          {
+            "code": "PHSCS 121",
+            "credits": 3
+          },
+          {
+            "code": "STAT 201",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "CS 236",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 291R",
+            "credits": 0.5
+          },
+          {
+            "code": "IT&C 255",
+            "credits": 3
+          },
+          {
+            "code": "TES 112",
+            "credits": 1
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IT&C 293",
+            "credits": 0.5
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IT&C 344",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 347",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 231",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IT&C 350",
+            "credits": 3
+          },
+          {
+            "code": "IT&C 366",
+            "credits": 3
+          },
+          {
+            "code": "ENGL 316",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IT&C 446",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IT&C 447",
+            "credits": 3
+          }
+        ]
+      }
+    ],
+    "cohorts": [],
+    "_src": "https://ece.byu.edu/00000185-ad08-df95-a99d-ef69a0580001/it2022-2023-pdf"
+  },
+  "Manufacturing Engineering (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MFGEN 130",
+            "credits": 1
+          },
+          {
+            "code": "MATH 112",
+            "credits": 4
+          },
+          {
+            "code": "PHSCS 121",
+            "credits": 3
+          },
+          {
+            "code": "MFGEN 140",
+            "credits": 3
+          },
+          {
+            "code": "CHEM 105",
+            "credits": 4
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "CCE 103",
+            "credits": 3
+          },
+          {
+            "code": "C S 110",
+            "credits": 3
+          },
+          {
+            "code": "ME EN 250",
+            "credits": 3
+          },
+          {
+            "code": "WRTG 150",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MFGEN 220",
+            "credits": 3
+          },
+          {
+            "code": "CCE 203",
+            "credits": 3
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3
+          },
+          {
+            "code": "MFGEN 291",
+            "credits": 1
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MFGEN 230",
+            "credits": 3
+          },
+          {
+            "code": "BIO 100",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MFGEN 340",
+            "credits": 3
+          },
+          {
+            "code": "MFGEN 333",
+            "credits": 3
+          },
+          {
+            "code": "MFGEN 331",
+            "credits": 4
+          },
+          {
+            "code": "MFGEN 401",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "MFGEN 381",
+            "credits": 3
+          },
+          {
+            "code": "MFGEN 355",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ME EN 475",
+            "credits": 3
+          },
+          {
+            "code": "MFGEN 491",
+            "credits": 1
+          },
+          {
+            "code": "WRTG 316",
+            "credits": 3
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "ME EN 476",
+            "credits": 3
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Junior Year Fall Envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "MFGEN 340",
+          "MFGEN 333",
+          "MFGEN 331",
+          "MFGEN 401"
+        ]
+      },
+      {
+        "label": "Junior Year Winter Envelope",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "MFGEN 381",
+          "MFGEN 355"
+        ]
+      },
+      {
+        "label": "Senior Year Fall Envelope",
+        "year": 4,
+        "season": "F",
+        "courses": [
+          "ME EN 475",
+          "MFGEN 491"
+        ]
+      },
+      {
+        "label": "Senior Year Winter Envelope",
+        "year": 4,
+        "season": "W",
+        "courses": [
+          "ME EN 476"
+        ]
+      }
+    ],
+    "_src": "https://mfgen.byu.edu/0000019d-e58c-d7cb-ad9f-ef8e9b8d0001/mfgen-flowchart-2026-2027"
+  },
+  "Information Systems (BS)": {
+    "terms": [
+      {
+        "year": 1,
+        "season": "F",
+        "courses": [
+          {
+            "code": "CS 111",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 303",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "M COM 320",
+            "credits": 3.0
+          },
+          {
+            "code": "ACC 200",
+            "credits": 3.0
+          },
+          {
+            "code": "ECON 110",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 1,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MSB 180",
+            "credits": 1.0
+          },
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "F",
+        "courses": [
+          {
+            "code": "IS 401",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 403",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 404",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 402",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
+          {
+            "code": "IS 414",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 455",
+            "credits": 3.0
+          },
+          {
+            "code": "IS 456",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          }
+        ]
+      }
+    ],
+    "cohorts": [
+      {
+        "label": "Complete junior year, fall envelope",
+        "year": 3,
+        "season": "F",
+        "courses": [
+          "IS 401",
+          "IS 403",
+          "IS 404",
+          "IS 402"
+        ]
+      },
+      {
+        "label": "Complete junior year, winter courses",
+        "year": 3,
+        "season": "W",
+        "courses": [
+          "IS 414",
+          "IS 455",
+          "IS 456"
+        ]
+      }
+    ],
+    "_src": "https://marriott.byu.edu/infosys/wp-content/uploads/sites/35/IS_Flowchart_2026_web.pdf"
+  }
+}
