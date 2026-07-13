@@ -174,6 +174,9 @@ const Solver = (() => {
      outright — a GE bucket containing one of them is auto-covered (the neuro
      student's required bio class IS their Biological Science GE) */
   let _preRequired = null;
+  /* set by expand(): courseId -> {fillKey, bucketKey, groupIdx} for classes the
+     student chose from a dropdown slot — the UI keeps these swappable */
+  let _fillMeta = null;
 
   function placeholderFill(cat, program, bucket, realPool, key, slots, completed, take, profile, group) {
     const isRel = /(^|[^a-z])rel/i.test(bucket.id) || /religion/i.test(bucket.name);
@@ -191,7 +194,10 @@ const Solver = (() => {
     // for Option 8.1 can't leak into Option 8.3's slot
     const fillKey = key + (group ? `::g${group.gi}` : "");
     const fills = ((profile.fills || {})[fillKey] || []).filter(cid => cat[cid]);
-    fills.forEach(cid => take(cid, key, 1));
+    fills.forEach(cid => {
+      take(cid, key, 1);
+      if (_fillMeta) _fillMeta.set(cid, { fillKey, bucketKey: key, groupIdx: group ? group.gi : null });
+    });
     const want = slots != null ? slots : Math.max(1, Math.round(bucket.pick.n / slotCr));
     const remaining = Math.max(0, want - alreadyDone - fills.length - covered.length);
     if (remaining <= 0) return;
@@ -237,6 +243,7 @@ const Solver = (() => {
     let doubleCounted = 0;
     const cap = profile.settings.doubleCountCap ?? 15;
 
+    const dcIds = new Set();    // which courses actually double-count
     const take = (id, bucketKey, instances = 1) => {
       if (!chosen.has(id)) chosen.set(id, { buckets: new Set(), instances: 0 });
       const rec = chosen.get(id);
@@ -244,12 +251,14 @@ const Solver = (() => {
         // sharing across buckets = double counting
         if (doubleCounted + cat[id].credits > cap) return false;
         doubleCounted += cat[id].credits;
+        dcIds.add(id);
       }
       rec.buckets.add(bucketKey);
       rec.instances = Math.max(rec.instances, instances);
       return true;
     };
 
+    _fillMeta = new Map();
     // courses the majors/minors REQUIRE outright — used to auto-cover GE
     // buckets that list them (double-count), before any bucket expands
     _preRequired = new Set();
@@ -263,7 +272,9 @@ const Solver = (() => {
           if (pool.length === 1) _preRequired.add(pool[0]);
         }
       });
-      if (p.flowchartPlan) for (const code in p.flowchartPlan) { if (cat[code]) _preRequired.add(code); }
+      if (p.flowchartPlan) for (const code in p.flowchartPlan) {
+        if (p.flowchartPlan[code].f && cat[code]) _preRequired.add(code);
+      }
     });
 
     /* Pass 1/2 — REQUIRED vs CHOICE (the LLM-guided pivot).
@@ -324,13 +335,14 @@ const Solver = (() => {
       placeholderFill(cat, p, b, realPool, key, slots, completed, take, profile);
     }));
 
-    // Pass 2.4: guarantee every course the official flowchart lists is INCLUDED
-    // (business core like HRM 391 / PSE 390 / STRAT 392, or new courses like
-    // IS 456 that the catalog requirement lists don't sequence).
+    // Pass 2.4: guarantee every course the official DEPARTMENT FLOWCHART lists
+    // is INCLUDED (business core like HRM 391 / STRAT 392, new courses like
+    // IS 456). MAP-sheet hints (no "f" flag) are sequence-only — the specific
+    // electives a MAP shows as examples must NOT be forced into the plan.
     programs.forEach(p => {
       if (!p.flowchartPlan) return;
       for (const code in p.flowchartPlan) {
-        if (cat[code] && !completed.has(code)) take(code, `${p.id}::flowchart`, 1);
+        if (p.flowchartPlan[code].f && cat[code] && !completed.has(code)) take(code, `${p.id}::flowchart`, 1);
       }
     });
 
@@ -373,7 +385,7 @@ const Solver = (() => {
       gap -= 3; en++;
     }
 
-    return { chosen, warnings, doubleCounted, completed, groupSel };
+    return { chosen, warnings, doubleCounted, completed, groupSel, dcIds, fillMeta: _fillMeta };
   }
 
   /* Build schedulable instances from chosen courses */
@@ -408,8 +420,11 @@ const Solver = (() => {
 
   function prereqSatisfied(state, inst, t, coSet) {
     const { cat, completed, assign, byUid } = state;
-    // repeatable sequencing: instance k after instance k-1
-    if (inst.k > 1) {
+    // repeatable sequencing: instance k after instance k-1 — REAL repeatable
+    // courses only (one enrollment per semester). Bucket placeholder slots are
+    // exempt (two different electives from one bucket can share a term) EXCEPT
+    // religion slots, which stay strictly one per semester (BYU pacing).
+    if (inst.k > 1 && (!inst.course.bucket || inst.course.isReligion)) {
       const prevUid = `${baseId(inst.uid)}#${inst.k - 1}`;
       const pt = assign.get(prevUid);
       if (pt === undefined || pt >= t) return false;
@@ -436,6 +451,8 @@ const Solver = (() => {
   function canPlace(state, inst, t, ignoreCap = false) {
     const term = state.terms[t];
     if (!term || !term.enabled) return false;
+    // the 4-year plan boundary: nothing schedules past the term budget
+    if (state.termBudget != null && t > state.termBudget) return false;
     if (!inst.course.off.includes(term.season)) return false;
     // soft seeding cap: first passes fill F/W to ~16 so the plan spreads into
     // enough terms to taper the final year (18 stays the hard cap for the
@@ -551,6 +568,7 @@ const Solver = (() => {
       }
       // fallback (no target year, or it wasn't available): earliest feasible term
       for (let t = minT; t < state.terms.length; t++) {
+        if (state.termBudget != null && t > state.termBudget) break;
         const term = state.terms[t];
         if (!term || !term.enabled || term.season !== blk.season) continue;
         if (state.load[t] + credits > term.cap) continue;
@@ -570,8 +588,13 @@ const Solver = (() => {
     state.depths = depths;               // scorePlan pulls deep chains early
     // freshman-only 19x seminars/projects must claim year-1 seats before the
     // GE placeholders (which can fill ANY term) soak them up
-    const froshOnly = i => (/\b19\d[A-Z]?\b/.test(i.course.display || i.course.id || "") &&
-                            courseLevel(i.course) <= 1) ? 0 : 1;
+    const froshOnly = i => ((/\b19\d[A-Z]?\b/.test(i.course.display || i.course.id || "") &&
+                             courseLevel(i.course) <= 1) ||
+                            /^(UNIV 101|WRTG 150)$/.test(baseId(i.uid))) ? 0 : 1;
+    const courseNum = i => {
+      const m = (i.course.display || i.course.id || "").match(/(\d{3})/);
+      return m ? +m[1] : 999;
+    };
     const fc = state.fcHint || {};
     const rest = state.instances
       .filter(i => !state.assign.has(i.uid) && !i.course.elective)
@@ -580,6 +603,7 @@ const Solver = (() => {
         (froshOnly(a) - froshOnly(b)) ||
         (depths.get(b.uid) - depths.get(a.uid)) ||
         (courseLevel(a.course) - courseLevel(b.course)) ||        // 1xx/2xx before 3xx/4xx
+        (courseNum(a) - courseNum(b)) ||                          // CHEM 105 before CHEM 106
         ((b.course.demand === "high") - (a.course.demand === "high")) ||
         (b.course.credits - a.course.credits));
     // multiple passes: prereq chains unlock as earlier courses land. Placement
@@ -592,7 +616,8 @@ const Solver = (() => {
           if (state.assign.has(inst.uid)) return;
           if (skipBlocks && state.blockOf.has(inst.uid)) return;   // cohort blocks placed separately
           // flowchart-hinted courses aim straight for their target year+season
-          const hint = fc[baseId(inst.uid)];
+          // (first instance only — repeats span semesters by definition)
+          const hint = inst.k === 1 ? fc[baseId(inst.uid)] : null;
           if (respectPacing && hint) {
             for (let t = 0; t < state.terms.length; t++) {
               const tm = state.terms[t];
@@ -619,6 +644,17 @@ const Solver = (() => {
     state.softCapFW = 0;     // relaxed passes get the full cap
     tryFill(true, false);
     tryFill(false, false);   // relaxed fallback for the stubborn few
+    // budget extension — LAST resort: only if real courses can't fit the
+    // 4-year budget, stretch a whole year at a time (keeps a Winter finish)
+    for (let ext = 0; ext < 3; ext++) {
+      if (!state.instances.some(i => !state.assign.has(i.uid) && !i.course.elective)) break;
+      const fwBeyond = state.terms.filter(tm =>
+        tm.isFW && tm.enabled && tm.index > state.termBudget);
+      if (fwBeyond.length < 2) break;
+      state.termBudget = fwBeyond[1].index;   // +Fall+Winter
+      tryFill(true, false);
+      tryFill(false, false);
+    }
 
     /* 4b — verify pinned courses ended up after their prerequisites */
     state.pinnedUids.forEach(uid => {
@@ -646,9 +682,10 @@ const Solver = (() => {
       }
     }
     while (ei < electives.length) {
-      // remaining electives: earliest F/W term with headroom
+      // remaining electives: earliest F/W term with headroom (inside budget)
       let placed = false;
       for (let t = 0; t < state.terms.length; t++) {
+        if (state.termBudget != null && t > state.termBudget) break;
         const term = state.terms[t];
         if (!term.enabled || !term.isFW) continue;
         if (state.load[t] + 3 <= term.cap) { place(state, electives[ei++], t); placed = true; break; }
@@ -694,8 +731,8 @@ const Solver = (() => {
       hardByTerm.set(tm.index, hard);
     });
 
-    // SPEED — finish line + number of enrolled terms
-    const speed = lastIdx * 1.4 + activeIdx.size * 0.5;
+    // (No SPEED objective: the hard term budget already fixes the plan at the
+    // classic 4-year shape — max(8, credits/16) semesters ending in Winter.)
 
     // COST — part-time F/W wastes the flat-tuition band; Sp/Su tuition is extra,
     // but a 12-month lease means housing for Sp/Su is already paid (cheaper to use it)
@@ -747,7 +784,12 @@ const Solver = (() => {
         gePerTerm.set(t, (gePerTerm.get(t) || 0) + 1);
       }
       const yr = acadYearIdx(terms, t);
-      const hint = state.fcHint && state.fcHint[baseId(uid)];
+      // first-semester courses (UNIV 101, first-year writing) stay freshman
+      // year no matter which scoring branch applies below
+      if (yr > 0 && /^(UNIV 101|WRTG 150)$/.test(baseId(uid))) structure += yr * 12;
+      // repeat instances (#2+) can't all sit in the hinted term — a repeatable
+      // seminar spans many semesters by definition, so only #1 chases the hint
+      const hint = i.k === 1 && state.fcHint && state.fcHint[baseId(uid)];
       if (hint) {
         // 2a) FLOWCHART PLACEMENT — the department's official chart is
         //     authoritative: pull the course to its recommended year+season.
@@ -771,7 +813,8 @@ const Solver = (() => {
           if (d >= 2 && !c.placeholder && !c.elective) structure += yr * (d - 1) * 1.3;
         }
         if (!c.placeholder) {
-          const isFreshmanOnly = /\b19\d[A-Z]?\b/.test(c.display || c.id || "");
+          const isFreshmanOnly = /\b19\d[A-Z]?\b/.test(c.display || c.id || "") ||
+                                 /^(UNIV 101|WRTG 150)$/.test(baseId(uid));
           const lateLimit = isFreshmanOnly ? 0 : lvl <= 1 ? 1 : lvl === 2 ? 2 : 99;
           const late = yr - lateLimit;
           if (late > 0) structure += late * (isFreshmanOnly ? 8 : lvl <= 1 ? 5 : 2.5);
@@ -813,21 +856,47 @@ const Solver = (() => {
       structure += Math.max(0, load[t] - 14) * 2.2      // over the senior taper
                  + Math.max(0, load[t] - 10) * 0.25;    // gently: lighter is better
     });
-    gePerTerm.forEach((n, t) => { if (lastTwo.has(t)) structure += n * 8; });
+    // strong but not compression-blocking: emptying a straggler term shifts
+    // the "last two" boundary onto GE-bearing terms — the compressed plan must
+    // still win, then improve() relocates those GEs earlier. And a final term
+    // STARVING below full-time takes GEs gladly (better than part-time).
+    gePerTerm.forEach((n, t) => { if (lastTwo.has(t) && load[t] >= minFW) structure += n * 8; });
     fwActive.forEach(t => { if (load[t] < minFW) structure += (minFW - load[t]) * 2.0; });
     // over BYU's 18-credit registration cap (a rigid envelope can force a term
     // over; everything MOVABLE should clear out of its way)
     fwActive.forEach(t => { if (load[t] > BYU_HARD_CAP) structure += (load[t] - BYU_HARD_CAP) * 9; });
-    for (let t = firstIdx + 1; t < lastIdx; t++) {
+    // every budget term is a real semester: an empty Fall/Winter inside the
+    // 4-year budget is a gap (and an empty FINAL Winter breaks the April
+    // graduation) — the plan spreads to fill all of them
+    const spanEnd = state.termBudget != null ? state.termBudget : lastIdx - 1;
+    for (let t = firstIdx + 1; t <= spanEnd; t++) {
       const tm = terms[t];
-      if (tm.isFW && tm.enabled && load[t] === 0) structure += 15;
+      if (tm && tm.isFW && tm.enabled && load[t] === 0) structure += 15;
     }
-    if (fwActive.length && terms[fwActive[fwActive.length - 1]].season === "F") structure += 2.5;
+    if (fwActive.length && terms[fwActive[fwActive.length - 1]].season === "F") structure += 8;
+    // 6) lower number first within a department level: CHEM 105 before
+    //    CHEM 106, MATH 302 before 303 — patches gaps in catalog prereq data
+    //    (same term is fine; only a strictly LATER lower number is penalized)
+    if (state.seqGroups) {
+      const termOf = id => {
+        const t = assign.get(id);
+        return t !== undefined ? t : assign.get(`${id}#1`);
+      };
+      state.seqGroups.forEach(group => {
+        for (let i = 0; i < group.length - 1; i++) {
+          for (let j = i + 1; j < group.length; j++) {
+            if (group[i].num === group[j].num) continue;
+            const ti = termOf(group[i].id), tj = termOf(group[j].id);
+            if (ti !== undefined && tj !== undefined && ti > tj) structure += 3;
+          }
+        }
+      });
+    }
 
     const total =
-      (w.speed / 5) * speed + (w.cost / 5) * cost + (w.risk / 5) * risk +
+      (w.cost / 5) * cost + (w.risk / 5) * risk +
       (w.life / 5) * life + structure;
-    return { total, parts: { speed, cost, risk, life, structure } };
+    return { total, parts: { cost, risk, life, structure } };
   }
 
   /* --------------------------- improvement --------------------------- */
@@ -843,7 +912,7 @@ const Solver = (() => {
       const out = [];
       state.instances.forEach(i => {
         if (i.uid !== uid && i.course.pre.flat().includes(bid)) out.push(i);
-        if (baseId(i.uid) === bid && i.k > state.byUid.get(uid).k) out.push(i); // later repeats
+        if (baseId(i.uid) === bid && (!i.course.bucket || i.course.isReligion) && i.k > state.byUid.get(uid).k) out.push(i); // later repeats (sequenced courses only)
       });
       return out;
     };
@@ -892,7 +961,7 @@ const Solver = (() => {
       const t = state.assign.get(i.uid);
       if (t === undefined) return;
       if (i.course.pre.flat().includes(bid)) m = Math.min(m, t);
-      if (baseId(i.uid) === bid && i.k > state.byUid.get(uid).k) m = Math.min(m, t);
+      if (baseId(i.uid) === bid && (!i.course.bucket || i.course.isReligion) && i.k > state.byUid.get(uid).k) m = Math.min(m, t);
     });
     return m;
   }
@@ -916,17 +985,71 @@ const Solver = (() => {
           const depLimit = depLimitOf(state, uid);
           unplace(state, inst);
           let placed = false;
-          for (let x = 0; x < state.terms.length && x < depLimit; x++) {
-            if (x === t) continue;
+          // lightest destination first — dumping everything into one early
+          // term stacks religion/GE and gets the whole move rejected
+          const order = state.terms.map(tm => tm.index)
+            .filter(x => x !== t && x < depLimit && !lows.includes(x))
+            .sort((a, b) => state.load[a] - state.load[b]);
+          for (const x of order) {
             if (canPlace(state, inst, x)) { place(state, inst, x); moved.push(inst); placed = true; break; }
           }
           if (!placed) { place(state, inst, t); ok = false; break; }
         }
-        if (!ok || scorePlan(state).total > before) {
+        // small tolerance: emptying a straggler shifts the last-two boundary
+        // and briefly looks worse; the improve() pass after cleans that up
+        if (!ok || scorePlan(state).total > before + 3) {
           moved.forEach(inst => { unplace(state, inst); place(state, inst, t); });
         } else if (ok) { emptied = true; }
       }
       if (!emptied) break;
+    }
+  }
+
+  /* Targeted rebalance: pull courses from the heaviest terms into starved
+     (below-minimum) ones. Random hill-climbing rarely samples exactly this
+     donor→starved pair, so extended plans kept 2-5 credit tail terms. */
+  function fillLight(state) {
+    const minFW = state.profile.settings.minCreditsFW || 12;
+    for (let round = 0; round < 40; round++) {
+      const activeIdx = new Set(state.assign.values());
+      let first = Infinity;
+      activeIdx.forEach(t => first = Math.min(first, t));
+      // starved candidates include EMPTY budget terms — an empty final Winter
+      // otherwise strands the plan on a Fall finish
+      const fw = state.terms.filter(tm => tm.isFW && tm.enabled &&
+        (activeIdx.has(tm.index) ||
+         (state.termBudget != null && tm.index > first && tm.index <= state.termBudget)))
+        .map(tm => tm.index);
+      const starved = fw.filter(t => state.load[t] < minFW)
+        .sort((a, b) => state.load[a] - state.load[b])[0];
+      if (starved === undefined) return;
+      const donors = fw.filter(t => t !== starved && activeIdx.has(t))
+        .sort((a, b) => state.load[b] - state.load[a]);
+      // filling an EMPTY term takes several moves before the score nets
+      // positive (each early move sits below full time) — move a batch of
+      // courses to the floor in one score-gated step
+      const before = scorePlan(state).total;
+      const batch = [];
+      for (const d of donors) {
+        if (state.load[starved] >= minFW) break;
+        if (state.load[d] <= state.load[starved] + 3) break;   // nothing meaningfully heavier
+        const uids = [...state.assign].filter(([, t]) => t === d).map(([u]) => u);
+        for (const uid of uids) {
+          if (state.load[starved] >= minFW) break;
+          const inst = state.byUid.get(uid);
+          if (state.pinnedUids.has(uid) || state.blockOf.has(uid)) continue;
+          if (state.load[d] >= minFW && state.load[d] - inst.course.credits < minFW) continue;
+          if (starved >= depLimitOf(state, uid)) continue;
+          unplace(state, inst);
+          if (canPlace(state, inst, starved)) { place(state, inst, starved); batch.push([inst, d]); }
+          else place(state, inst, d);
+        }
+      }
+      if (!batch.length) return;
+      if (scorePlan(state).total > before + 0.01) {            // didn't pay off — revert
+        batch.forEach(([inst, d]) => { unplace(state, inst); place(state, inst, d); });
+        return;
+      }
     }
   }
 
@@ -1028,9 +1151,10 @@ const Solver = (() => {
       }
 
       // SEASON check — pinned/moved courses can sit in a term the class
-      // isn't normally taught.
+      // isn't normally taught. Envelope members are exempt: the department
+      // enrolls the cohort as a block regardless of the catalog season.
       const tm = terms[t];
-      if (tm && c.off && !c.off.includes(tm.season)) {
+      if (tm && c.off && !c.off.includes(tm.season) && !state.blockOf.has(uid)) {
         addCF(uid, "warn", `${c.display || baseId(uid)} isn't normally taught in ${SEASON_NAME[tm.season]} (offered: ${[...c.off].map(s => SEASON_NAME[s]).join(", ")}).`);
       }
     });
@@ -1136,6 +1260,18 @@ const Solver = (() => {
     const expandRes = expand(profile, programs, cat);
     const instances = buildInstances(expandRes.chosen, expandRes.completed, cat);
     const state = makeState(profile, terms, instances, cat, expandRes.completed);
+    // HARD TERM BUDGET — the classic 4-year plan. Every plan targets
+    // max(8, credits/16) Fall/Winter semesters, extended so the LAST one is a
+    // Winter (graduate in April). seed/improve/consolidate all stay inside it;
+    // it only stretches (by whole years) if courses genuinely can't fit.
+    {
+      let planCr = 0;
+      instances.forEach(i => { planCr += i.course.credits; });
+      const fwEnabled = terms.filter(tm => tm.isFW && tm.enabled);
+      let n = Math.max(8, Math.ceil(planCr / 16));
+      while (n < fwEnabled.length && fwEnabled[n - 1] && fwEnabled[n - 1].season !== "W") n++;
+      state.termBudget = fwEnabled[Math.min(n, fwEnabled.length) - 1].index;
+    }
     // flowchart placement hints: courseId -> {y (1-based year), s (F/W)}. The
     // official department flowchart, where we have one, overrides the generic
     // level-pacing heuristic for those courses.
@@ -1146,6 +1282,24 @@ const Solver = (() => {
         if (!state.fcHint[code]) state.fcHint[code] = p.flowchartPlan[code];
       }
     });
+    // sequence groups for the "lower number first" rule: same dept + same
+    // hundreds level (CHEM 105 before CHEM 106, MATH 302 before 303, ...)
+    state.seqGroups = (() => {
+      const g = new Map();
+      const seen = new Set();
+      instances.forEach(i => {
+        const id = baseId(i.uid);
+        if (seen.has(id) || i.course.placeholder || i.course.elective) return;
+        seen.add(id);
+        const m = id.match(/^([A-Z][A-Z &]*?)\s*(\d)(\d{2})[A-Z]?$/);
+        if (!m) return;
+        const key = `${m[1]}:${m[2]}`;
+        if (!g.has(key)) g.set(key, []);
+        g.get(key).push({ id, num: +(m[2] + m[3]) });
+      });
+      return [...g.values()].filter(a => a.length >= 2)
+        .map(a => a.sort((x, y) => x.num - y.num));
+    })();
 
     const { problems, unscheduled } = seed(state, programs);
     const seedNum = (hashStr(JSON.stringify({
@@ -1155,6 +1309,10 @@ const Solver = (() => {
     consolidate(state);                        // empty straggler light terms
     expandTail(state);                         // open a light final term if the tail is crammed
     improve(state, 400, seedNum ^ 0x9e3779b9); // settle after the compound moves
+    consolidate(state);                        // second sweep once the tail is clean
+    fillLight(state);                          // rebalance heavy → starved terms
+    improve(state, 300, seedNum ^ 0x51ed2701);
+    fillLight(state);
 
     const score = scorePlan(state);
     const { flags, courseFlags } = analyze(state, expandRes, programs, problems);
@@ -1164,6 +1322,21 @@ const Solver = (() => {
     const placements = [];
     state.assign.forEach((t, uid) => {
       const inst = state.byUid.get(uid);
+      const fm = expandRes.fillMeta && expandRes.fillMeta.get(baseId(uid));
+      if (fm) {
+        // a class the student picked from a dropdown slot — stays swappable
+        placements.push({
+          uid, termIndex: t,
+          courseId: baseId(uid), display: inst.course.display || baseId(uid),
+          name: inst.course.name, credits: inst.course.credits,
+          diff: inst.course.diff, buckets: inst.buckets,
+          pinned: state.pinnedUids.has(uid), block: state.blockOf.get(uid) || null,
+          flags: courseFlags.get(uid) || [],
+          placeholder: false, elective: false, bucket: false,
+          isFill: true, fillKey: fm.fillKey, bucketKey: fm.bucketKey, groupIdx: fm.groupIdx,
+        });
+        return;
+      }
       placements.push({
         uid, termIndex: t,
         courseId: baseId(uid), display: inst.course.display || baseId(uid),
@@ -1182,7 +1355,8 @@ const Solver = (() => {
     });
 
     if (expandRes.doubleCounted > 0) {
-      flags.push({ level: "info", icon: "clone", text: `${expandRes.doubleCounted} credits double-counted across programs (cap: ${profile.settings.doubleCountCap} cr).` });
+      const names = [...expandRes.dcIds].map(id => cat[id]?.display || id).join(", ");
+      flags.push({ level: "info", icon: "clone", text: `${expandRes.doubleCounted} credits double-counted across programs (cap: ${profile.settings.doubleCountCap} cr): ${names}. Click a class for the requirements it fills.` });
     }
 
     return {
@@ -1192,7 +1366,22 @@ const Solver = (() => {
       unscheduled: unscheduled.map(i => ({ uid: i.uid, name: i.course.name })),
       solveMs: Math.round(performance.now() - t0),
       state, // kept live for drag-drop validation
+      _ctx: { expandRes, programsFull: programs, problems }, // for reanalyze()
     };
+  }
+
+  /* Recompute flags + per-course warnings on the LIVE state (after a manual
+     move) so a fixed prerequisite order clears its stale warning immediately. */
+  function reanalyze(result) {
+    const { expandRes, programsFull, problems } = result._ctx || {};
+    if (!expandRes) return;
+    const { flags, courseFlags } = analyze(result.state, expandRes, programsFull, problems);
+    if (expandRes.doubleCounted > 0) {
+      const names = [...expandRes.dcIds].map(id => result.state.cat[id]?.display || id).join(", ");
+      flags.push({ level: "info", icon: "clone", text: `${expandRes.doubleCounted} credits double-counted across programs (cap: ${result.state.profile.settings.doubleCountCap} cr): ${names}. Click a class for the requirements it fills.` });
+    }
+    result.flags = flags;
+    result.placements.forEach(p => { p.flags = courseFlags.get(p.uid) || []; });
   }
 
   /* validate a manual drag of uid -> targetTerm on a solved state */
@@ -1216,7 +1405,7 @@ const Solver = (() => {
       const t2 = state.assign.get(i.uid);
       if (t2 === undefined) return;
       if (i.course.pre.flat().includes(baseId(uid)) && t2 <= targetTermIndex) { depOk = false; depName = i.course.display || baseId(i.uid); }
-      if (baseId(i.uid) === baseId(uid) && i.k > inst.k && t2 <= targetTermIndex) { depOk = false; depName = i.course.display || baseId(i.uid); }
+      if (baseId(i.uid) === baseId(uid) && (!inst.course.bucket || inst.course.isReligion) && i.k > inst.k && t2 <= targetTermIndex) { depOk = false; depName = i.course.display || baseId(i.uid); }
     });
     place(state, inst, from);
     if (!preOk) return { ok: false, reason: `Prerequisites for ${inst.course.display || uid} wouldn't be complete before ${term.label}.` };
@@ -1241,7 +1430,8 @@ const Solver = (() => {
     if (p) { p.termIndex = targetTermIndex; p.pinned = true; }
     state.pinnedUids.add(uid);
     result.score = scorePlan(state);
+    reanalyze(result);   // warnings track the move (stale prereq flags clear)
   }
 
-  return { solve, validateMove, applyMove, SEASON_NAME };
+  return { solve, validateMove, applyMove, reanalyze, SEASON_NAME };
 })();

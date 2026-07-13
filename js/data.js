@@ -182,6 +182,9 @@ const DATA = (() => {
   const UNIV_CORE = {
     id: "univ-core", name: "University Core (GE + Religion)", type: "core", credits: 39,
     buckets: [
+      { id: "univ101", name: "BYU Foundations for Student Success", pick: { type: "all" },
+        options: ["UNIV 101"],
+        note: "UNIV 101 is required for all new freshmen — take it your first semester." },
       { id: "fyw", name: "First-Year Writing", pick: { type: "courses", n: 1 },
         options: ["WRTG 150"], waivableByExam: true },
       ...(GE_REAL || HAND_GE_BUCKETS),
@@ -508,6 +511,19 @@ const DATA = (() => {
     ...p, detailed: true,
     college: p.college || "BYU",
   })) : [];
+
+  // The hand IS programs replace the catalog IS record (they encode the cohort
+  // blocks), but they must still inherit the catalog's flowchart/MAP placement
+  // hints — incl. force-included precore (IS 110, MSB 180, GSCM 201/211) and
+  // the year-4 business core (HRM 391, PSE 390, STRAT 392).
+  if (HAVE_REAL) {
+    const catIS = CATALOG_DATA.programs.find(p =>
+      p.type === "major" && /^Information Systems \(BS\)$/.test(p.name));
+    if (catIS && catIS.flowchartPlan) {
+      IS_BS.flowchartPlan = catIS.flowchartPlan;
+      IS_BS_MISM.flowchartPlan = catIS.flowchartPlan;
+    }
+  }
 
   const majors = HAVE_REAL
     ? [

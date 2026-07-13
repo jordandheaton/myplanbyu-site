@@ -1,0 +1,13051 @@
+{
+ "Accounting (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 310",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ACC 401",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 403",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 406",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 408",
+      "credits": 1.5
+     },
+     {
+      "code": "ACC 410",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 402",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 407",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 405",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 411",
+      "credits": 1.5
+     },
+     {
+      "code": "ACC 409",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ACC 404",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 402",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 571",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 391",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 241",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741198276870/xbYpWXUjgidc.pdf"
+ },
+ "Acting (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 122",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 125",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 128",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 115",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 140",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 228",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 222",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 102",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 127",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 223",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 225",
+      "credits": 2.0
+     },
+     {
+      "code": "MDT 229",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 267",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 260R",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 224",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 322",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 324",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 325",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 240",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 421",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 422",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 424",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 428",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 410",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 427",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 491",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741198361555/iPPydhuzwhOS.pdf"
+ },
+ "Actuarial Science (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 130",
+      "credits": 0.5
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "STAT 274",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STAT 230",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 250",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     },
+     {
+      "code": "STAT 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STAT 330",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 344",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 346",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 390",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STAT 348",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 444",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743525977742/vztnfh9cE4pa.pdf"
+ },
+ "American Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "AM ST 303",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "AM ST 304",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IAS 300",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741210867703/lYKJA9KiRhdD.pdf"
+ },
+ "Animation (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "DESAN 101",
+      "credits": 1.0
+     },
+     {
+      "code": "CSANM 150",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESAN 102",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 110",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 102",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CSANM 210",
+      "credits": 3.0
+     },
+     {
+      "code": "CSANM 250",
+      "credits": 3.0
+     },
+     {
+      "code": "DESAN 250R",
+      "credits": 3.0
+     },
+     {
+      "code": "DESAN 262",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CSANM 258",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 294",
+      "credits": 3.0
+     },
+     {
+      "code": "ARTHC 201",
+      "credits": 3.0
+     },
+     {
+      "code": "DESAN 363R",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARTHC 202",
+      "credits": 3.0
+     },
+     {
+      "code": "CSANM 352R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESAN 460",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1766417532270/LlcED93HY3eJ.pdf"
+ },
+ "Anthropology: Cultural and Linguistic Double Major (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ANTHR 101",
+      "credits": 3.0
+     },
+     {
+      "code": "ANTHR 150",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ANTHR 304",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ANTHR 305",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ANTHR 442",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ANTHR 495R",
+      "credits": 6.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ANTHR 499",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741623540549/EbR9XOoqp5Pj.pdf"
+ },
+ "Applied English Linguistics (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ELING 223",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ELING 273",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ELING 332",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ELING 325",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ELING 326",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ELING 324",
+      "credits": 3.0
+     },
+     {
+      "code": "ELING 327",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ELING 495R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741202548648/rmYnuHD8lJI5.pdf"
+ },
+ "Applied Physics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 191",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "C S 111",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 225",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 230",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 291",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 302",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 222",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 240",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 303",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 245",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 318",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 321",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 330",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 430",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 441",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741206503232/JAXfT8ameMjz.pdf"
+ },
+ "Arabic Language (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARAB 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARAB 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IHUM 242",
+      "credits": 3.0
+     },
+     {
+      "code": "ARAB 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARAB 202",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARAB 211R",
+      "credits": 2.0
+     },
+     {
+      "code": "ARAB 300",
+      "credits": 4.0
+     },
+     {
+      "code": "ARAB 302",
+      "credits": 4.0
+     },
+     {
+      "code": "ARAB 311R",
+      "credits": 2.0
+     },
+     {
+      "code": "ARAB 331",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARAB 411R",
+      "credits": 3.0
+     },
+     {
+      "code": "ARAB 495R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741207811522/MEO174CNUGTI.pdf"
+ },
+ "Art (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ART 133",
+      "credits": 3.0
+     },
+     {
+      "code": "ART 102",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ART 210",
+      "credits": 3.0
+     },
+     {
+      "code": "ART 220",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ART 216",
+      "credits": 1.5
+     },
+     {
+      "code": "ART 217",
+      "credits": 1.5
+     },
+     {
+      "code": "ART 225",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ART 320",
+      "credits": 3.0
+     },
+     {
+      "code": "ART 215",
+      "credits": 3.0
+     },
+     {
+      "code": "ART 395R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ART 480R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ART 326",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ART 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ART 497",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741210405807/uEyWv68D0NyI.pdf"
+ },
+ "Art Education K-12 (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ART 133",
+      "credits": 3.0
+     },
+     {
+      "code": "ART 102",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARTED 326",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ART 260",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ART 216",
+      "credits": 1.5
+     },
+     {
+      "code": "ART 217",
+      "credits": 1.5
+     },
+     {
+      "code": "ART 395R",
+      "credits": 0.5
+     },
+     {
+      "code": "SC ED 350",
+      "credits": 2.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARTED 339",
+      "credits": 3.0
+     },
+     {
+      "code": "ARTED 397",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARTED 380",
+      "credits": 3.0
+     },
+     {
+      "code": "ARTED 378",
+      "credits": 3.0
+     },
+     {
+      "code": "ARTED 450",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARTED 478",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARTED 476R",
+      "credits": 12.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741280411880/UiOK0SAnRyQb.pdf"
+ },
+ "Art History & Curatorial Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARTHC 201",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARTHC 202",
+      "credits": 3.0
+     },
+     {
+      "code": "ART 200",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARTHC 300",
+      "credits": 3.0
+     },
+     {
+      "code": "HCOLL 110",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741286238820/ZKaCzMWw0s5Z.pdf"
+ },
+ "Biochemistry (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 201",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 227",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 351M",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 297R",
+      "credits": 0.5
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 381",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 384",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 497R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 482",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 584",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 468",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 483",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 586",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 489",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 594R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 495",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743788540112/RUel5ESekVkJ.pdf"
+ },
+ "Biodiversity & Conservation (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     },
+     {
+      "code": "BIO 130",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 220",
+      "credits": 4.0
+     },
+     {
+      "code": "BIO 264",
+      "credits": 4.0
+     },
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 230",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     },
+     {
+      "code": "BIO 350",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 420",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741295041768/U3Vvb2KMRpk3.pdf"
+ },
+ "Bioinformatics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 130",
+      "credits": 4.0
+     },
+     {
+      "code": "BIO 165",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 111",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 264",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "CS 235",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 250",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 236",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 240",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 312",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 364",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 465",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741295581499/uvh6rVziXeNy.pdf"
+ },
+ "Biological Science Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 130",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 220",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 230",
+      "credits": 4.0
+     },
+     {
+      "code": "BIO 276",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 101",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 380",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 350",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 377",
+      "credits": 3.0
+     },
+     {
+      "code": "BIO 378",
+      "credits": 1.0
+     },
+     {
+      "code": "BIO 379",
+      "credits": 1.0
+     },
+     {
+      "code": "BIO 420",
+      "credits": 4.0
+     },
+     {
+      "code": "BIO 470",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 476",
+      "credits": 12.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741296842240/yENyJDJd4JkY.pdf"
+ },
+ "Biology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 130",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 350",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 420",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741297902303/kW31FgsaFq0e.pdf"
+ },
+ "Biophysics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 120",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 250",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 241",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 351",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 352",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 353",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 360",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 481",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 225",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CELL 362",
+      "credits": 3.0
+     },
+     {
+      "code": "CELL 363",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 468",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 455R",
+      "credits": 0.5
+     },
+     {
+      "code": "CELL 568",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741298897476/vyRVAfy4f2jY.pdf"
+ },
+ "Business Management (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     },
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 325",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MSB 326",
+      "credits": 1.0
+     },
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MSB 413",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741300241977/jDTnXP23wovo.pdf"
+ },
+ "Cell Biology and Physiology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 120",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 220",
+      "credits": 4.0
+     },
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 241",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 351",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CELL 325",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 352",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 106",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 360",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 481",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CELL 362",
+      "credits": 3.0
+     },
+     {
+      "code": "CELL 363",
+      "credits": 1.0
+     },
+     {
+      "code": "CELL 382",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 455R",
+      "credits": 0.5
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741633473666/H09gzq66Zugq.pdf"
+ },
+ "Chemical Engineering (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "WRTG 150",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 170",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 111",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "CH EN 191",
+      "credits": 0.5
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 112",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CH EN 263",
+      "credits": 2.0
+     },
+     {
+      "code": "CH EN 273",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 291",
+      "credits": 0.5
+     },
+     {
+      "code": "CHEM 357",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 302",
+      "credits": 4.0
+     },
+     {
+      "code": "STAT 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CH EN 374",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 311",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 285",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 303",
+      "credits": 4.0
+     },
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CH EN 378",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 386",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 345",
+      "credits": 0.5
+     },
+     {
+      "code": "CH EN 391",
+      "credits": 0.5
+     },
+     {
+      "code": "CH EN 467",
+      "credits": 3.0
+     },
+     {
+      "code": "EC EN 301",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CH EN 373",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 376",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 385",
+      "credits": 0.5
+     },
+     {
+      "code": "ENGL 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CH EN 436",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 476",
+      "credits": 3.0
+     },
+     {
+      "code": "CH EN 479",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CH EN 451",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741644537915/rxFX1Kmtz1oc.pdf"
+ },
+ "Chemistry (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 201",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 227",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 297R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 381",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 384",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 497R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 460",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 391",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 495",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743787438128/Jg0FHDqKrf5K.pdf"
+ },
+ "Chemistry (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 201",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 227",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 291R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 381",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 497R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 460",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 462",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 514",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 518",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 463",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 594R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 495",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743787297515/b9qW1F5UDLks.pdf"
+ },
+ "Chemistry Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 111",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 112",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 113",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 201",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 227",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 150",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 291R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     },
+     {
+      "code": "PHY S 276",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 497R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     },
+     {
+      "code": "PHIL 423",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 331",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 495",
+      "credits": 1.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "PHY S 377",
+      "credits": 3.0
+     },
+     {
+      "code": "PHY S 378",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743183570467/d195CAP9Ci2M.pdf"
+ },
+ "Chinese (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHIN 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHIN 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHIN 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHIN 202",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHIN 301",
+      "credits": 4.0
+     },
+     {
+      "code": "CHIN 345R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHIN 302",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHIN 441",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHIN 495",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741706906168/iIh47xIpEQgm.pdf"
+ },
+ "Civil Engineering (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CCE 102",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CCE 103",
+      "credits": 3.0
+     },
+     {
+      "code": "CCE 122",
+      "credits": 1.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CE 291R",
+      "credits": 0.5
+     },
+     {
+      "code": "CCE 203",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CE 270",
+      "credits": 3.0
+     },
+     {
+      "code": "CE 232",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 314",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 334",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CE 471",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741711763542/LZVw0xgOa6ei.pdf"
+ },
+ "Commercial Music (BM)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 186",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 251",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 260R",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 256",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 221",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 222",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 286",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 301",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 308",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742234817395/iW1A4XCPizi8.pdf"
+ },
+ "Communication Disorders (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "COMD 133",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 167",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "PHYS 167",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ASL 101",
+      "credits": 4.0
+     },
+     {
+      "code": "COMD 211",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 213",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 215",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "COMD 321",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 325",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 323",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "COMD 431",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 335",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "COMD 445",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 420",
+      "credits": 3.0
+     },
+     {
+      "code": "COMD 450",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "COMD 460",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741719130741/s3f4s5KH5BgM.pdf"
+ },
+ "Comparative Literature (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HCOLL 110",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CMLIT 342",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CMLIT 497",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741724297432/aSRKZKiAWpMr.pdf"
+ },
+ "Computer Engineering (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "EC EN 191",
+      "credits": 0.5
+     },
+     {
+      "code": "EC EN 192",
+      "credits": 1.0
+     },
+     {
+      "code": "C S 111",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "C S 235",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "C S 236",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "C S 240",
+      "credits": 4.0
+     },
+     {
+      "code": "EC EN 240",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 334",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EC EN 330",
+      "credits": 4.0
+     },
+     {
+      "code": "EC EN 340",
+      "credits": 4.0
+     },
+     {
+      "code": "EC EN 391",
+      "credits": 0.5
+     },
+     {
+      "code": "EC EN 380",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 320",
+      "credits": 4.0
+     },
+     {
+      "code": "STAT 201",
+      "credits": 3.0
+     },
+     {
+      "code": "EC EN 390",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EC EN 475",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 476",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1755198741768/d3dtcXWIRsxZ.pdf"
+ },
+ "Computer Science (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 111",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "CS 191",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 235",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 260",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 236",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 224",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 291",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 240",
+      "credits": 4.0
+     },
+     {
+      "code": "CS 252",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 312",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 340",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 324",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 404",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741979410106/T8AVpBP1rfXj.pdf"
+ },
+ "Cybersecurity (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 101",
+      "credits": 3.0
+     },
+     {
+      "code": "EC EN 191",
+      "credits": 0.5
+     },
+     {
+      "code": "EC EN 192",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "C S 111",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 235",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 266",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 210A",
+      "credits": 2.0
+     },
+     {
+      "code": "IT&C 210B",
+      "credits": 2.0
+     },
+     {
+      "code": "IT&C 291R",
+      "credits": 0.5
+     },
+     {
+      "code": "IT&C 247",
+      "credits": 3.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 224",
+      "credits": 3.0
+     },
+     {
+      "code": "EC EN 225",
+      "credits": 1.0
+     },
+     {
+      "code": "IT&C 293",
+      "credits": 0.5
+     },
+     {
+      "code": "STAT 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 231",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 344",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IT&C 350",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 366",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EC EN 475",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 567",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 476",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 566",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1772725215300/Rm5HtyR9bm2K.pdf"
+ },
+ "Dance (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 261",
+      "credits": 1.0
+     },
+     {
+      "code": "DANCE 244",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 230",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 317",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 460",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741899882659/OK744i9zeDIG.pdf"
+ },
+ "Dance (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 241R",
+      "credits": 1.5
+     },
+     {
+      "code": "DANCE 229R",
+      "credits": 0.5
+     },
+     {
+      "code": "DANCE 261",
+      "credits": 1.0
+     },
+     {
+      "code": "CELL 220",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 243",
+      "credits": 2.5
+     },
+     {
+      "code": "DANCE 244R",
+      "credits": 1.0
+     },
+     {
+      "code": "DANCE 230",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 363",
+      "credits": 1.0
+     },
+     {
+      "code": "DANCE 355",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 317",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 342",
+      "credits": 4.0
+     },
+     {
+      "code": "DANCE 264",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 343",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 462R",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 459",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 351",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 469",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741971896226/M9cZGPpuMGtv.pdf"
+ },
+ "Dance Education K-12 (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 241R",
+      "credits": 1.5
+     },
+     {
+      "code": "DANCE 180",
+      "credits": 1.0
+     },
+     {
+      "code": "DANCE 261",
+      "credits": 1.0
+     },
+     {
+      "code": "DANCE 264",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 243R",
+      "credits": 2.5
+     },
+     {
+      "code": "DANCE 244R",
+      "credits": 1.0
+     },
+     {
+      "code": "CELL 220",
+      "credits": 4.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 230",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 346",
+      "credits": 3.0
+     },
+     {
+      "code": "DANCE 363",
+      "credits": 1.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 340R",
+      "credits": 2.5
+     },
+     {
+      "code": "DANCE 351",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 362",
+      "credits": 2.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 350",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 343",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 345",
+      "credits": 1.5
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 355",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 365",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 366",
+      "credits": 2.0
+     },
+     {
+      "code": "DANCE 462R",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DANCE 460",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741965219561/ykTfUQO9pxrN.pdf"
+ },
+ "Data Science (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "C S 111",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 115",
+      "credits": 0.5
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "C S 180",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STAT 230",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 270",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 281",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 235",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "C S 240",
+      "credits": 4.0
+     },
+     {
+      "code": "STAT 330",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 380",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 240",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 386",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 452",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 383",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 251",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 404",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743525003394/f8T93Z2NX9ne.pdf"
+ },
+ "Dietetics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NDFS 300",
+      "credits": 4.0
+     },
+     {
+      "code": "NDFS 405",
+      "credits": 0.5
+     },
+     {
+      "code": "NDFS 440",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 356",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 424",
+      "credits": 2.0
+     },
+     {
+      "code": "NDFS 445",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NDFS 400",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 455",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 458",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 491",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 434",
+      "credits": 4.0
+     },
+     {
+      "code": "NDFS 466",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 475",
+      "credits": 2.0
+     },
+     {
+      "code": "NDFS 490",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742333584826/fQ1ooauc6F9N.pdf"
+ },
+ "Early Childhood Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SFL 210",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECE 200",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECE 301",
+      "credits": 3.0
+     },
+     {
+      "code": "EL ED 203",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CPSE 300",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECE 355",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 305",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECE 299R",
+      "credits": 2.0
+     },
+     {
+      "code": "ECE 330",
+      "credits": 3.0
+     },
+     {
+      "code": "ECE 333",
+      "credits": 3.0
+     },
+     {
+      "code": "ECE 336",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 370",
+      "credits": 2.0
+     },
+     {
+      "code": "ECE 340",
+      "credits": 2.0
+     },
+     {
+      "code": "EDLF 411",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECE 399R",
+      "credits": 2.0
+     },
+     {
+      "code": "ECE 430",
+      "credits": 2.0
+     },
+     {
+      "code": "ECE 433",
+      "credits": 3.0
+     },
+     {
+      "code": "ECE 444",
+      "credits": 2.0
+     },
+     {
+      "code": "ECE 446",
+      "credits": 3.0
+     },
+     {
+      "code": "ECE 447",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741819037072/dHsGlBt5IDs3.pdf"
+ },
+ "Earth & Space Science Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOL 111",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 137",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOL 491R",
+      "credits": 0.5
+     },
+     {
+      "code": "PHSCS 127",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOL 411",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     },
+     {
+      "code": "PHY S 276R",
+      "credits": 4.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CP SE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     },
+     {
+      "code": "PHY S 377",
+      "credits": 3.0
+     },
+     {
+      "code": "PHY S 378",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1751312491561/ta1ToKGgvagE.pdf"
+ },
+ "Economics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "ECON 210",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECON 378",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 380",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 381",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 382",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 388",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECON 398",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742337346845/zzY0qA0Kbasu.pdf"
+ },
+ "Editing and Publishing (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DIGHT 230",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ELING 430",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ELING 495R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742411119044/zfbadvM3qkVz.pdf"
+ },
+ "Electrical Engineering (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "EC EN 191",
+      "credits": 0.5
+     },
+     {
+      "code": "EC EN 192",
+      "credits": 1.0
+     },
+     {
+      "code": "C S 111",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "C S 235",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 240",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 314",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 334",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EC EN 330",
+      "credits": 4.0
+     },
+     {
+      "code": "EC EN 340",
+      "credits": 4.0
+     },
+     {
+      "code": "EC EN 391",
+      "credits": 0.5
+     },
+     {
+      "code": "EC EN 380",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 360",
+      "credits": 4.0
+     },
+     {
+      "code": "STAT 201",
+      "credits": 3.0
+     },
+     {
+      "code": "EC EN 390",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EC EN 475",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 476",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1755198904448/AnDbb98Xxj2G.pdf"
+ },
+ "Elementary Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARTED 326",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 305",
+      "credits": 2.0
+     },
+     {
+      "code": "SFL 210",
+      "credits": 3.0
+     },
+     {
+      "code": "EL ED 200",
+      "credits": 2.0
+     },
+     {
+      "code": "PETE 169",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CPSE 300",
+      "credits": 3.0
+     },
+     {
+      "code": "EL ED 340",
+      "credits": 3.0
+     },
+     {
+      "code": "EL ED 203",
+      "credits": 2.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     },
+     {
+      "code": "MTHED 306",
+      "credits": 2.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EL ED 445",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PETE 212",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EDLF 411",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741818174060/xA1z8qnEQPmY.pdf"
+ },
+ "English (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENGL 203",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ENGL 302",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENGL 303",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742411716244/HynSSgoaRIHW.pdf"
+ },
+ "English Teaching (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENGL 203",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ENGL 303",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENGL 276R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENGL 382",
+      "credits": 3.0
+     },
+     {
+      "code": "ENGL 420",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ENGL 378",
+      "credits": 3.0
+     },
+     {
+      "code": "ENGL 426",
+      "credits": 2.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENGL 329",
+      "credits": 3.0
+     },
+     {
+      "code": "ENGL 423",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ENGL 479",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1756486850230/vrAbFWYssAAb.pdf"
+ },
+ "Entrepreneurial Management (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ENT 101",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     },
+     {
+      "code": "ENT 113",
+      "credits": 1.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     },
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MSB 325",
+      "credits": 3.0
+     },
+     {
+      "code": "ENT 326",
+      "credits": 1.0
+     },
+     {
+      "code": "ENT 401",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ENT 402",
+      "credits": 3.0
+     },
+     {
+      "code": "ENT 411",
+      "credits": 3.0
+     },
+     {
+      "code": "ENT 436",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     },
+     {
+      "code": "MCOM 320",
+      "credits": 3.0
+     },
+     {
+      "code": "ENT 302",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741878551896/B1xwBJLrERnr.pdf"
+ },
+ "Environmental Geology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOL 111",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOL 210",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 230",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOL 370",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 491R",
+      "credits": 0.5
+     },
+     {
+      "code": "GEOL 435",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 106",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 375",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOL 445",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 550",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 420",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 421",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOL 535R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1756147149963/AApTv5SKxKJR.pdf"
+ },
+ "Environmental Science and Sustainability (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 155",
+      "credits": 1.0
+     },
+     {
+      "code": "PWS 282",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 283",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 305",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 306",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 365",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 366",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 375",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742418399851/eKkfM1uXh0Ky.pdf"
+ },
+ "European Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "EUROP 200",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EUROP 330",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 250",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EUROP 320R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EUROP 490R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741887438914/Hsw3azwP4Bhu.pdf"
+ },
+ "Exercise & Wellness (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NDFS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STDEV 150",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 220",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HLTH 320",
+      "credits": 3.0
+     },
+     {
+      "code": "CELL 305",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EXSC 463",
+      "credits": 3.0
+     },
+     {
+      "code": "EXSC 464",
+      "credits": 0.5
+     },
+     {
+      "code": "EXSC 410",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EXSC 387",
+      "credits": 3.0
+     },
+     {
+      "code": "EXSC 480",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EXSC 399R",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742418526905/wAstQoqmw2qq.pdf"
+ },
+ "Exercise Science (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 120",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NDFS 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "CELL 220",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EXSC 362",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EXSC 463",
+      "credits": 3.0
+     },
+     {
+      "code": "EXSC 464",
+      "credits": 0.5
+     },
+     {
+      "code": "EXSC 440",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742419560829/qCtrn3gMnHCJ.pdf"
+ },
+ "Experience Design and Management (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EXDM 300",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EXDM 405",
+      "credits": 3.0
+     },
+     {
+      "code": "EXDM 404",
+      "credits": 3.0
+     },
+     {
+      "code": "EXDM 422",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     },
+     {
+      "code": "EXDM 495",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EXDM 418",
+      "credits": 3.0
+     },
+     {
+      "code": "EXDM 415",
+      "credits": 3.0
+     },
+     {
+      "code": "EXDM 416",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "EXDM 423",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EXDM 496R",
+      "credits": 1.5
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741879433580/wqKmUS5qb3Y2.pdf"
+ },
+ "Family & Consumer Sciences Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SFL 185R",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 102",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 276R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SFL 110",
+      "credits": 2.0
+     },
+     {
+      "code": "SFL 210",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 287",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SFL 260",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 382",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SC ED 350",
+      "credits": 2.0
+     },
+     {
+      "code": "SFL 280",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 222",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 215",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 175",
+      "credits": 1.0
+     },
+     {
+      "code": "NDFS 251",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "SFL 371",
+      "credits": 1.0
+     },
+     {
+      "code": "SFL 377",
+      "credits": 3.0
+     },
+     {
+      "code": "SFL 378",
+      "credits": 1.0
+     },
+     {
+      "code": "SFL 379",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741292153503/wdHnfg9vB1oP.pdf"
+ },
+ "Family History - Genealogy (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 200",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 205",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 217",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 206R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 220",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 201",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 218",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 439",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 490",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 496R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742496195097/CFbTutdPBnw5.pdf"
+ },
+ "Finance (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     },
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FIN 180",
+      "credits": 0.5
+     },
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FIN 326",
+      "credits": 2.0
+     },
+     {
+      "code": "FIN 453",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 400",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FIN 401",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 410",
+      "credits": 3.0
+     },
+     {
+      "code": "ACC 310",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ACC 241",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741880100799/XE9hGOTEbbYc.pdf"
+ },
+ "Food Science (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "NDFS 191",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 351",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "NDFS 250",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 251",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 352",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 353",
+      "credits": 1.0
+     },
+     {
+      "code": "MMBIO 222",
+      "credits": 1.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NDFS 361",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 362",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 355",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 481",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 450",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 462",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 464",
+      "credits": 2.0
+     },
+     {
+      "code": "NDFS 465",
+      "credits": 3.0
+     },
+     {
+      "code": "NDFS 350",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742498463891/rIt3w54ermDd.pdf"
+ },
+ "French (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 321",
+      "credits": 3.0
+     },
+     {
+      "code": "FREN 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 322",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 362",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742498800224/JaAVqk2vX59q.pdf"
+ },
+ "French Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 321",
+      "credits": 3.0
+     },
+     {
+      "code": "FREN 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 322",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742498963159/pfGiwAWyZebY.pdf"
+ },
+ "French Teaching (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "FREN 202",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 321",
+      "credits": 4.0
+     },
+     {
+      "code": "FLANG 276",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 322",
+      "credits": 4.0
+     },
+     {
+      "code": "FREN 330",
+      "credits": 4.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 361",
+      "credits": 3.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "FREN 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FREN 362",
+      "credits": 3.0
+     },
+     {
+      "code": "FREN 377",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 378",
+      "credits": 3.0
+     },
+     {
+      "code": "FREN 379",
+      "credits": 3.0
+     },
+     {
+      "code": "FREN 491R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FREN 476R",
+      "credits": 1.0
+     },
+     {
+      "code": "FREN 496R",
+      "credits": 12.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741894825156/LwxVncDlGsiA.pdf"
+ },
+ "Genetics, Genomics & Biotechnology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 188",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 288",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741893665768/eyt55Tq5OKmh.pdf"
+ },
+ "Geography: Global Studies (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOG 100",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOG 120",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOG 211",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOG 110",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOG 222",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOG 130",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742504477570/l6zoaOKieTdb.pdf"
+ },
+ "Geology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOL 111",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 112",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GEOL 230",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 351",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOL 352",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 370",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 491R",
+      "credits": 1.0
+     },
+     {
+      "code": "GEOL 375",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 106",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOL 405",
+      "credits": 3.0
+     },
+     {
+      "code": "GEOL 420",
+      "credits": 2.0
+     },
+     {
+      "code": "GEOL 421",
+      "credits": 2.0
+     },
+     {
+      "code": "GEOL 422",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742575030293/RCsJr9zPwlTS.pdf"
+ },
+ "German Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GERM 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GERM 400R",
+      "credits": 1.0
+     },
+     {
+      "code": "GERM 401",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1712088137188/XurbLC6vrXK5.pdf"
+ },
+ "German Teaching (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GERM 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GERM 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GERM 201",
+      "credits": 4.0
+     },
+     {
+      "code": "GERM 311R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GERM 202",
+      "credits": 4.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     },
+     {
+      "code": "FLANG 276",
+      "credits": 4.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GERM 330",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GERM 343",
+      "credits": 3.0
+     },
+     {
+      "code": "GERM 344",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GERM 377",
+      "credits": 3.0
+     },
+     {
+      "code": "GERM 378",
+      "credits": 1.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GERM 400R",
+      "credits": 1.0
+     },
+     {
+      "code": "GERM 401",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742579660479/jYMdjx4Xzrl9.pdf"
+ },
+ "Global Supply Chain Management (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GSCM 401",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 402",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 403",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 404",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 326",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 412",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GSCM 429",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742581795190/SHRdLZlg4dOB.pdf"
+ },
+ "Graphic Design (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "DESGD 145",
+      "credits": 3.0
+     },
+     {
+      "code": "OR IHUM 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DES 111R",
+      "credits": 0.5
+     },
+     {
+      "code": "DES 280",
+      "credits": 3.0
+     },
+     {
+      "code": "DESGD 340",
+      "credits": 3.0
+     },
+     {
+      "code": "DESGD 343",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESGD 341",
+      "credits": 3.0
+     },
+     {
+      "code": "DESGD 349",
+      "credits": 3.0
+     },
+     {
+      "code": "DESGD 362",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESGD 440",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESGD 380",
+      "credits": 3.0
+     },
+     {
+      "code": "DES 390",
+      "credits": 3.0
+     },
+     {
+      "code": "DESGD 488",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESGD 441",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESGD 442",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1746816851960/aXcBHHYApO8c.pdf"
+ },
+ "History (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 220",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 221",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 200",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 202",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742584193453/EZ9uFx9qU9gs.pdf"
+ },
+ "History Teaching (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 220",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 221",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 200",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 201",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 364",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "HIST 477",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 478",
+      "credits": 1.0
+     },
+     {
+      "code": "HIST 490",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 395",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742584996734/m9AajBtgOysj.pdf"
+ },
+ "Human Resource Management (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HRM 401",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 326",
+      "credits": 1.0
+     },
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     },
+     {
+      "code": "ENT 302",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 380",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HRM 402",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 411",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 412",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 325",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MSB 413",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 421",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741880718475/YWlVK8gBKcpq.pdf"
+ },
+ "Illustration (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESIL 101",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DES 150",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 130",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 140",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DES 111R",
+      "credits": 0.5
+     },
+     {
+      "code": "ARTHC 202",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 230",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 250",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 263",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESIL 352",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 488",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DES 390",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 350",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 354",
+      "credits": 3.0
+     },
+     {
+      "code": "DESIL 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESIL 490",
+      "credits": 2.0
+     },
+     {
+      "code": "DESIL 451",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESIL 497",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1746816699410/c5My4Im0HCHE.pdf"
+ },
+ "Information Systems (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     },
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 303",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IS 404",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 402",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 403",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 415",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IS 401",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 413",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 414",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 455",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     },
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     },
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741881366057/kUfeftMHR7eb.pdf"
+ },
+ "Information Technology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 101",
+      "credits": 3.0
+     },
+     {
+      "code": "C S 111",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 124",
+      "credits": 3.0
+     },
+     {
+      "code": "TECH 112",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 210A",
+      "credits": 2.0
+     },
+     {
+      "code": "IT&C 210B",
+      "credits": 2.0
+     },
+     {
+      "code": "IT&C 291R",
+      "credits": 0.5
+     },
+     {
+      "code": "IT&C 255",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "C S 236",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 293",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 344",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IT&C 350",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 366",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IT&C 446",
+      "credits": 3.0
+     },
+     {
+      "code": "IT&C 231",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742829165814/h07lraZWvCQS.pdf"
+ },
+ "Interdisciplinary Design (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARTHC 202",
+      "credits": 3.0
+     },
+     {
+      "code": "DES 198",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DES 111R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DES 390",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DES 498",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1746816484683/EPANINBPNlCc.pdf"
+ },
+ "Interdisciplinary Humanities (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HCOLL 310",
+      "credits": 1.0
+     },
+     {
+      "code": "IHUM 250",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IHUM 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IHUM 202",
+      "credits": 3.0
+     },
+     {
+      "code": "IHUM 280R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IHUM 311",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IHUM 350",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "IHUM 370",
+      "credits": 3.0
+     },
+     {
+      "code": "IHUM 390R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IHUM 490R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742835668429/UVrMTQYgSwUo.pdf"
+ },
+ "International Relations (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "STDEV 109",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "GEOG 120",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "POLI 200",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ECON 380",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 388",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 381",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1748442412549/x3ssDAYha2eY.pdf"
+ },
+ "Italian (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ITAL 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ITAL 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ITAL 321",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ITAL 322",
+      "credits": 3.0
+     },
+     {
+      "code": "ITAL 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ITAL 491",
+      "credits": 0.5
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742838087718/pVO6efD23UBg.pdf"
+ },
+ "Italian Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ITAL 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ITAL 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ITAL 321",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ITAL 322",
+      "credits": 3.0
+     },
+     {
+      "code": "ITAL 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ITAL 491",
+      "credits": 0.5
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742926405137/AQoBQL92VIFB.pdf"
+ },
+ "Japanese (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "JAPAN 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "JAPAN 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "JAPAN 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "JAPAN 202",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "JAPAN 301",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "JAPAN 302",
+      "credits": 4.0
+     },
+     {
+      "code": "JAPAN 311",
+      "credits": 2.0
+     },
+     {
+      "code": "JAPAN 345",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "JAPAN 321",
+      "credits": 3.0
+     },
+     {
+      "code": "JAPAN 441",
+      "credits": 3.0
+     },
+     {
+      "code": "JAPAN 322",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "JAPAN 443",
+      "credits": 3.0
+     },
+     {
+      "code": "JAPAN 444",
+      "credits": 3.0
+     },
+     {
+      "code": "JAPAN 495",
+      "credits": 2.0
+     },
+     {
+      "code": "JAPAN 411",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742927256292/rg5NmP0P6ba8.pdf"
+ },
+ "Korean (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "KOREA 101",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "KOREA 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "KOREA 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "KOREA 202",
+      "credits": 4.0
+     },
+     {
+      "code": "KOREA 211R",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "KOREA 301",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "KOREA 302",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 346",
+      "credits": 3.0
+     },
+     {
+      "code": "KOREA 340",
+      "credits": 3.0
+     },
+     {
+      "code": "KOREA 401",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "KOREA 325",
+      "credits": 3.0
+     },
+     {
+      "code": "KOREA 443",
+      "credits": 3.0
+     },
+     {
+      "code": "KOREA 402",
+      "credits": 3.0
+     },
+     {
+      "code": "KOREA 495",
+      "credits": 2.0
+     },
+     {
+      "code": "KOREA 491",
+      "credits": 0.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742927695467/zbKdtBL5SqiW.pdf"
+ },
+ "Latin American Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "LT AM 211",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "LT AM 495",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742928461348/Qzi0NbYK6Oma.pdf"
+ },
+ "Latin Teaching (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HCOLL 110",
+      "credits": 1.0
+     },
+     {
+      "code": "LATIN 111",
+      "credits": 5.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "LATIN 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CL CV 307",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 286",
+      "credits": 1.0
+     },
+     {
+      "code": "LATIN 302",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "LATIN 301",
+      "credits": 3.0
+     },
+     {
+      "code": "FLANG 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "LATIN 401",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "LATIN 377",
+      "credits": 3.0
+     },
+     {
+      "code": "LATIN 378",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742929153552/PzZ3ECBd8Lbq.pdf"
+ },
+ "Linguistics (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "LING 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "LING 495R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742930656792/iC2e7ZGLAiJ2.pdf"
+ },
+ "Machine Learning (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 111",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 191",
+      "credits": 0.5
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 235",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 180",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 236",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 240",
+      "credits": 4.0
+     },
+     {
+      "code": "CS 270",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 312",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 473",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CS 474",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CS 404",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742330271444/PNYfBsv8jk0f.pdf"
+ },
+ "Manufacturing Engineering (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MFGEN 130",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "TES 112",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CCE 103",
+      "credits": 3.0
+     },
+     {
+      "code": "BIO 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "CCE 203",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 220",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 291",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ME EN 250",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 230",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 399R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MFGEN 333",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 331",
+      "credits": 4.0
+     },
+     {
+      "code": "MFGEN 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MFGEN 381",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 355",
+      "credits": 3.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MFGEN 401",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 475",
+      "credits": 3.0
+     },
+     {
+      "code": "MFGEN 491",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ME EN 476",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741805870227/VxtfcAdgc3rq.pdf"
+ },
+ "Marketing (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "MSB 494R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     },
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MKTG 401",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 402",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 403",
+      "credits": 3.0
+     },
+     {
+      "code": "MKTG 326",
+      "credits": 1.0
+     },
+     {
+      "code": "MSB 325",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MKTG 429",
+      "credits": 3.0
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 392",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742931363009/G4OiUlR1ZahA.pdf"
+ },
+ "Mathematics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 191",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 290",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "CS 111",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 314",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 371",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 413",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 341",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 342",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 334",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 352",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1751309093304/r5iKFPBOGlrH.pdf"
+ },
+ "Mathematics Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 290",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 213",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 215",
+      "credits": 1.0
+     },
+     {
+      "code": "MTHED 177",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 314",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MTHED 277",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 278",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 362",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 341",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 301",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 308",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 334",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 300",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 377",
+      "credits": 3.0
+     },
+     {
+      "code": "MTHED 378",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1750177956258/Z4IKZQr2roXI.pdf"
+ },
+ "Mechanical Engineering (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 191",
+      "credits": 0.5
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "ME EN 101",
+      "credits": 3.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CCE 203",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 204",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 302",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "EC EN 301",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 250",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 272",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 275",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 303",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ME EN 231",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 321",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 330",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 335",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 382",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 312",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 362",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 372",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ME EN 340",
+      "credits": 3.0
+     },
+     {
+      "code": "ME EN 475",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ME EN 476",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742934236026/hgau2s1RLty4.pdf"
+ },
+ "Media Arts Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 105",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 114",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 185",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 391",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742936166985/trfsEhC7S42c.pdf"
+ },
+ "Medical Laboratory Science (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "MMBIO 121",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 102",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CELL 220",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 241",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 285",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 221",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 222",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 261",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 411",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 409",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 410",
+      "credits": 2.0
+     },
+     {
+      "code": "MMBIO 412",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 406",
+      "credits": 4.0
+     },
+     {
+      "code": "MMBIO 407",
+      "credits": 4.0
+     },
+     {
+      "code": "MMBIO 418",
+      "credits": 2.0
+     },
+     {
+      "code": "MMBIO 419",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741729404769/S980REe2r7Tb.pdf"
+ },
+ "Microbiology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 151",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 241",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 106",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742405462802/pNttCaBTtONr.pdf"
+ },
+ "Middle East Studies / Arabic (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MESA 201",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "ARAB 101",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MESA 250",
+      "credits": 3.0
+     },
+     {
+      "code": "ARAB 102",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARAB 201",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ARAB 202",
+      "credits": 4.0
+     },
+     {
+      "code": "MESA 300",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "ARAB 300",
+      "credits": 4.0
+     },
+     {
+      "code": "ARAB 302",
+      "credits": 4.0
+     },
+     {
+      "code": "ARAB 211R",
+      "credits": 2.0
+     },
+     {
+      "code": "ARAB 311R",
+      "credits": 2.0
+     },
+     {
+      "code": "ARAB 331",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MESA 495",
+      "credits": 3.0
+     },
+     {
+      "code": "IAS 301R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "IAS 320R",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741809524850/pcTkvdHw4qta.pdf"
+ },
+ "Molecular Biology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 241",
+      "credits": 1.0
+     },
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 165",
+      "credits": 3.0
+     },
+     {
+      "code": "BIO 250",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 360",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 390R",
+      "credits": 1.0
+     },
+     {
+      "code": "MMBIO 490R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 441",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MMBIO 468",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741728723940/TzzN2NBYXr2T.pdf"
+ },
+ "Music (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 260R",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 221",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 222",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 301",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742229827043/Rhh4R6wq3CMy.pdf"
+ },
+ "Music Composition (BM)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 187R",
+      "credits": 1.0
+     },
+     {
+      "code": "MUSIC 221",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 260R",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 387R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 222",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 187",
+      "credits": 1.0
+     },
+     {
+      "code": "MUISC 287",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 301",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 395",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 388R",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 481",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 449",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742236649807/PfNEMJKK1NGC.pdf"
+ },
+ "Music Dance Theatre (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 161",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 115",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 122",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 128",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 260R",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 140",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 228",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 113",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 201",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 267",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 290",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 229",
+      "credits": 4.0
+     },
+     {
+      "code": "TMA 260",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 360R",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 422",
+      "credits": 2.0
+     },
+     {
+      "code": "MDT 300",
+      "credits": 3.0
+     },
+     {
+      "code": "MDT 328",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DANCE 361",
+      "credits": 2.5
+     },
+     {
+      "code": "TMA 223",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 427",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 491",
+      "credits": 1.0
+     },
+     {
+      "code": "MDT 426R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742942257478/As7WOr6xmeRB.pdf"
+ },
+ "Music Education (BM)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUISC 276",
+      "credits": 3.0
+     },
+     {
+      "code": "MUSIC 262R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 281",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 395",
+      "credits": 3.0
+     },
+     {
+      "code": "MUSIC 235",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 221",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 301",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 282",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 283",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SC ED 353",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 379",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 350",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 476",
+      "credits": 12.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742237896037/ttxt2H4e0THK.pdf"
+ },
+ "Neuroscience (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CELL 120",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "PSYCH 111",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     },
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     },
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 351",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     },
+     {
+      "code": "NEURO 205",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 352",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 106",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     },
+     {
+      "code": "NEURO 360",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CELL 362",
+      "credits": 3.0
+     },
+     {
+      "code": "NEURO 460",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PSYCH 375",
+      "credits": 3.0
+     },
+     {
+      "code": "CELL 360",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NEURO 480",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742943013185/E8j5YJUrsNjK.pdf"
+ },
+ "Nursing (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NDFS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 285",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MMBIO 221",
+      "credits": 3.0
+     },
+     {
+      "code": "MMBIO 222",
+      "credits": 1.0
+     },
+     {
+      "code": "NURS 294",
+      "credits": 3.0
+     },
+     {
+      "code": "PDBIO 305",
+      "credits": 4.0
+     },
+     {
+      "code": "NURS 290",
+      "credits": 1.0
+     },
+     {
+      "code": "NURS 288",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NURS 301",
+      "credits": 3.0
+     },
+     {
+      "code": "NURS 292",
+      "credits": 1.5
+     },
+     {
+      "code": "NURS 295",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 296",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 298",
+      "credits": 1.0
+     },
+     {
+      "code": "NURS 300",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NURS 361",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 362",
+      "credits": 1.0
+     },
+     {
+      "code": "NURS 341",
+      "credits": 3.0
+     },
+     {
+      "code": "NURS 342",
+      "credits": 2.5
+     },
+     {
+      "code": "NURS 348",
+      "credits": 1.0
+     },
+     {
+      "code": "NURS 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NURS 371",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 351",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 352",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 378",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 372",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "NURS 461",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 462",
+      "credits": 1.5
+     },
+     {
+      "code": "NURS 471",
+      "credits": 3.0
+     },
+     {
+      "code": "NURS 472",
+      "credits": 3.0
+     },
+     {
+      "code": "NURS 478",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NURS 491",
+      "credits": 2.0
+     },
+     {
+      "code": "NURS 492",
+      "credits": 5.0
+     },
+     {
+      "code": "NURS 449",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743012549159/DWvMu2zGJKQx.pdf"
+ },
+ "Philosophy (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHIL 200",
+      "credits": 1.0
+     },
+     {
+      "code": "PHIL 201",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHIL 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHIL 205",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHIL 300",
+      "credits": 3.0
+     },
+     {
+      "code": "PHIL 305",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HCOLL 399R",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHIL 490",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743014667335/RfraSRCu9dfO.pdf"
+ },
+ "Photo- & Lens- Based Design (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESPH 116",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESPH 120",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 260",
+      "credits": 3.0
+     },
+     {
+      "code": "ARTHC 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DES 111R",
+      "credits": 0.5
+     },
+     {
+      "code": "DESPH 240",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 270",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESPH 273",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 276",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESPH 360",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 378",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 379",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DES 390",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 377R",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 388",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESPH 475",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPH 490",
+      "credits": 1.0
+     },
+     {
+      "code": "DES 480",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESPH 497",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1746816631190/DvEj2i6R9Q3z.pdf"
+ },
+ "Physical Education Tchg/Coaching (K-12) (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SWELL 191",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SFL 210",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "NDFS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PETE 227",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PETE 274",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 3.0
+     },
+     {
+      "code": "PETE 230",
+      "credits": 3.0
+     },
+     {
+      "code": "PETE 300",
+      "credits": 2.0
+     },
+     {
+      "code": "PETE 364",
+      "credits": 2.0
+     },
+     {
+      "code": "PETE 430",
+      "credits": 2.0
+     },
+     {
+      "code": "PETE 330R",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PETE 231",
+      "credits": 3.0
+     },
+     {
+      "code": "PETE 276R",
+      "credits": 3.0
+     },
+     {
+      "code": "PETE 461",
+      "credits": 3.0
+     },
+     {
+      "code": "PETE 301",
+      "credits": 2.0
+     },
+     {
+      "code": "PETE 366",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PETE 377",
+      "credits": 3.0
+     },
+     {
+      "code": "EXDM 123",
+      "credits": 2.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "PETE 399R",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 350",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741819863905/gOq2PHCTTzep.pdf"
+ },
+ "Physical Science Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 105",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 107",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 106",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 108",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     },
+     {
+      "code": "GEOL 111",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 127",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "CHEM 106",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 1.0
+     },
+     {
+      "code": "GEOL 112",
+      "credits": 4.0
+     },
+     {
+      "code": "PHY S 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CHEM 223",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 201",
+      "credits": 0.5
+     },
+     {
+      "code": "GEOL 210",
+      "credits": 3.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 137",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 310",
+      "credits": 3.0
+     },
+     {
+      "code": "CHEM 331",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 167",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHS S 377",
+      "credits": 3.0
+     },
+     {
+      "code": "PHY S 378",
+      "credits": 1.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743015268209/wnJ2P0f57pmw.pdf"
+ },
+ "Physics (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 191",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "CS 111",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 225",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 230",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 291",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 302",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 222",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 240",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 303",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 245",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 318",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 321",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 330",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 360",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 430",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 441",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 451",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 498R",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743015835776/wwpWYTZ12ASR.pdf"
+ },
+ "Physics Education (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 191",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 225",
+      "credits": 2.0
+     },
+     {
+      "code": "MATH 302",
+      "credits": 4.0
+     },
+     {
+      "code": "PHY S 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 222",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 240",
+      "credits": 2.0
+     },
+     {
+      "code": "IP&T 371",
+      "credits": 1.0
+     },
+     {
+      "code": "IP&T 372",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 127",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     },
+     {
+      "code": "WRTG 316",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHY S 377",
+      "credits": 3.0
+     },
+     {
+      "code": "PHY S 378",
+      "credits": 1.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743016646364/Tn5vWojOaE0o.pdf"
+ },
+ "Physics and Astronomy (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 121",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 191",
+      "credits": 0.5
+     },
+     {
+      "code": "MATH 112",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 123",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 113",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 127",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 227",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 230",
+      "credits": 1.0
+     },
+     {
+      "code": "PHSCS 291",
+      "credits": 0.5
+     },
+     {
+      "code": "CS 111",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 222",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 228",
+      "credits": 3.0
+     },
+     {
+      "code": "MATH 302",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MATH 303",
+      "credits": 4.0
+     },
+     {
+      "code": "PHSCS 321",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 330",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 329",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 318",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 427",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 441",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 451",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 428",
+      "credits": 3.0
+     },
+     {
+      "code": "PHSCS 498R",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743016241959/zpPegoRFgL0k.pdf"
+ },
+ "Plant and Landscape Systems (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 110",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 191",
+      "credits": 1.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 211",
+      "credits": 2.0
+     },
+     {
+      "code": "PWS 212",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 216",
+      "credits": 2.0
+     },
+     {
+      "code": "PWS 198R",
+      "credits": 0.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 319",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 320",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 214",
+      "credits": 2.0
+     },
+     {
+      "code": "PWS 220",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 301",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 331",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 431",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 481",
+      "credits": 2.0
+     },
+     {
+      "code": "ENT 381",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 402",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743019425140/V8TMsRqe5gtw.pdf"
+ },
+ "Political Science (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "POLI 200",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "POLI 300",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743020348601/RHFkMGPoggf2.pdf"
+ },
+ "Portuguese (BA)": {
+  "terms": [
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PORT 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PORT 360",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STDEV 317",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PORT 491",
+      "credits": 0.5
+     },
+     {
+      "code": "PORT 493",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743180257053/KgCuzxfWJ81k.pdf"
+ },
+ "Portuguese Studies (Secondary Major) (BA)": {
+  "terms": [
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PORT 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STDEV 317",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PORT 491",
+      "credits": 0.5
+     },
+     {
+      "code": "PORT 493",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1743179347366/R9p3QoPwEIhn.pdf"
+ },
+ "Product & User Experience Design (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESPX 115",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESPX 220",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 260",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESGD 243",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 210",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 231",
+      "credits": 3.0
+     },
+     {
+      "code": "IP&T 420",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DESGD 362",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 214",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 230",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 365",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DES 111R",
+      "credits": 0.5
+     },
+     {
+      "code": "DESPX 388",
+      "credits": 2.0
+     },
+     {
+      "code": "DESPX 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "DES 390",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "DESPX 461R",
+      "credits": 3.0
+     },
+     {
+      "code": "DESPX 497R",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1746464474397/Uy3MuMsPJSMP.pdf"
+ },
+ "Psychology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MATH 110",
+      "credits": 3.0
+     },
+     {
+      "code": "PSYCH 210",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PSYCH 307",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PSYCH 308",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PSYCH 310",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PSYCH 381",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742935025281/mtBEyetxWDEZ.pdf"
+ },
+ "Russian (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "A HTG 100",
+      "credits": 3.0
+     },
+     {
+      "code": "RUSS 102",
+      "credits": 5.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "RUSS 201",
+      "credits": 5.0
+     },
+     {
+      "code": "RUSS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "RUSS 202",
+      "credits": 5.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "RUSS 321",
+      "credits": 3.0
+     },
+     {
+      "code": "RUSS 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "RUSS 322",
+      "credits": 3.0
+     },
+     {
+      "code": "RUSS 323",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "RUSS 421",
+      "credits": 3.0
+     },
+     {
+      "code": "RUSS 441",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "RUSS 422",
+      "credits": 3.0
+     },
+     {
+      "code": "RUSS 492",
+      "credits": 2.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742839400160/Og9HI73uzZBY.pdf"
+ },
+ "Social Science Teaching (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "GEOG 120",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 221",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "HIST 201",
+      "credits": 3.0
+     },
+     {
+      "code": "POLI 110",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 202",
+      "credits": 3.0
+     },
+     {
+      "code": "PSYCH 111",
+      "credits": 3.0
+     },
+     {
+      "code": "SOC 111",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "HIST 364",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 395",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     },
+     {
+      "code": "HIST 477",
+      "credits": 3.0
+     },
+     {
+      "code": "HIST 478",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742837702906/sXa7g6C8NksY.pdf"
+ },
+ "Sociology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SOC 300",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 307",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 310",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742834821736/x8m5ciqXvmKr.pdf"
+ },
+ "Spanish (BA)": {
+  "terms": [
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 360",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 325",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STDEV 317",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 491",
+      "credits": 0.5
+     },
+     {
+      "code": "SPAN 493",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742833596787/IkD8KeQJ0ZEm.pdf"
+ },
+ "Spanish Studies (Secondary Major) (BA)": {
+  "terms": [
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 325",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STDEV 317",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 493",
+      "credits": 1.0
+     },
+     {
+      "code": "SPAN 491",
+      "credits": 0.5
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742832386223/MaZZbTLKrlps.pdf"
+ },
+ "Spanish Teaching (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 321",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 322",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FLANG 276",
+      "credits": 4.0
+     },
+     {
+      "code": "SPAN 326",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 345",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 353",
+      "credits": 3.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 355",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 335",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 491",
+      "credits": 0.5
+     },
+     {
+      "code": "IP&T 373",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 377",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SC ED 375",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 378",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 380",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742830425409/YlQws96BhQsn.pdf"
+ },
+ "Spanish Translation (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 321",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 330",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 325",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 360",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 361",
+      "credits": 3.0
+     },
+     {
+      "code": "PLANG 380",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "SPAN 362",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "SPAN 469",
+      "credits": 3.0
+     },
+     {
+      "code": "SPAN 491",
+      "credits": 0.5
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742585766012/beYGIgXbwe92.pdf"
+ },
+ "Strategic Management (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "MSB 180",
+      "credits": 1.0
+     },
+     {
+      "code": "IS 110",
+      "credits": 1.0
+     },
+     {
+      "code": "MKTG 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ACC 200",
+      "credits": 3.0
+     },
+     {
+      "code": "IS 201",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "FIN 201",
+      "credits": 3.0
+     },
+     {
+      "code": "STAT 121",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "ECON 110",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STRAT 326",
+      "credits": 1.0
+     },
+     {
+      "code": "STRAT 401",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 402",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 431",
+      "credits": 1.5
+     },
+     {
+      "code": "M COM 320",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 201",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "STRAT 411",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 412",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 432",
+      "credits": 1.5
+     },
+     {
+      "code": "HRM 391",
+      "credits": 3.0
+     },
+     {
+      "code": "GSCM 211",
+      "credits": 1.5
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "STRAT 421",
+      "credits": 3.0
+     },
+     {
+      "code": "STRAT 433",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MSB 390",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1741881876750/PSGCTwQOH3Ov.pdf"
+ },
+ "Theatre Arts Education K-12 (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 115",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 140",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 122",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 123",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 201",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 276",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 260",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 202",
+      "credits": 3.0
+     },
+     {
+      "code": "CPSE 402",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 355",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 336",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 375",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 395",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 377B",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 353",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 255",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 491",
+      "credits": 2.0
+     },
+     {
+      "code": "SC ED 375",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 476",
+      "credits": 12.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742503043768/N2MmtkJmXke8.pdf"
+ },
+ "Theatre Arts Studies (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 111",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 140",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 115",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 259",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 260R",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 123",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 201",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 202",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 395",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 491",
+      "credits": 1.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1742500205355/LOpRff4s2P5n.pdf"
+ },
+ "Wildlife & Wildlands Conservation (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 115",
+      "credits": 1.0
+     },
+     {
+      "code": "PWS 100",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 215",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 225",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 135",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 282",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 283",
+      "credits": 1.0
+     },
+     {
+      "code": "PWS 350",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 344",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 330",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 335",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 275",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 447",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 355",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 357",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 375",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PWS 416",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PWS 417",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 446",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "_src": "files/form/1758641849219/EW3ohrfoiNK8.pdf"
+ }
+}

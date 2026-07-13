@@ -20,14 +20,20 @@ so the advisor can mix and cite them.
 | `transfer_credit.py` | `enrollment.byu.edu` AP/IB + transfer-guide hubs | AP & IB exam equivalency tables (2020–2027, PDFs), 29 feeder-school transfer guides (PDFs), associate-degree GE waiver rules (`type=transfer_credit`) | `data/transfer_credit.json` | yearly (new AP guide each spring) |
 | `tuition_graduation.py` | `enrollment.byu.edu` tuition + graduation pages | Tuition & fee rates, cost of attendance (`type=policy`); graduation application deadlines per cycle, how-to-apply, cum laude rules (`type=deadline`) | `data/tuition_graduation.json` | each semester |
 | `flowcharts.py` | department hub pages (all 8 Marriott business programs + 5 Fulton engineering) | Official major flowchart PDFs — the recommended semester-by-semester sequence, junior-core envelopes, lecture-series choices (`type=flowchart`); hub-crawled so year rollovers self-heal; add a CONFIG entry per new department | `data/flowcharts.json` | yearly |
+| `maps.py` | coursedog `majorAcademicPlan` file refs (via the catalog's signedUrl endpoint) | Official **MAP sheets** — the college advisement centers' 8-semester plans, published for ~123 majors (`type=map_sheet`). Parsed DETERMINISTICALLY (regex, no LLM) into `data/maps_plans.json` for solver sequencing hints | `data/maps.json` + `data/maps_plans.json` | yearly |
 
-**Flowchart → solver pipeline** (run after `flowcharts.py`): `extract_flowchart_plans.py`
-has Claude turn each flowchart PDF's garbled 2-D text into a structured
-`{course → year+season}` plan (`data/flowchart_plans.json`); `generate_data.py`
-bakes those hints into `catalog_data.js`; the planner solver then targets each
-hinted course's recommended term (level-pacing is the fallback where no
-flowchart exists). Full refresh: `flowcharts.py` → `extract_flowchart_plans.py`
-→ `generate_data.py` → `embed_and_load.py --only-sources flowcharts`.
+**Sequencing → solver pipeline**: three layers merge in
+`generate_data.attach_flowchart_plans`, weakest → strongest:
+1. **MAP sheets** (`sources/maps.py`, ~123 majors) — per-course year+season
+   hints only (a MAP's specific electives are examples, never force-included);
+2. **department flowcharts** (`flowcharts.py` → `extract_flowchart_plans.py`,
+   Claude at temperature 0, newest sheet per program) — hints **plus**
+   force-included courses (business core) and RIGID junior-core envelopes;
+3. **hand-verified overrides** (`data/flowchart_overrides.json`) — corrections
+   for charts whose PDF text scrambles too badly (e.g. Accounting envelopes).
+Level-pacing is the fallback where no layer covers a course. Full refresh:
+`flowcharts.py` → `extract_flowchart_plans.py` → `sources/maps.py` →
+`generate_data.py` → `embed_and_load.py --only-sources flowcharts,maps`.
 
 Course offering patterns ("Fall and Winter", "Winter Even Years", ...) come
 from the catalog itself: every course's `_raw_summary.courseTypicallyOffered`

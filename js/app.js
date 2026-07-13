@@ -239,8 +239,9 @@ const App = (() => {
       card.addEventListener("dragend", () => { card.classList.remove("dragging"); $$(".col-body.over").forEach(c => c.classList.remove("over")); });
       card.addEventListener("click", (e) => {
         const p = result.placements.find(x => x.uid === card.dataset.uid);
-        if (p && p.bucket) { e.stopPropagation(); openBucketPicker(p, card); }
-        else openCourseModal(card.dataset.uid);
+        if (p && (p.bucket || (p.isFill && e.target.closest(".fill-change")))) {
+          e.stopPropagation(); openBucketPicker(p, card);
+        } else openCourseModal(card.dataset.uid);
       });
     });
     // per-semester course search: only shows classes actually offered that
@@ -321,11 +322,11 @@ const App = (() => {
       </div>`;
     }
     return `
-    <div class="card" draggable="true" data-uid="${esc(p.uid)}">
+    <div class="card ${p.isFill ? "card-fillpick" : ""}" draggable="true" data-uid="${esc(p.uid)}">
       <span class="badge ${t.cls}">${t.label}</span>
       <div class="card-main">
         <span class="card-code">${esc(p.display)}${p.uid.includes("#") ? `<span class="card-rep" title="Repeatable course — one enrollment per semester. This is enrollment ${p.uid.split("#")[1]} of the ${p.repTotal || "several"} your requirement needs.">take ${p.uid.split("#")[1]}${p.repTotal ? `/${p.repTotal}` : ""}</span>` : ""}</span>
-        <span class="card-name">${esc(p.name)}</span>
+        <span class="card-name">${esc(p.name)}${p.isFill ? ` <span class="fill-change" title="You picked this from a requirement dropdown — swap it any time"><i class="fas fa-list-ul"></i> change ▾</span>` : ""}</span>
       </div>
       <div class="card-side">
         <span class="card-cr">${p.credits.toFixed(1)}</span>
@@ -359,14 +360,7 @@ const App = (() => {
            + (c.demand === "high" ? (w.risk / 5) * 1.5 : 0)
            + (c.rare ? 4 : 0);
     };
-    const usable = (ph.suggestions || []).filter(code => DATA.courses[code] && !inPlan.has(code));
-    const opts = usable
-      .filter(code => DATA.courses[code].off.includes(season))
-      .sort((a, b) => prefScore(a) - prefScore(b))
-      .slice(0, 40);
-    // fallback: nothing taught this term -> offer the other suggestions with
-    // their seasons; picking one moves the slot to a term where it IS taught
-    const alts = opts.length ? [] : usable.sort((a, b) => prefScore(a) - prefScore(b)).slice(0, 20);
+    const isSwap = !!p.isFill;          // a chosen class being swapped out
     const fillKey = p.fillKey || p.bucketKey;
 
     // which numbered catalog requirement this slot fills (Req 4.2 / Opt 8.1)
@@ -377,6 +371,41 @@ const App = (() => {
     const group = bucket && bucket.pick.type === "group" && p.groupIdx != null
       ? bucket.groups[p.groupIdx] : null;
 
+    // option pool: the placeholder's curated suggestions, else rebuilt from
+    // the bucket definition (needed when a chosen class is being swapped)
+    let basePool = ph.suggestions;
+    if (!basePool || !basePool.length) {
+      basePool = group ? [...(group.options || [])] : bucket ? [...(bucket.options || [])] : [];
+      if (bucket && bucket.tag) {
+        for (const [code, c] of Object.entries(DATA.courses)) {
+          if (c.tags && c.tags.includes(bucket.tag)) basePool.push(code);
+        }
+      }
+    }
+    // per-option prerequisite check relative to this slot's term
+    const compl = new Set(prof.completed || []);
+    const unmetPre = code => {
+      const c = DATA.courses[code];
+      for (const g of (c.pre || [])) {
+        const alts2 = Array.isArray(g) ? g : [g];
+        const ok = alts2.some(x => compl.has(x) ||
+          result.placements.some(pl => pl.courseId === x && pl.termIndex < p.termIndex));
+        if (!ok) return alts2.map(x => (DATA.courses[x] || {}).display || x).join(" or ");
+      }
+      return null;
+    };
+    const preOf = {};
+    const usable = [...new Set(basePool)].filter(code => DATA.courses[code] && !inPlan.has(code));
+    usable.forEach(code => { preOf[code] = unmetPre(code); });
+    const rank = code => prefScore(code) + (preOf[code] ? 50 : 0);   // unmet-prereq options sink
+    const opts = usable
+      .filter(code => DATA.courses[code].off.includes(season))
+      .sort((a, b) => rank(a) - rank(b))
+      .slice(0, 40);
+    // fallback: nothing taught this term -> offer the other suggestions with
+    // their seasons; picking one moves the slot to a term where it IS taught
+    const alts = opts.length ? [] : usable.sort((a, b) => rank(a) - rank(b)).slice(0, 20);
+
     // sibling option-groups the student could switch this slot to
     const sel = (result.groupSel || {})[p.bucketKey] || [];
     const switchable = group ? bucket.groups
@@ -385,25 +414,23 @@ const App = (() => {
                    (x.g.options || []).some(o => DATA.courses[o]))
       : [];
 
+    const itemHtml = (code, move) => {
+      const c = DATA.courses[code];
+      const em = move ? [...c.off].map(s => Solver.SEASON_NAME[s]).join("/") : `${c.credits} cr`;
+      return `<button class="bp-item ${move ? "bp-alt" : ""}" data-code="${esc(code)}" ${move ? 'data-move="1"' : ""}>
+        <b>${esc(code)}</b><span>${esc(c.name)}${preOf[code] ? `<i class="bp-preq" title="Prerequisite not completed or scheduled before this term">needs ${esc(preOf[code])} first</i>` : ""}</span><em>${esc(em)}</em></button>`;
+    };
     const menu = document.createElement("div");
     menu.className = "ctx-menu bucket-picker";
     menu.innerHTML = `
-      <div class="bp-head">${esc(p.display)} · ${esc(result.terms[p.termIndex].label)}
+      <div class="bp-head">${isSwap ? `${esc(p.display)} → change class` : esc(p.display)} · ${esc(result.terms[p.termIndex].label)}
         ${reqLine ? `<span class="bp-req">${esc(reqLine)}${group ? ` · ${esc(group.label)}` : ""}</span>` : ""}
         <span class="bp-sub">${opts.length ? "only classes taught this term" : "no options taught this term — picking one moves the slot"}</span></div>
       <div class="bp-list">
-        ${opts.map(code => {
-          const c = DATA.courses[code];
-          return `<button class="bp-item" data-code="${esc(code)}">
-            <b>${esc(code)}</b><span>${esc(c.name)}</span><em>${c.credits} cr</em></button>`;
-        }).join("")}
-        ${alts.map(code => {
-          const c = DATA.courses[code];
-          const seasons = [...c.off].map(s => Solver.SEASON_NAME[s]).join("/");
-          return `<button class="bp-item bp-alt" data-code="${esc(code)}" data-move="1">
-            <b>${esc(code)}</b><span>${esc(c.name)}</span><em>${esc(seasons)}</em></button>`;
-        }).join("")}
+        ${opts.map(code => itemHtml(code, false)).join("")}
+        ${alts.map(code => itemHtml(code, true)).join("")}
         ${opts.length || alts.length ? "" : `<div class="bp-empty">Every option is already in your plan — check the progress report, or use the semester search bar.</div>`}
+        ${isSwap ? `<button class="bp-item bp-unfill"><b><i class="fas fa-rotate-left"></i></b><span>Back to an open "choose a class" slot</span></button>` : ""}
       </div>
       ${switchable.length ? `
       <div class="bp-switch">
@@ -430,12 +457,32 @@ const App = (() => {
         year = target.year; ssn = target.season;
       }
       prof.fills = prof.fills || {};
-      (prof.fills[fillKey] = prof.fills[fillKey] || []).push(code);
+      const arr = (prof.fills[fillKey] = prof.fills[fillKey] || []);
+      if (isSwap) {
+        // replace the previously chosen class in place
+        const idx = arr.indexOf(p.courseId);
+        if (idx >= 0) arr[idx] = code; else arr.push(code);
+        delete prof.pins[p.courseId];
+      } else {
+        arr.push(code);
+      }
       prof.pins[code] = { year, season: ssn, manual: true };
       activePlan().updatedAt = Date.now(); save();
       solveActive();
-      toast(`${code} chosen for ${p.display}${btn.dataset.move ? ` — scheduled ${Solver.SEASON_NAME[ssn]} ${year} (not taught ${Solver.SEASON_NAME[season]})` : ""}.`, "ok");
+      toast(`${code} ${isSwap ? `swapped in for ${p.display}` : `chosen for ${p.display} — stays in ${Solver.SEASON_NAME[ssn]} ${year}`}${btn.dataset.move ? ` (moved: not taught ${Solver.SEASON_NAME[season]})` : ""}.`, "ok");
     }));
+    const unfillBtn = menu.querySelector(".bp-unfill");
+    if (unfillBtn) unfillBtn.addEventListener("click", () => {
+      closeMenus();
+      const arr = (prof.fills || {})[fillKey] || [];
+      const idx = arr.indexOf(p.courseId);
+      if (idx >= 0) arr.splice(idx, 1);
+      if (!arr.length && prof.fills) delete prof.fills[fillKey];
+      delete prof.pins[p.courseId];
+      activePlan().updatedAt = Date.now(); save();
+      solveActive();
+      toast(`${p.display} returned to an open slot.`, "ok");
+    });
     menu.querySelectorAll(".bp-group").forEach(btn => btn.addEventListener("click", () => {
       const gi = parseInt(btn.dataset.gi, 10);
       closeMenus();
@@ -725,7 +772,8 @@ const App = (() => {
 
   /* ------------------------- priorities modal ------------------------ */
   const DIALS = [
-    ["speed", "Speed to graduation", "Finish in as few semesters as possible."],
+    // (no "speed" dial — every plan targets the classic 4-year shape:
+    // 8+ semesters, ending in Winter, extended only when courses can't fit)
     ["cost", "Financial cost", "Pack the flat-tuition band (12–18 cr), use lease-covered Spring/Summer wisely, avoid extra terms."],
     ["risk", "GPA protection", "Never stack 3+ historically hard classes in one semester."],
     ["life", "Life balance", "Avoid crammed terms and long heavy streaks; keep religion pacing steady."],

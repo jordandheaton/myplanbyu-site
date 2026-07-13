@@ -1,0 +1,36 @@
+{
+  "_readme": "Hand-verified corrections that OVERRIDE both MAP-sheet and LLM flowchart extraction (strongest layer in generate_data.attach_flowchart_plans). Add a program here when its PDF text scrambles too badly for reliable extraction. Schema matches flowchart_plans.json. Verified by Jordan against the Fall 2026 Accounting flowchart image (envelope boxes are 12+12 credit locked blocks; ACC 408/409 are 'Complete senior year, fall courses'; ACC 504 replaced ACC 404 in the new curriculum).",
+  "Accounting (BS)": {
+    "terms": [
+      {"year": 3, "season": "F", "courses": [
+        {"code": "ACC 401", "credits": 3.0},
+        {"code": "ACC 402", "credits": 3.0},
+        {"code": "ACC 403", "credits": 3.0},
+        {"code": "ACC 410", "credits": 1.5},
+        {"code": "ACC 411", "credits": 1.5}
+      ]},
+      {"year": 3, "season": "W", "courses": [
+        {"code": "ACC 405", "credits": 3.0},
+        {"code": "ACC 406", "credits": 3.0},
+        {"code": "ACC 407", "credits": 3.0},
+        {"code": "ACC 504", "credits": 3.0}
+      ]},
+      {"year": 4, "season": "F", "courses": [
+        {"code": "ACC 408", "credits": 1.5},
+        {"code": "ACC 409", "credits": 1.5},
+        {"code": "STRAT 392", "credits": 3.0},
+        {"code": "PSE 571", "credits": 3.0}
+      ]},
+      {"year": 4, "season": "W", "courses": [
+        {"code": "FIN 402", "credits": 3.0},
+        {"code": "HRM 391", "credits": 3.0}
+      ]}
+    ],
+    "cohorts": [
+      {"label": "Accounting Junior Core — fall envelope", "year": 3, "season": "F",
+       "courses": ["ACC 401", "ACC 402", "ACC 403", "ACC 410", "ACC 411"]},
+      {"label": "Accounting Junior Core — winter envelope", "year": 3, "season": "W",
+       "courses": ["ACC 405", "ACC 406", "ACC 407", "ACC 504"]}
+    ]
+  }
+}

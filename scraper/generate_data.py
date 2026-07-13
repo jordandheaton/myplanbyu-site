@@ -51,6 +51,11 @@ PROGRAM_TYPES = {
     "MINOR": "minor", "Minor": "minor",
     "CERT": "cert", "CERTIFICATE": "cert",
 }
+# The planner is for UNDERGRADUATE studies only — graduate degrees (the catalog
+# labels them MAJOR too) are excluded here. The RAG advisor still ingests the
+# full catalog, so the chatbot can answer MAcc/MBA/PhD questions.
+GRAD_DESIGS = {"MS", "PHD", "MA", "MED", "MFA", "MACC", "MPA", "MBA", "EDD",
+               "MM", "MPH", "MISM", "JD", "LLM", "EDS", "MSW", "MENG", "DNP"}
 CORE_NAME = "University Core 2004-Present"
 
 # University Core block names, by stable block order (verified July 2026 by
@@ -96,18 +101,44 @@ def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
+def _num(x) -> Optional[float]:
+    if isinstance(x, (int, float)):
+        return float(x)
+    if isinstance(x, str) and re.search(r"[\d.]+", x):
+        return float(re.search(r"[\d.]+", x).group(0))
+    return None
+
+
 def course_credits(c: Dict[str, Any]) -> float:
+    """Planning credits for a course. Variable-credit courses (min..max, e.g.
+    EXDM 496R 0.5-12) plan at the MINIMUM enrollment — the old max made a 1.5
+    credit internship show as a 12-credit semester monster. Genuine 0-credit
+    requirements (BIO 497 field exam) stay 0."""
     ch = c.get("credit_hours")
     if isinstance(ch, (int, float)):
         return float(ch)
     if isinstance(ch, dict):
         inner = ch.get("creditHours") or {}
-        v = inner.get("value") or inner.get("min") or ch.get("numberOfCredits")
-        if isinstance(v, (int, float)):
-            return float(v)
-        if isinstance(v, str) and re.search(r"[\d.]+", v):
-            return float(re.search(r"[\d.]+", v).group(0))
+        v, mn = _num(inner.get("value")), _num(inner.get("min"))
+        if mn is not None and v is not None and mn != v:
+            return mn if mn > 0 else v          # variable: plan the minimum
+        if v is not None:
+            return v
+        if mn is not None:
+            return mn
+        n = _num(ch.get("numberOfCredits"))
+        if n is not None:
+            return n
     return 3.0
+
+
+def is_variable_credit(c: Dict[str, Any]) -> bool:
+    ch = c.get("credit_hours")
+    if isinstance(ch, dict):
+        inner = ch.get("creditHours") or {}
+        v, mn = _num(inner.get("value")), _num(inner.get("min"))
+        return v is not None and mn is not None and mn != v
+    return False
 
 
 def build_course_maps(courses: List[Dict[str, Any]]):
@@ -397,9 +428,10 @@ def parse_freeform(p: Dict[str, Any], id2code, by_code, name2code, ptype: str,
             elif len(groups) == 1:          # only one real option -> just require it
                 g = groups[0]
                 take = g["take"]
-                pick = ({"type": "credits", "n": take["credits"]} if isinstance(take, dict)
+                pick = ({"type": "credits", "n": float(take[1])} if isinstance(take, tuple)
+                        else {"type": "credits", "n": take["credits"]} if isinstance(take, dict)
                         else {"type": "all"} if take == "all"
-                        else {"type": "courses", "n": take})
+                        else {"type": "courses", "n": int(take)})
                 buckets.append({
                     "id": f"{slugify(name)}-{node['num'].replace('.', '-')}",
                     "name": (re.sub(r"\s*[—–-]\s*", " — ", node["header"]).strip())[:80],
@@ -535,6 +567,8 @@ LC_CODE_RE = re.compile(r"\b([A-Z][A-Z&]{1,5})\s?(\d{3}[A-Z]?R?)\b")
 
 
 FLOWCHART_PLANS = Path(__file__).resolve().parent / "data" / "flowchart_plans.json"
+MAPS_PLANS = Path(__file__).resolve().parent / "data" / "maps_plans.json"
+FLOWCHART_OVERRIDES = Path(__file__).resolve().parent / "data" / "flowchart_overrides.json"
 
 
 def attach_flowchart_plans(programs: List[Dict[str, Any]], by_code, out_courses) -> None:
@@ -544,12 +578,53 @@ def attach_flowchart_plans(programs: List[Dict[str, Any]], by_code, out_courses)
     Codes are normalized to real catalog spacing ('CS 111' -> 'C S 111') and
     brand-new courses on the chart (IS 456, PSE 390, ...) are synthesized so
     they're plannable."""
-    if not FLOWCHART_PLANS.exists():
-        print("flowchart plans: none (run extract_flowchart_plans.py)")
+    # three layers, weakest -> strongest:
+    #   1. MAP sheets (advisement's official 8-semester plan, ~123 majors)
+    #   2. department flowchart extraction (business/eng, incl. envelopes)
+    #   3. hand-verified overrides (data/flowchart_overrides.json)
+    # Later layers override per-COURSE placements; the strongest layer that
+    # defines cohorts wins the cohort list for that program.
+    layers = []
+    if MAPS_PLANS.exists():
+        layers.append(json.loads(MAPS_PLANS.read_text(encoding="utf-8")))
+    if FLOWCHART_PLANS.exists():
+        layers.append(json.loads(FLOWCHART_PLANS.read_text(encoding="utf-8")))
+    if FLOWCHART_OVERRIDES.exists():
+        layers.append(json.loads(FLOWCHART_OVERRIDES.read_text(encoding="utf-8")))
+    if not layers:
+        print("flowchart plans: none (run sources/maps.py + extract_flowchart_plans.py)")
         return
-    plans = json.loads(FLOWCHART_PLANS.read_text(encoding="utf-8"))
+    # normalize away "(BS)" suffixes AND "&"/"and" spelling differences
+    # ("Experience Design & Management" vs "...Design and Management") — used
+    # both for MERGING layers keyed under different spellings and for matching
+    norm = lambda s: re.sub(r"\s+", " ", re.sub(r"\s*\(.*\)$", "", s)
+                            .replace("&", "and")).strip().lower()
+
+    plans: Dict[str, Any] = {}
+    for li, layer in enumerate(layers):
+        # MAP sheets (the weakest layer) are SEQUENCE hints only; department
+        # flowcharts/overrides also FORCE-INCLUDE their courses (business core
+        # like HRM 391 isn't in the catalog requirement lists but is required)
+        forced = not (MAPS_PLANS.exists() and li == 0)
+        for name, plan in layer.items():
+            if name.startswith("_") or not isinstance(plan, dict):
+                continue                    # _readme / metadata keys
+            m = plans.setdefault(norm(name), {"name": name, "course_terms": {}, "cohorts": None})
+            for t in plan.get("terms", []):
+                y, s = t.get("year"), t.get("season")
+                if not y or s not in ("F", "W"):
+                    continue
+                for c in t.get("courses", []):
+                    raw = c["code"] if isinstance(c, dict) else c
+                    cred = c.get("credits") if isinstance(c, dict) else None
+                    entry = {"y": int(y), "s": s, "cr": cred}
+                    if forced:
+                        entry["f"] = 1
+                    m["course_terms"][re.sub(r"\s+", " ", raw).strip().upper()] = entry
+            if plan.get("cohorts"):
+                m["cohorts"] = plan["cohorts"]
+
     by_name = {p["name"]: p for p in programs}
-    norm = lambda s: re.sub(r"\s*\(.*\)$", "", s).strip().lower()
     by_base = {}
     for p in programs:
         by_base.setdefault(norm(p["name"]), p)
@@ -560,8 +635,8 @@ def attach_flowchart_plans(programs: List[Dict[str, Any]], by_code, out_courses)
 
     SEASON_OFF = {"F": "F", "W": "W"}
     attached = 0
-    for prog_name, plan in plans.items():
-        prog = by_name.get(prog_name) or by_base.get(norm(prog_name))
+    for key, plan in plans.items():
+        prog = by_name.get(plan["name"]) or by_base.get(key)
         if not prog:
             continue
 
@@ -570,6 +645,12 @@ def attach_flowchart_plans(programs: List[Dict[str, Any]], by_code, out_courses)
             course entry if the chart lists one the catalog doesn't have yet."""
             code = cindex.get(compact(raw))
             if code:
+                # variable-credit courses (EXDM 496R: 0.5-12): the chart's
+                # listed credit value is what students actually enroll for
+                if credits and code in out_courses and code in by_code \
+                        and is_variable_credit(by_code[code]) \
+                        and 0 < float(credits) <= 12:
+                    out_courses[code]["c"] = float(credits)
                 return code
             # normalize spacing to a plausible real code, then synthesize
             code = re.sub(r"\s+", " ", raw).strip().upper()
@@ -579,18 +660,14 @@ def attach_flowchart_plans(programs: List[Dict[str, Any]], by_code, out_courses)
             return code
 
         hint: Dict[str, Dict[str, Any]] = {}
-        for t in plan.get("terms", []):
-            y, s = t.get("year"), t.get("season")
-            if not y or s not in ("F", "W"):
-                continue
-            for c in t.get("courses", []):
-                raw = c["code"] if isinstance(c, dict) else c
-                cred = c.get("credits") if isinstance(c, dict) else None
-                code = resolve(raw, cred, s)
-                hint.setdefault(code, {"y": int(y), "s": s})
+        for raw, tm in plan["course_terms"].items():
+            code = resolve(raw, tm.get("cr"), tm["s"])
+            hint[code] = {"y": tm["y"], "s": tm["s"]}
+            if tm.get("f"):
+                hint[code]["f"] = 1        # required by the dept flowchart
 
         cohorts = []
-        for c in plan.get("cohorts", []):
+        for c in (plan.get("cohorts") or []):
             s = c.get("season")
             if s not in ("F", "W"):
                 continue
@@ -809,6 +886,8 @@ def main() -> int:
         ptype = PROGRAM_TYPES.get(str(p.get("type")))
         if not ptype:
             continue
+        if str(p.get("degree_designation") or "").strip().upper() in GRAD_DESIGS:
+            continue                       # undergraduate planner only
         parsed = parse_freeform(p, id2code, by_code, name2code, ptype, synth)
         if parsed is None:
             parsed = parse_structured(p, id2code, by_code, ptype)
@@ -818,6 +897,29 @@ def main() -> int:
             skipped += 1
             continue
         out_programs.append(parsed)
+
+    # EMPHASIS-based majors: some majors (Communications, Statistics, Public
+    # Health, ...) keep an EMPTY parent record — the real requirements live in
+    # per-emphasis records ("Communications: Advertising"). Students declare an
+    # emphasis anyway, so each emphasis becomes a selectable major.
+    have_major = {re.sub(r"\s*\(.*\)$", "", p["name"]).split(":")[0].strip().lower()
+                  for p in out_programs if p["type"] == "major"}
+    n_emph = 0
+    for p in latest:
+        if str(p.get("type")).upper() != "EMPHASIS":
+            continue
+        if str(p.get("degree_designation") or "").strip().upper() in GRAD_DESIGS:
+            continue
+        base = str(p.get("name") or "").split(":")[0].strip().lower()
+        if not base or base in have_major:
+            continue                       # parent major already plannable
+        parsed = parse_freeform(p, id2code, by_code, name2code, "major", synth)
+        if parsed is None:
+            continue
+        out_programs.append(parsed)
+        n_emph += 1
+    if n_emph:
+        print(f"emphasis-based majors added (parent had no requirements): {n_emph}")
 
     # language certificates from the CLS scrape (not in Coursedog at all)
     lang_certs = parse_language_certs(by_code)
