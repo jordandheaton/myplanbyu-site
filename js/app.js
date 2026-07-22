@@ -131,11 +131,15 @@ const App = (() => {
   }
 
   /* ------------------------------ render ----------------------------- */
+  let timeline = { byTerm: new Map(), list: [] };   // deadlines & opportunities
+
   function render() {
     renderStudentBand();
     renderToolbar();
+    timeline = result ? buildTimeline() : { byTerm: new Map(), list: [] };
     renderBoard();
     renderProgress();
+    renderTimeline(timeline);
     renderPlans();
   }
 
@@ -210,6 +214,9 @@ const App = (() => {
         ${overCap ? `<div class="col-warnbar">${over18
           ? `<i class="fas fa-triangle-exclamation"></i> ${credits} cr — over BYU's 18-credit cap (needs college approval)`
           : `<i class="fas fa-triangle-exclamation"></i> ${credits} cr — over your ${tm.cap}-credit limit`}</div>` : ""}
+        ${(timeline.byTerm.get(tm.index) || []).map(ev => `
+          <div class="col-event ${ev.cls || ""}" title="${esc(ev.detail || "")}">
+            <i class="fas ${ev.icon}"></i> ${esc(ev.text)}</div>`).join("")}
         <div class="col-body" data-term="${tm.index}">
           ${items.map(cardHtml).join("")}
           ${items.length ? "" : `<div class="col-hint">open — drag a class here</div>`}
@@ -311,12 +318,13 @@ const App = (() => {
     // schedule shows WHAT is required (Arts GE, a Religion Cornerstone) without
     // locking a specific class until the student picks one.
     if (p.bucket) {
+      // sheet-labeled slots read exactly like the printed MAP line
       return `
       <div class="card card-bucket ${t.cls}" draggable="true" data-uid="${esc(p.uid)}" data-ph="1">
         <span class="badge ${t.cls}">${t.label}</span>
         <div class="card-main">
           <span class="card-code">${esc(p.display)}${p.reqLabel ? ` <span class="req-tag" title="Catalog requirement number">${esc(p.reqLabel)}</span>` : ""}</span>
-          <span class="card-name"><i class="fas fa-list-ul"></i> choose a class ▾</span>
+          <span class="card-name"><i class="fas fa-list-ul"></i> ${p.sheetName ? `${esc(p.sheetName)} — choose ▾` : "choose a class ▾"}</span>
         </div>
         <div class="card-side"><span class="card-cr">${p.credits.toFixed(1)}</span></div>
       </div>`;
@@ -326,7 +334,7 @@ const App = (() => {
       <span class="badge ${t.cls}">${t.label}</span>
       <div class="card-main">
         <span class="card-code">${esc(p.display)}${p.uid.includes("#") ? `<span class="card-rep" title="Repeatable course — one enrollment per semester. This is enrollment ${p.uid.split("#")[1]} of the ${p.repTotal || "several"} your requirement needs.">take ${p.uid.split("#")[1]}${p.repTotal ? `/${p.repTotal}` : ""}</span>` : ""}</span>
-        <span class="card-name">${esc(p.name)}${p.isFill ? ` <span class="fill-change" title="You picked this from a requirement dropdown — swap it any time"><i class="fas fa-list-ul"></i> change ▾</span>` : ""}</span>
+        <span class="card-name">${esc(p.sheetName || p.name)}${p.isFill ? ` <span class="fill-change" title="You picked this from a requirement dropdown — swap it any time"><i class="fas fa-list-ul"></i> change ▾</span>` : ""}</span>
       </div>
       <div class="card-side">
         <span class="card-cr">${p.credits.toFixed(1)}</span>
@@ -395,16 +403,29 @@ const App = (() => {
       return null;
     };
     const preOf = {};
-    const usable = [...new Set(basePool)].filter(code => DATA.courses[code] && !inPlan.has(code));
-    usable.forEach(code => { preOf[code] = unmetPre(code); });
+    // The FULL catalog pool for this requirement — every real option, so the
+    // student sees the complete roster (BYU's "CE Breadth: choose 7" should show
+    // all 7, not just the two that happen to be un-scheduled). We split it into:
+    //   opts     — taught this term & not already in the plan (pick to fill here)
+    //   alts     — a real option, but taught another term (pick MOVES the slot)
+    //   inPlan   — already in the plan (informational; picking again would double it)
+    const allPool = [...new Set(basePool)].filter(code => DATA.courses[code]);
+    allPool.forEach(code => { preOf[code] = unmetPre(code); });
     const rank = code => prefScore(code) + (preOf[code] ? 50 : 0);   // unmet-prereq options sink
-    const opts = usable
+    const free = allPool.filter(code => !inPlan.has(code));
+    const opts = free
       .filter(code => DATA.courses[code].off.includes(season))
       .sort((a, b) => rank(a) - rank(b))
       .slice(0, 40);
-    // fallback: nothing taught this term -> offer the other suggestions with
-    // their seasons; picking one moves the slot to a term where it IS taught
-    const alts = opts.length ? [] : usable.sort((a, b) => rank(a) - rank(b)).slice(0, 20);
+    // other-term options are now ALWAYS shown (not just when nothing fits this
+    // term) — picking one moves the slot to a term where it IS taught.
+    const optSet = new Set(opts);
+    const alts = free.filter(code => !optSet.has(code))
+      .sort((a, b) => rank(a) - rank(b)).slice(0, 20);
+    // pool courses already scheduled (often pulled in as a prerequisite of some
+    // other class) — surfaced so the requirement's full option list is visible.
+    const inPlanPool = allPool.filter(code => inPlan.has(code))
+      .sort((a, b) => rank(a) - rank(b)).slice(0, 20);
 
     // sibling option-groups the student could switch this slot to
     const sel = (result.groupSel || {})[p.bucketKey] || [];
@@ -425,11 +446,15 @@ const App = (() => {
     menu.innerHTML = `
       <div class="bp-head">${isSwap ? `${esc(p.display)} → change class` : esc(p.display)} · ${esc(result.terms[p.termIndex].label)}
         ${reqLine ? `<span class="bp-req">${esc(reqLine)}${group ? ` · ${esc(group.label)}` : ""}</span>` : ""}
-        <span class="bp-sub">${opts.length ? "only classes taught this term" : "no options taught this term — picking one moves the slot"}</span></div>
+        <span class="bp-sub">${allPool.length} option${allPool.length === 1 ? "" : "s"} for this requirement${opts.length ? "" : " — none taught this term, so picking one moves the slot"}</span></div>
       <div class="bp-list">
         ${opts.map(code => itemHtml(code, false)).join("")}
+        ${alts.length ? `<div class="bp-grouphdr">taught another term — picking moves this slot</div>` : ""}
         ${alts.map(code => itemHtml(code, true)).join("")}
-        ${opts.length || alts.length ? "" : `<div class="bp-empty">Every option is already in your plan — check the progress report, or use the semester search bar.</div>`}
+        ${inPlanPool.length ? `<div class="bp-grouphdr">already in your plan</div>
+          ${inPlanPool.map(code => { const c = DATA.courses[code];
+            return `<div class="bp-item bp-inplan" title="Already scheduled elsewhere in your plan — often a prerequisite of another class"><b>${esc(code)}</b><span>${esc(c.name)}</span><em><i class="fas fa-check"></i> in plan</em></div>`; }).join("")}` : ""}
+        ${opts.length || alts.length || inPlanPool.length ? "" : `<div class="bp-empty">No catalog options resolve for this requirement — check the progress report, or use the semester search bar.</div>`}
         ${isSwap ? `<button class="bp-item bp-unfill"><b><i class="fas fa-rotate-left"></i></b><span>Back to an open "choose a class" slot</span></button>` : ""}
       </div>
       ${switchable.length ? `
@@ -494,6 +519,245 @@ const App = (() => {
       solveActive();
       toast(`Switched to ${bucket.groups[gi].label}.`, "ok");
     }));
+  }
+
+  /* ------------- timeline: deadlines & opportunities layer ------------- */
+  /* Baked by scraper/generate_timeline.py into js/timeline_data.js:
+     academic dates, limited-enrollment admission notes, program->college,
+     college-tagged study abroad, curated scholarship deadlines. Everything
+     here is defensive — the app still works if TIMELINE is absent. */
+  const MONTH_NAME = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthSeason = m => (m >= 9 ? "F" : m >= 7 ? "U" : m >= 5 ? "S" : "W");
+
+  function studentColleges() {
+    if (typeof TIMELINE === "undefined" || !result) return [];
+    const cols = [];
+    (result.programs || []).forEach(id => {
+      const c = (TIMELINE.programColleges || {})[id];
+      if (c && !cols.includes(c)) cols.push(c);
+    });
+    return cols;
+  }
+
+  // client-side academic-year index matching the solver's (incl. mid-degree
+  // standing offset carried on result.terms.yearOffset)
+  function acadYearOf(tm) {
+    const t0 = result.terms[0];
+    const ay = x => (x.season === "F" ? x.year : x.year - 1);
+    return ay(tm) - ay(t0) + (result.terms.yearOffset || 0);
+  }
+
+  function buildTimeline() {
+    const empty = { byTerm: new Map(), deadlines: [], recs: [], schols: [], abroad: [] };
+    if (typeof TIMELINE === "undefined" || !result) return empty;
+    const { byTerm, deadlines, recs, schols, abroad } = empty;
+    const chip = (t, c) => { if (t == null) return; if (!byTerm.has(t)) byTerm.set(t, []); byTerm.get(t).push(c); };
+    const activeT = [...new Set(result.placements.map(p => p.termIndex))].sort((a, b) => a - b);
+    if (!activeT.length) return empty;
+    const lastT = activeT[activeT.length - 1];
+    const cols = studentColleges();
+    const state = result.state;
+
+    // 1) limited-enrollment admission — the make-or-break deadline (chips stay
+    //    on the board; scholarships/abroad live in the panel sections only)
+    (result.programs || []).forEach(pid => {
+      const prog = DATA.programIndex[pid];
+      if (!prog || pid === "univ-core") return;
+      const g = state.admitGate && state.admitGate[pid] != null ? state.admitGate[pid] : null;
+      const note = (TIMELINE.admitNotes || {})[pid];
+      if (g == null && !note) return;
+      const short = prog.name.replace(/\s*\(.*\)$/, "");
+      if (g != null) {
+        // application happens DURING the academic year before the professional
+        // phase (acadYear g); chip on that year's Winter term when in plan
+        const applyTm = result.terms.find(tm => tm.enabled && tm.isFW &&
+          tm.season === "W" && tm.index <= lastT && acadYearOf(tm) === g - 1) ||
+          result.terms.find(tm => tm.index === activeT[0]);
+        chip(applyTm && applyTm.index, { icon: "fa-lock", cls: "ev-admit",
+          text: `Apply to ${short}`, detail: note || `Limited enrollment — professional phase starts the following Fall. Confirm the exact deadline with the college advisement center.` });
+        deadlines.push({ when: applyTm ? applyTm.label : `Year ${g}`, icon: "fa-lock",
+          title: `${short} application`, detail: note || "Limited-enrollment program — apply the year before the professional phase begins.", cls: "ev-admit" });
+      } else {
+        chip(activeT[0], { icon: "fa-lock", cls: "ev-admit", text: `${short}: application required`,
+          detail: note });
+        deadlines.push({ when: "Early", icon: "fa-lock", title: `${short} requires an application/audition`, detail: note, cls: "ev-admit" });
+      }
+    });
+
+    // 2) academic dates for terms with real calendar data (chips + deadline rows)
+    (TIMELINE.academicDates || []).forEach(d => {
+      const tm = result.terms.find(x => x.season === d.s && x.year === d.y && activeT.includes(x.index));
+      if (!tm) return;
+      chip(tm.index, { icon: "fa-calendar-check", cls: "ev-dates",
+        text: `Add/drop ${d.addDrop || "?"}`,
+        detail: `${tm.label}: runs ${d.start} – ${d.end}. Add/drop deadline ${d.addDrop}; withdraw deadline ${d.withdraw}.` });
+      deadlines.push({ when: tm.label, icon: "fa-calendar-check", cls: "ev-dates",
+        title: `Add/drop ${d.addDrop} · withdraw ${d.withdraw}`, detail: `Term runs ${d.start} – ${d.end}.` });
+    });
+
+    // 3) RELEVANT SCHOLARSHIPS — Scholarship-Matcher-style relevance: your
+    //    college's own awards first, then university-wide BYU, then national.
+    (TIMELINE.scholarships || []).filter(s =>
+      (s.colleges.includes("any") || s.colleges.some(c => cols.includes(c))) &&
+      // audience-specific awards (incoming freshmen, transfers) don't apply
+      // to a continuing student planning at BYU
+      !(s.levels.length && s.levels.every(l => l === "incoming-freshman" || l === "transfer")))
+      .forEach(s => schols.push({
+        name: s.name, url: s.url, award: s.award, note: s.deadlineNote,
+        gpa: s.minGPA, group: s.group, scope: s.scope,
+        collegeMatch: s.colleges.some(c => cols.includes(c)),
+        when: s.deadline ? `${MONTH_NAME[s.deadline.month]} ${s.deadline.day}` : "varies",
+        sortKey: s.deadline ? s.deadline.month * 40 + s.deadline.day : 999,
+      }));
+    schols.sort((a, b) => (b.collegeMatch - a.collegeMatch) ||
+      ((a.scope !== "byu") - (b.scope !== "byu")) || (a.sortKey - b.sortKey));
+
+    // 4) RELEVANT STUDY ABROAD — matched to the student's college(s)
+    (TIMELINE.studyAbroad || []).filter(p => p.colleges.some(c => cols.includes(c)))
+      .forEach(p => abroad.push({ name: p.name, url: p.url, term: p.term,
+        colleges: p.colleges.filter(c => cols.includes(c)) }));
+
+    // 5) RECOMMENDATIONS — rule-based, from THIS plan's actual shape. Each can
+    //    carry an `act` the student applies with ONE CLICK — the solver never
+    //    silently changes a constraint (e.g. adding Spring) on its own.
+    const prof = activePlan() ? activePlan().profile : null;
+    const st = prof ? prof.settings : {};
+    const load = t => result.placements.filter(p => p.termIndex === t).reduce((s, p) => s + p.credits, 0);
+    const fwActive = result.terms.filter(tm => tm.isFW && activeT.includes(tm.index));
+    const heavy = fwActive.filter(tm => load(tm.index) >= 17);
+    // 5a) Spring/Summer-ONLY courses whose offered seasons are all disabled
+    const spsuOnly = [...result.placements, ...(result.unscheduled || []).map(u => ({ display: u.name, courseId: u.uid }))]
+      .filter(p => {
+        const c = DATA.courses[p.courseId];
+        if (!c) return false;
+        const off = String(c.off);
+        if (/[FW]/.test(off)) return false;
+        return !((st.allowSpring && off.includes("S")) || (st.allowSummer && off.includes("U")));
+      });
+    if (spsuOnly.length) {
+      const wantsS = spsuOnly.some(p => String(DATA.courses[p.courseId].off).includes("S"));
+      const wantsU = spsuOnly.some(p => { const o = String(DATA.courses[p.courseId].off); return o.includes("U") && !o.includes("S"); });
+      recs.push({ icon: "fa-sun",
+        title: `${spsuOnly.slice(0, 3).map(p => p.display).join(", ")} ${spsuOnly.length > 1 ? "are" : "is"} only taught ${wantsS && wantsU ? "Spring/Summer" : wantsS ? "Spring" : "Summer"} — your plan can't schedule ${spsuOnly.length > 1 ? "them" : "it"} without that term.`,
+        detail: "One click re-plans with the term added. Your other constraints stay as they are.",
+        act: { kind: "seasons", spring: wantsS, summer: wantsU,
+          label: `Add ${wantsS && wantsU ? "Spring & Summer terms" : wantsS ? "a Spring term" : "a Summer term"}` } });
+    }
+    // 5a2) the official sheet paces work into Spring, but the courses fit F/W
+    if (!spsuOnly.length && result.state && result.state.mapWantsSpring) {
+      recs.push({ icon: "fa-sun",
+        title: "Your major's official MAP sheet uses a Spring term — this plan re-sequenced that work into Fall/Winter.",
+        detail: "Adding Spring restores the sheet's intended pacing and lightens Fall/Winter loads.",
+        act: { kind: "seasons", spring: true, summer: false, label: "Add a Spring term" } });
+    }
+    // 5b) Spring as a pressure valve for a long or heavy plan
+    if (!st.allowSpring && !st.allowSummer && !spsuOnly.length && (heavy.length >= 2 || fwActive.length >= 9)) {
+      const springable = result.placements.filter(p => { const c = DATA.courses[p.courseId]; return c && String(c.off).includes("S"); }).length;
+      const firstSpring = result.terms.find(tm => tm.season === "S" && tm.index > activeT[0]);
+      if (springable >= 3) recs.push({ icon: "fa-sun",
+        title: `A Spring term${firstSpring ? ` (${firstSpring.label})` : ""} could help — ${springable} of your planned classes are also taught Spring.`,
+        detail: `${heavy.length ? `${heavy.length} semester${heavy.length > 1 ? "s" : ""} run${heavy.length > 1 ? "" : "s"} 17 credits; ` : ""}${fwActive.length >= 9 ? `the plan spans ${fwActive.length} Fall/Winter semesters; ` : ""}a 6-9 credit Spring lightens the load or shortens the plan.`,
+        act: { kind: "seasons", spring: true, summer: false, label: "Add a Spring term" } });
+    }
+    // 5c) open-elective headroom = a free minor/certificate
+    const elecCr = result.placements.filter(p => p.elective || /^ELECTIVE\+/.test(p.uid))
+      .reduce((s, p) => s + p.credits, 0);
+    if (elecCr >= 6 && (prof && !(prof.minorIds || []).length)) {
+      recs.push({ icon: "fa-graduation-cap",
+        title: `~${Math.round(elecCr)} credits of open electives — that's room for a minor or certificate with no extra semesters.`,
+        detail: "Compare one side-by-side before committing; your current plan stays untouched.",
+        act: { kind: "whatif_minor", label: "Compare adding a minor…" } });
+    }
+    // 5d) heavy terms that a drag could ease (only when Spring isn't the answer)
+    if (heavy.length && (st.allowSpring || st.allowSummer)) {
+      recs.push({ icon: "fa-scale-unbalanced",
+        title: `${heavy.map(tm => tm.label).join(" and ")} run${heavy.length > 1 ? "" : "s"} 17 credits.`,
+        detail: "A Spring/Summer class or dragging one elective to a lighter semester would ease the crunch." });
+    }
+    // 5e) scholarship full-time flag unchecked but plan floors at 12
+    if (prof && !st.scholarshipFullTime && schols.some(s => s.scope === "byu")) {
+      recs.push({ icon: "fa-circle-check",
+        title: "BYU scholarships require full-time (12+ cr) — this plan keeps every Fall/Winter at 12+, so you're covered.",
+        detail: "Make it a hard guarantee on every future re-plan:",
+        act: { kind: "fulltime", label: "Guarantee full-time status" } });
+    }
+
+    return { byTerm, deadlines, recs, schols, abroad };
+  }
+
+  /* Apply a one-click Recommended action. The student initiated it — settings
+     changes re-solve immediately; bigger changes route through what-if. */
+  function applyRec(act) {
+    const plan = activePlan();
+    if (!plan || !act) return;
+    if (act.kind === "seasons") {
+      if (act.spring) plan.profile.settings.allowSpring = true;
+      if (act.summer) plan.profile.settings.allowSummer = true;
+      plan.updatedAt = Date.now(); save();
+      solveActive();
+      toast(`${act.spring && act.summer ? "Spring & Summer" : act.spring ? "Spring" : "Summer"} terms enabled — plan rebuilt.`, "ok");
+    } else if (act.kind === "whatif_minor") {
+      openWhatIf({ type: "add_minor" });
+    } else if (act.kind === "fulltime") {
+      plan.profile.settings.scholarshipFullTime = true;
+      plan.updatedAt = Date.now(); save();
+      solveActive();
+      toast("Full-time (12+ cr) is now a hard guarantee.", "ok");
+    }
+  }
+
+  function renderTimeline(tl) {
+    const sec = $("#timelineSec"), el = $("#timelineList");
+    if (!sec || !el) return;
+    const any = tl.deadlines.length || tl.recs.length || tl.schols.length || tl.abroad.length;
+    if (!any) { sec.hidden = true; return; }
+    sec.hidden = false;
+    const item = e => `
+      <div class="tl-item ${e.cls || ""}">
+        <span class="tl-when">${esc(e.when)}</span>
+        <div class="tl-body">
+          <b>${esc(e.title)}</b>
+          ${e.detail ? `<p>${esc(e.detail)}</p>` : ""}
+          ${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">Details <i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}
+        </div>
+      </div>`;
+    el.innerHTML = `
+      ${tl.deadlines.map(item).join("")}
+      ${tl.recs.length ? `<div class="tl-recs">
+        <h4><i class="fas fa-lightbulb"></i> Recommended</h4>
+        ${tl.recs.map((r, i) => `<div class="tl-rec"><i class="fas ${r.icon}"></i><div>
+          <b>${esc(r.title)}</b>${r.detail ? `<p>${esc(r.detail)}</p>` : ""}
+          ${r.act ? `<button class="btn primary sm tl-rec-btn" data-rec="${i}"><i class="fas fa-wand-magic-sparkles"></i> ${esc(r.act.label)}</button>` : ""}
+        </div></div>`).join("")}
+      </div>` : ""}
+      ${tl.schols.length ? `<details class="tl-acc">
+        <summary><i class="fas fa-sack-dollar"></i> Relevant scholarships <span class="tl-count">${tl.schols.length}</span></summary>
+        ${tl.schols.map(s => `
+          <div class="tl-item ev-money">
+            <span class="tl-when">${esc(s.when)}</span>
+            <div class="tl-body">
+              <b>${esc(s.name)}</b>${s.collegeMatch ? ` <span class="tl-badge">your college</span>` : s.scope !== "byu" ? ` <span class="tl-badge nat">national</span>` : ""}
+              <p>${esc([s.award, s.gpa ? `${s.gpa}+ GPA` : "", s.note].filter(Boolean).join(" · "))}</p>
+              ${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">Details <i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}
+            </div>
+          </div>`).join("")}
+      </details>` : ""}
+      ${tl.abroad.length ? `<details class="tl-acc">
+        <summary><i class="fas fa-plane"></i> Study abroad for your college <span class="tl-count">${tl.abroad.length}</span></summary>
+        <p class="tl-acc-hint">Matched to your college by the courses each program grants credit for. Most run Spring/Summer — they fit between your semesters.</p>
+        ${tl.abroad.map(p => `
+          <div class="tl-item ev-abroad">
+            <span class="tl-when">${esc((p.term || "varies").split("|")[0].trim().slice(0, 22))}</span>
+            <div class="tl-body">
+              <b>${esc(p.name)}</b>
+              ${p.term ? `<p>${esc(p.term)}</p>` : ""}
+              ${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">Details <i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}
+            </div>
+          </div>`).join("")}
+      </details>` : ""}`;
+    // one-click Recommended actions (the student opts in — never automatic)
+    el.querySelectorAll(".tl-rec-btn").forEach(b =>
+      b.addEventListener("click", () => applyRec((tl.recs[+b.dataset.rec] || {}).act)));
   }
 
   function renderProgress() {
@@ -673,6 +937,94 @@ const App = (() => {
     URL.revokeObjectURL(a.href);
   }
 
+  /* ------------------------- clean print / PDF ----------------------- */
+  /* Builds a dedicated printable document (hidden iframe) instead of
+     printing the app shell: every semester in a wrapping grid, clean tables,
+     plan summary, key deadlines, warnings, and a verify-with-MyMAP footer.
+     The scrolling board could never fit all semesters on paper. */
+  function printPlan() {
+    const plan = activePlan();
+    if (!plan || !result) { toast("Generate a plan first."); return; }
+    const progNames = (result.programs || []).filter(id => id !== "univ-core")
+      .map(id => DATA.programIndex[id]?.name || id);
+    const byTerm = new Map();
+    result.placements.forEach(p => {
+      if (!byTerm.has(p.termIndex)) byTerm.set(p.termIndex, []);
+      byTerm.get(p.termIndex).push(p);
+    });
+    const termIdx = [...byTerm.keys()].sort((a, b) => a - b);
+    const totalCr = result.placements.reduce((s, p) => s + p.credits, 0);
+    const done = plan.profile.completed || [];
+    const doneCr = done.reduce((s, id) => s + (DATA.courses[id]?.credits ?? 3), 0);
+    const warns = (result.flags || []).filter(f => f.level === "warn").slice(0, 4);
+
+    const termBlock = t => {
+      const items = byTerm.get(t);
+      const cr = items.reduce((s, p) => s + p.credits, 0);
+      items.sort((a, b) => b.credits - a.credits);
+      return `<div class="term">
+        <div class="term-head"><b>${esc(result.terms[t].label)}</b><span>${cr.toFixed(1).replace(/\.0$/, "")} cr</span></div>
+        <table>${items.map(p => `<tr>
+          <td class="code">${esc(p.display)}${p.bucket ? " ▾" : ""}${p.pinned ? " 📌" : ""}</td>
+          <td class="name">${esc(p.bucket ? (p.name || "choose a class") : p.name)}</td>
+          <td class="cr">${p.credits.toFixed(1).replace(/\.0$/, "")}</td>
+        </tr>`).join("")}</table>
+      </div>`;
+    };
+
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(plan.name)} — myplanBYU</title>
+      <style>
+        * { box-sizing: border-box; margin: 0; }
+        body { font: 10.5px/1.45 'Segoe UI', Arial, sans-serif; color: #1c2733; padding: 28px 32px; }
+        h1 { font-size: 19px; margin-bottom: 2px; }
+        .sub { color: #55677a; font-size: 11px; margin-bottom: 12px; }
+        .stats { display: flex; gap: 22px; border: 1px solid #d8dfe6; border-radius: 8px; padding: 8px 14px; margin-bottom: 14px; font-size: 11px; }
+        .stats b { font-size: 14px; display: block; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .term { border: 1px solid #d8dfe6; border-radius: 8px; padding: 8px 10px; break-inside: avoid; }
+        .term-head { display: flex; justify-content: space-between; border-bottom: 1.5px solid #1c2733; padding-bottom: 4px; margin-bottom: 5px; font-size: 11.5px; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 2.5px 4px 2.5px 0; vertical-align: top; border-bottom: 1px solid #eef1f4; }
+        tr:last-child td { border-bottom: 0; }
+        .code { white-space: nowrap; font-weight: 600; width: 34%; }
+        .name { color: #45566a; }
+        .cr { text-align: right; white-space: nowrap; width: 30px; color: #45566a; }
+        .sec { margin-top: 14px; break-inside: avoid; }
+        .sec h2 { font-size: 12px; margin-bottom: 5px; }
+        .sec p, .sec li { font-size: 10px; color: #45566a; }
+        .sec ul { padding-left: 16px; }
+        .legend { margin-top: 10px; font-size: 9.5px; color: #55677a; }
+        .foot { margin-top: 16px; padding-top: 8px; border-top: 1px solid #d8dfe6; font-size: 9.5px; color: #55677a; }
+        @page { margin: 12mm; }
+      </style></head><body>
+      <h1>${esc(plan.name)}</h1>
+      <div class="sub">${esc(progNames.join(" · "))} — draft plan generated ${new Date().toLocaleDateString()} by myplanBYU${result.state && result.state.mapName ? ` · follows the official ${esc(result.state.mapName.replace(/\s*\(.*\)$/, ""))} MAP sheet` : ""}</div>
+      <div class="stats">
+        <div><b>${termIdx.length}</b> semesters</div>
+        <div><b>${Math.round(totalCr)}</b> planned credits</div>
+        ${done.length ? `<div><b>${Math.round(doneCr)}</b> credits already completed</div>` : ""}
+        <div><b>${esc(result.terms[termIdx[termIdx.length - 1]].label)}</b> graduation</div>
+      </div>
+      <div class="grid">${termIdx.map(termBlock).join("")}</div>
+      <div class="legend">▾ = choose-a-class slot (any listed option satisfies it) · 📌 = pinned. Credits shown per class; term totals include every card.</div>
+      ${timeline.deadlines.length ? `<div class="sec"><h2>Key deadlines</h2><ul>${timeline.deadlines.slice(0, 6).map(d => `<li><b>${esc(d.when)}:</b> ${esc(d.title)}</li>`).join("")}</ul></div>` : ""}
+      ${warns.length ? `<div class="sec"><h2>Planner warnings</h2><ul>${warns.map(w => `<li>${esc(w.text)}</li>`).join("")}</ul></div>` : ""}
+      <div class="foot">Draft made with myplanBYU, an unofficial planning tool — verify against MyMAP and your college advisement center before registering.</div>
+      </body></html>`;
+
+    const f = document.createElement("iframe");
+    f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
+    document.body.appendChild(f);
+    f.contentDocument.open();
+    f.contentDocument.write(html);
+    f.contentDocument.close();
+    f.onload = () => {
+      f.contentWindow.focus();
+      f.contentWindow.print();
+      setTimeout(() => f.remove(), 2000);
+    };
+  }
+
   /* --------------------------- course modal -------------------------- */
   /* if a class was chosen from a bucket dropdown, find its fill entry so it
      can be put back (returns [fillKey, index] or null) */
@@ -683,6 +1035,197 @@ const App = (() => {
       if (i >= 0) return [k, i];
     }
     return null;
+  }
+
+  /* ---------------- what-if: compare this plan against a change --------- */
+  /* Solve a MODIFIED copy of the active profile and diff it against the
+     current plan: which credits carry over, what's newly required, what's no
+     longer needed, semesters and graduation date. Entry points: Plan Options
+     -> "What if…" and the AI advisor's proposed-action button (chat.js). */
+  const WHATIF_TYPES = {
+    add_minor:    { label: "Add a minor",        pool: () => DATA.minors, max: 1 },
+    add_cert:     { label: "Add a certificate",  pool: () => DATA.certs,  max: 1 },
+    switch_major: { label: "Switch major",       pool: () => DATA.majors, max: 1 },
+    remove_minor: { label: "Drop a minor",       pool: () => (activePlan()?.profile.minorIds || []).map(id => DATA.programIndex[id]).filter(Boolean), max: 1 },
+    enable_spsu:  { label: "Allow Spring & Summer terms", pool: null },
+  };
+
+  function whatIfProfile(mod) {
+    const plan = activePlan();
+    if (!plan) return null;
+    const p = JSON.parse(JSON.stringify(plan.profile));
+    if (mod.type === "switch_major") {
+      p.majorId = mod.programId;
+      // pins/fills/removals refer to the OLD major's plan — a fresh start is honest
+      p.pins = {}; p.fills = {}; p.excluded = [];
+    }
+    if (mod.type === "add_minor") p.minorIds = [...new Set([...(p.minorIds || []), mod.programId])].slice(0, 2);
+    if (mod.type === "remove_minor") p.minorIds = (p.minorIds || []).filter(id => id !== mod.programId);
+    if (mod.type === "add_cert") p.certIds = [...new Set([...(p.certIds || []), mod.programId])];
+    if (mod.type === "enable_spsu") { p.settings.allowSpring = true; p.settings.allowSummer = true; }
+    return p;
+  }
+
+  function planMetrics(r) {
+    const activeT = [...new Set(r.placements.map(p => p.termIndex))].sort((a, b) => a - b);
+    const real = r.placements.filter(p => !p.placeholder && !/^ELECTIVE\+/.test(p.uid));
+    return {
+      fwTerms: r.terms.filter(tm => tm.isFW && activeT.includes(tm.index)).length,
+      spsuTerms: r.terms.filter(tm => !tm.isFW && activeT.includes(tm.index)).length,
+      credits: r.placements.reduce((s, p) => s + p.credits, 0),
+      // "choose a class" requirement slots vs pure open-elective filler —
+      // a new minor mostly arrives as slots, so the diff must show them
+      slotCr: r.placements.filter(p => p.placeholder && !p.elective && !/^ELECTIVE\+/.test(p.uid))
+        .reduce((s, p) => s + p.credits, 0),
+      elecCr: r.placements.filter(p => p.elective || /^ELECTIVE\+/.test(p.uid))
+        .reduce((s, p) => s + p.credits, 0),
+      grad: activeT.length ? r.terms[activeT[activeT.length - 1]].label : "—",
+      realIds: new Set(real.map(p => p.courseId)),
+      crOf: id => { const p = real.find(x => x.courseId === id); return p ? p.credits : 3; },
+      nameOf: id => { const p = real.find(x => x.courseId === id); return p ? p.display : id; },
+    };
+  }
+
+  function openWhatIf(preset) {
+    const plan = activePlan();
+    if (!plan || !result) { toast("Generate a plan first."); return; }
+    const body = $("#whatifBody");
+    $("#whatifModal").classList.add("open");
+    let mode = preset && WHATIF_TYPES[preset.type] ? preset.type : null;
+
+    const pickerHtml = () => `
+      <p class="wi-intro">Compare your current plan against a change — the solver builds the alternative and shows exactly what it costs: semesters, credits, what carries over, what's new.</p>
+      <div class="wi-modes">${Object.entries(WHATIF_TYPES).map(([k, t]) =>
+        `<button class="btn ${mode === k ? "primary" : "ghost"} sm" data-mode="${k}">${t.label}</button>`).join("")}
+      </div>
+      <div id="wiPick"></div>
+      <div class="wi-run"><button class="btn primary" id="wiRun" disabled><i class="fas fa-code-compare"></i> Compare</button></div>
+      <div id="wiResult"></div>`;
+
+    let chosenProg = preset && preset.programId ? preset.programId : null;
+    const renderPicker = () => {
+      body.innerHTML = pickerHtml();
+      body.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => {
+        mode = b.dataset.mode; chosenProg = null; renderPicker();
+      }));
+      const pickEl = body.querySelector("#wiPick");
+      if (mode && WHATIF_TYPES[mode].pool) {
+        pickEl.innerHTML = `<div id="wiSearch"></div>`;
+        searchSelect("#wiSearch", WHATIF_TYPES[mode].pool(), chosenProg ? [chosenProg] : [], 1,
+          ids => { chosenProg = ids[0] || null; body.querySelector("#wiRun").disabled = !chosenProg; });
+      }
+      const run = body.querySelector("#wiRun");
+      run.disabled = mode === "enable_spsu" ? false : !chosenProg;
+      run.addEventListener("click", () => runCompare({ type: mode, programId: chosenProg }));
+    };
+
+    const runCompare = (mod) => {
+      const resEl = body.querySelector("#wiResult");
+      resEl.innerHTML = `<div class="wi-solving"><i class="fas fa-gear fa-spin"></i> Building the alternative plan…</div>`;
+      setTimeout(() => {           // let the spinner paint before the solve blocks
+        const altProfile = whatIfProfile(mod);
+        let alt;
+        try { alt = Solver.solve(altProfile); }
+        catch (e) { resEl.innerHTML = `<div class="flag flag-error">The alternative couldn't be solved: ${esc(String(e))}</div>`; return; }
+        const A = planMetrics(result), B = planMetrics(alt);
+        const carry = [...A.realIds].filter(id => B.realIds.has(id));
+        const added = [...B.realIds].filter(id => !A.realIds.has(id));
+        const dropped = [...A.realIds].filter(id => !B.realIds.has(id));
+        const carryCr = carry.reduce((s, id) => s + A.crOf(id), 0);
+        const dTerms = B.fwTerms - A.fwTerms;
+        const dCr = Math.round(B.credits - A.credits);
+        const modLabel = mod.type === "enable_spsu" ? "with Spring/Summer terms"
+          : `${WHATIF_TYPES[mod.type].label.replace(/^Add a |^Switch |^Drop a /, m => m.toLowerCase())}: ${DATA.programIndex[mod.programId]?.name || ""}`;
+        const chipList = (ids, M) => ids.slice(0, 14).map(id => `<span class="chip">${esc(M.nameOf(id))}</span>`).join("") +
+          (ids.length > 14 ? `<span class="chip soft">+${ids.length - 14} more</span>` : "");
+        resEl.innerHTML = `
+          <div class="wi-grid">
+            <div class="wi-card"><h4>Current plan</h4>
+              <b>${A.fwTerms}</b> Fall/Winter semesters${A.spsuTerms ? ` + ${A.spsuTerms} Sp/Su` : ""}<br>
+              <b>${Math.round(A.credits)}</b> planned credits · graduates <b>${esc(A.grad)}</b></div>
+            <div class="wi-card wi-alt"><h4>What-if (${esc(modLabel)})</h4>
+              <b>${B.fwTerms}</b> Fall/Winter semesters${B.spsuTerms ? ` + ${B.spsuTerms} Sp/Su` : ""}
+              <span class="wi-delta ${dTerms > 0 ? "bad" : dTerms < 0 ? "good" : ""}">${dTerms > 0 ? `+${dTerms}` : dTerms || "±0"}</span><br>
+              <b>${Math.round(B.credits)}</b> planned credits
+              <span class="wi-delta ${dCr > 0 ? "bad" : dCr < 0 ? "good" : ""}">${dCr > 0 ? `+${dCr}` : dCr || "±0"}</span>
+              · graduates <b>${esc(B.grad)}</b></div>
+          </div>
+          <div class="wi-sec"><label><i class="fas fa-arrows-rotate"></i> Carries over</label>
+            <p>${carry.length} of your ${A.realIds.size} scheduled classes (${Math.round(carryCr)} cr) count in both plans — you lose nothing on those.${
+              Math.abs(B.slotCr - A.slotCr) >= 1 ? ` Flexible "choose a class" requirement slots go ${Math.round(A.slotCr)} → ${Math.round(B.slotCr)} cr${B.slotCr > A.slotCr ? " (the new program's requirements arrive as choose-slots)" : ""}.` : ""}${
+              A.elecCr - B.elecCr >= 3 ? ` ${Math.round(A.elecCr - B.elecCr)} cr of open electives convert into real requirements — that's why the totals barely move.` : ""}</p></div>
+          ${added.length ? `<div class="wi-sec"><label><i class="fas fa-plus"></i> Newly required (${added.length})</label><div class="cm-chips">${chipList(added, B)}</div></div>` : ""}
+          ${dropped.length ? `<div class="wi-sec"><label><i class="fas fa-minus"></i> No longer needed (${dropped.length})</label><div class="cm-chips">${chipList(dropped, A)}</div></div>` : ""}
+          <div class="wi-actions">
+            <button class="btn primary" id="wiSave"><i class="fas fa-floppy-disk"></i> Save as a new plan</button>
+            <button class="btn ghost" data-close="#whatifModal">Keep my current plan</button>
+          </div>
+          <p class="wi-note"><i class="fas fa-circle-info"></i> Saving creates a separate plan — your current one stays untouched in My Plans.</p>`;
+        resEl.querySelector("#wiSave").addEventListener("click", () => {
+          const name = mod.type === "enable_spsu" ? `${plan.name} + Sp/Su`
+            : `${plan.name.replace(/ \+.*$/, "")} + ${(DATA.programIndex[mod.programId]?.name || "change").replace(/\s*\(.*\)$/, "")}`;
+          newPlanFromProfile(altProfile, name);
+          closeModal("#whatifModal");
+          solveActive();
+          toast("Saved as a new plan — you're now viewing it.", "ok");
+        });
+        resEl.querySelector("[data-close]").addEventListener("click", () => closeModal("#whatifModal"));
+      }, 30);
+    };
+
+    renderPicker();
+    if (preset && (preset.programId || preset.type === "enable_spsu")) {
+      runCompare({ type: preset.type, programId: preset.programId });
+    }
+  }
+
+  /* Prerequisite-chain visual: what unlocks this course -> THIS -> what it
+     unlocks, resolved against the ACTUAL plan (✓ completed, term labels for
+     planned satisfiers, red for missing). One level each way — the deeper
+     story lives in the "Why it's here" chain notes. */
+  function chainHtml(p, c) {
+    if (p.placeholder || p.bucket) return "";
+    const completed = result.state.completed;
+    const placedAt = id => {
+      let best = null;
+      result.placements.forEach(x => {
+        if (x.courseId === id && (best === null || x.termIndex < best)) best = x.termIndex;
+      });
+      return best;
+    };
+    // upstream: per prereq group, the satisfier this plan actually uses
+    const up = (c.pre || []).map(group => {
+      const opts = Array.isArray(group) ? group : [group];
+      const doneOpt = opts.find(g => completed.has(g));
+      if (doneOpt) return { label: doneOpt, cls: "done", note: "✓ done" };
+      const planned = opts.map(g => ({ g, t: placedAt(g) })).filter(x => x.t !== null)
+        .sort((a, b) => a.t - b.t)[0];
+      if (planned) return { label: planned.g, cls: "", note: result.terms[planned.t].label };
+      return { label: opts[0] + (opts.length > 1 ? ` (or ${opts.length - 1} more)` : ""), cls: "miss", note: "not planned" };
+    });
+    // downstream: planned courses whose prereqs list this one
+    const seen = new Set();
+    const down = [];
+    result.placements.forEach(x => {
+      if (x.courseId === p.courseId || seen.has(x.courseId)) return;
+      const cc = result.state.cat[x.courseId];
+      if (!cc || !(cc.pre || []).some(g => (Array.isArray(g) ? g : [g]).includes(p.courseId))) return;
+      seen.add(x.courseId);
+      down.push({ label: x.display, note: result.terms[x.termIndex].label, t: x.termIndex });
+    });
+    down.sort((a, b) => a.t - b.t);
+    if (!up.length && !down.length) return "";
+    const chip = n => `<span class="cm-chn ${n.cls || ""}"><b>${esc(n.label)}</b><i>${esc(n.note)}</i></span>`;
+    return `<div class="cm-sec"><label>Prerequisite chain</label>
+      <div class="cm-chain">
+        <div class="cm-chain-col">${up.length ? up.map(chip).join("") : `<span class="cm-chain-none">no prerequisites</span>`}</div>
+        <span class="cm-chain-arrow"><i class="fas fa-arrow-right-long"></i></span>
+        <span class="cm-chain-this">${esc(p.display)}</span>
+        <span class="cm-chain-arrow"><i class="fas fa-arrow-right-long"></i></span>
+        <div class="cm-chain-col">${down.length
+          ? down.slice(0, 5).map(chip).join("") + (down.length > 5 ? `<span class="cm-chain-none">+${down.length - 5} more</span>` : "")
+          : `<span class="cm-chain-none">nothing in the plan waits on it</span>`}</div>
+      </div></div>`;
   }
 
   function openCourseModal(uid) {
@@ -716,8 +1259,13 @@ const App = (() => {
           <span class="diff-meter"><span style="width:${c.diff * 10}%" class="${c.diff >= 7 ? "hot" : ""}"></span></span> <b>${c.diff}/10</b></div>
         <div class="cm-cell"><label>Time cost</label><b>×${(c.load || 1).toFixed(1)} of credit hours</b></div>
       </div>
-      ${pre.length ? `<div class="cm-sec"><label>Prerequisites</label>${pre.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>` : ""}
+      ${(c.preText || pre.length) ? `<div class="cm-sec"><label>Prerequisites <span class="cm-seclabel-src">· per catalog</span></label>
+        ${c.preText ? `<p class="cm-pretext">${esc(c.preText)}</p>` : ""}
+        ${pre.length ? `<div class="cm-chips">${pre.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>` : ""}</div>`
+        : `<div class="cm-sec"><label>Prerequisites <span class="cm-seclabel-src">· per catalog</span></label><p class="cm-pretext cm-none">None listed.</p></div>`}
       ${buckets.length ? `<div class="cm-sec"><label>Fills requirements</label>${buckets.map(x => `<span class="chip soft">${esc(x)}</span>`).join("")}</div>` : ""}
+      ${chainHtml(p, c)}
+      ${(p.why || []).length ? `<div class="cm-sec"><label>Why it's here <span class="cm-seclabel-src">· solver reasoning</span></label>${p.why.map(w => `<div class="cm-why"><i class="fas fa-route"></i><span>${esc(w)}</span></div>`).join("")}</div>` : ""}
       ${p.flags.length ? `<div class="cm-sec"><label>Notes & flags</label>${p.flags.map(f => `<div class="flag flag-${f.level}"><i class="fas fa-circle-info"></i><span>${esc(f.text)}</span></div>`).join("")}</div>` : ""}
       ${p.block ? `<p class="cm-blocknote"><i class="fas fa-people-group"></i> Part of a locked cohort block — it moves only when the whole block moves.</p>` : `
       <div class="cm-move">
@@ -725,7 +1273,9 @@ const App = (() => {
         <button class="btn primary sm" id="cmMoveBtn">Move & pin</button>
         ${p.pinned ? `<button class="btn ghost sm" id="cmUnpinBtn">Unpin</button>` : ""}
         ${fillOf(p.courseId) ? `<button class="btn ghost sm" id="cmUnfillBtn" title="Turn this back into an open 'choose a class' slot"><i class="fas fa-rotate-left"></i> Back to dropdown</button>` : ""}
-      </div>`}
+        <button class="btn ghost sm cm-remove" id="cmRemoveBtn" title="Drop this class from the plan entirely"><i class="fas fa-trash-can"></i> Remove</button>
+      </div>
+      <p class="cm-removenote"><i class="fas fa-circle-info"></i> Removing drops the class from your plan. If a program requires it, that requirement will show as an open gap until you restore it (Plan Options → Restore removed).</p>`}
     `;
     $("#courseModal").classList.add("open");
     const btn = $("#cmMoveBtn");
@@ -764,32 +1314,56 @@ const App = (() => {
       toast("Unpinned — Re-optimize may move it.", "ok");
       render();
     };
+    const remove = $("#cmRemoveBtn");
+    if (remove) remove.onclick = () => removeCourse(p.courseId, p.display);
+  }
+
+  /* Drop a course from the plan entirely. Cleans every place the profile could
+     re-introduce it (extras / bucket fills / pins) and records it in
+     profile.excluded so the solver won't re-pull it as a requirement,
+     flowchart course, or prerequisite. A required course simply becomes an
+     honest open gap in the progress report until it's restored. */
+  function removeCourse(courseId, display) {
+    const plan = activePlan();
+    if (!plan) return;
+    const prof = plan.profile;
+    // 1) drop from user-added extras
+    if (prof.extras) prof.extras = prof.extras.filter(c => c !== courseId);
+    // 2) drop any bucket-fill picks that chose it
+    if (prof.fills) {
+      for (const k of Object.keys(prof.fills)) {
+        prof.fills[k] = prof.fills[k].filter(c => c !== courseId);
+        if (!prof.fills[k].length) delete prof.fills[k];
+      }
+    }
+    // 3) drop any pin
+    if (prof.pins) delete prof.pins[courseId];
+    // 4) record the exclusion (so requirements/flowchart/prereqs won't re-add it)
+    prof.excluded = prof.excluded || [];
+    if (!prof.excluded.includes(courseId)) prof.excluded.push(courseId);
+    plan.updatedAt = Date.now();
+    save();
+    closeModal("#courseModal");
+    solveActive();
+    toast(`${display} removed. Restore it from Plan Options → Restore removed.`, "ok");
   }
   function closeModal(sel) { $(sel).classList.remove("open"); }
 
   /* letter grades for the completed-courses checklist (record only) */
   const GRADES = ["—", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "P"];
 
-  /* ------------------------- priorities modal ------------------------ */
-  const DIALS = [
-    // (no "speed" dial — every plan targets the classic 4-year shape:
-    // 8+ semesters, ending in Winter, extended only when courses can't fit)
-    ["cost", "Financial cost", "Pack the flat-tuition band (12–18 cr), use lease-covered Spring/Summer wisely, avoid extra terms."],
-    ["risk", "GPA protection", "Never stack 3+ historically hard classes in one semester."],
-    ["life", "Life balance", "Avoid crammed terms and long heavy streaks; keep religion pacing steady."],
-  ];
+  /* ------------------------- constraints modal ------------------------ */
+  // (Preference dials removed: the solver runs a fixed policy — MAP-sheet
+  // pacing where a sheet exists, otherwise 14-16 credits per Fall/Winter
+  // semester, 17 when it saves a semester, 8-10 semesters total.)
   function openPriorities() {
     const plan = activePlan();
     if (!plan) { toast("Create a plan first."); return; }
     const prof = plan.profile;
     $("#prioBody").innerHTML = `
-      <h4>Optimization dials</h4>
-      ${DIALS.map(([k, name, desc]) => `
-        <div class="dial">
-          <div class="dial-top"><b>${name}</b><span class="dial-val" id="dv-${k}">${prof.weights[k]}</span></div>
-          <input type="range" min="0" max="10" value="${prof.weights[k]}" data-dial="${k}">
-          <p>${desc}</p>
-        </div>`).join("")}
+      <p class="prio-policy"><i class="fas fa-scale-balanced"></i> Plans follow the official
+      MAP sheet where one exists; otherwise semesters target <b>14–16 credits</b>
+      (17 when it saves a semester) across <b>8–10 semesters</b>.</p>
       <h4>Hard constraints</h4>
       <div class="prio-grid">
         <label>Max credits (Fall/Winter)
@@ -811,15 +1385,11 @@ const App = (() => {
             <option value="off-campus-12mo" ${prof.settings.housing === "off-campus-12mo" ? "selected" : ""}>Off campus (12-month lease)</option>
           </select></label>
       </div>`;
-    $$("#prioBody input[type=range]").forEach(r => r.addEventListener("input", () => {
-      $("#dv-" + r.dataset.dial).textContent = r.value;
-    }));
     $("#prioModal").classList.add("open");
     $("#prioApply").onclick = () => {
-      $$("#prioBody input[type=range]").forEach(r => prof.weights[r.dataset.dial] = parseInt(r.value, 10));
       Object.assign(prof.settings, {
-        maxCreditsFW: parseInt($("#pcMaxFW").value, 10) || 16,
-        minCreditsFW: parseInt($("#pcMinFW").value, 10) || 12,
+        maxCreditsFW: parseInt($("#pcMaxFW").value, 10) || 17,
+        minCreditsFW: parseInt($("#pcMinFW").value, 10) || 14,
         maxCreditsSpSu: parseInt($("#pcMaxSS").value, 10) || 8,
         doubleCountCap: parseInt($("#pcDcCap").value, 10) || 15,
         allowSpring: $("#pcSpring").checked, allowSummer: $("#pcSummer").checked,
@@ -828,7 +1398,7 @@ const App = (() => {
       });
       closeModal("#prioModal");
       solveActive();
-      toast("Re-optimized with new priorities.", "ok");
+      toast("Re-optimized with new constraints.", "ok");
     };
   }
 
@@ -865,8 +1435,178 @@ const App = (() => {
     }
   }
 
+  /* ---------------- transcript import (wizard History step) ------------ */
+  /* Paste text from the official transcript preview OR the new MyMAP
+     academic summary (or upload the PDF) — every course code is matched
+     against the real catalog, so junk can't get in. Three buckets:
+     graded/transfer/AP (auto-checked), no-grade-yet (unchecked — could be a
+     future "projected" semester), withdrawn/failed (never counted). */
+  const TI_GRADE_RE = /^(A-?|B[+-]?|C[+-]?|D[+-]?|E|F|P|CR|NC|W|UW|I|T|IP)$/;
+  const TI_BAD = new Set(["E", "F", "W", "UW", "NC", "I", "IP"]);
+
+  let _tiSubjects = null;             // known subject prefixes ("PHIL", "REL C")
+  function scanTranscript(text) {
+    if (!_tiSubjects) {
+      _tiSubjects = new Set(Object.keys(DATA.courses).map(k => k.replace(/\s+\S+$/, "")));
+    }
+    const found = new Map();          // id -> {grade, equiv, future, hours}
+    const unknown = new Set();        // real-looking BYU codes not in the current catalog
+    const lines = String(text || "").split(/\r?\n/);
+    // The official transcript separates finished work from current/registered
+    // work with a "CURRENT ENROLLMENT" header. When present, everything after
+    // it is in-progress and everything before it is COMPLETED — so a course
+    // whose grade token we couldn't parse (odd layout, unusual grade) still
+    // counts as done instead of silently landing unchecked and staying in the
+    // plan. MyMAP has no such header, so we fall back to the grade heuristic.
+    const hasEnrollBoundary = /current enrollment|courses in progress|registered/i.test(text);
+    let future = false;
+    const codeRe = /\b([A-Z][A-Z&]{0,5}(?:\s+[A-Z&]{1,5})?)\s+(\d{3}[A-Z]{0,2})\b/g;
+    lines.forEach((raw, li) => {
+      const line = raw.replace(/\s+/g, " ").trim();
+      if (!line) return;
+      if (/current enrollment|courses in progress|registered for/i.test(line)) future = true;
+      codeRe.lastIndex = 0;
+      let m;
+      while ((m = codeRe.exec(line))) {
+        const subjWords = m[1].replace(/\s+/g, " ").split(" ");
+        const id = `${subjWords.join(" ")} ${m[2]}`.toUpperCase();
+        const cat = DATA.courses[id];
+        if (!cat || cat.placeholder) {                    // catalog is the filter
+          // a known SUBJECT with an unknown number = likely a discontinued
+          // course (PHIL 215) — surface it instead of silently dropping it
+          const subj = id.replace(/\s+\S+$/, "");
+          if (!cat && _tiSubjects.has(subj)) unknown.add(id);
+          // a greedy two-word miss ("WORK MATH 110" from merged PDF columns)
+          // may have swallowed the REAL code — rescan from the second word
+          if (subjWords.length === 2) codeRe.lastIndex = m.index + subjWords[0].length + 1;
+          continue;
+        }
+        // grade on the SAME line (transcript layout: "... 3.00 A")
+        let grade = null;
+        const tail = line.slice(m.index + m[0].length);
+        const tm = tail.match(/(\d+\.\d{1,2})\s+(A-?|B[+-]?|C[+-]?|D[+-]?|E|F|P|CR|NC|W|UW|I|T)\b/);
+        if (tm) grade = tm[2];
+        // a real course ROW carries an hours value (decimal) — distinguishes a
+        // graded/completed row from a bare code mentioned in prose
+        const hours = /\b\d+\.\d{1,2}\b/.test(tail) || /\b\d+\.\d{1,2}\b/.test(line);
+        // MyMAP layout: hours then grade on FOLLOWING lines (blanks between)
+        if (!grade) {
+          for (let j = li + 1; j <= li + 6 && j < lines.length; j++) {
+            const t = lines[j].trim();
+            if (!t) continue;
+            if (/^\d+(\.\d+)?$/.test(t)) continue;        // the hours line
+            if (TI_GRADE_RE.test(t)) grade = t;
+            break;                                        // next real line decides
+          }
+        }
+        const equiv = /equivalent course/i.test(line);
+        const prev = found.get(id);
+        if (!prev || (!prev.grade && (grade || equiv))) {
+          found.set(id, { grade, equiv, future, hours: hours || (prev && prev.hours) });
+        }
+      }
+    });
+    const graded = [], inProgress = [], excluded = [];
+    found.forEach((v, id) => {
+      if (v.grade && TI_BAD.has(v.grade)) excluded.push({ id, grade: v.grade });
+      else if (v.grade || v.equiv) graded.push({ id, grade: v.grade || "P" });
+      // official transcript, real course row, in the COMPLETED region but grade
+      // unparsed -> still completed (don't strand it unchecked in the plan)
+      else if (hasEnrollBoundary && !v.future && v.hours) graded.push({ id, grade: "—" });
+      else inProgress.push({ id, grade: null });
+    });
+    const byId = (a, b) => a.id.localeCompare(b.id);
+    return { graded: graded.sort(byId), inProgress: inProgress.sort(byId),
+      excluded: excluded.sort(byId), unknown: [...unknown].sort() };
+  }
+
+  // pdf.js from cdnjs (same CDN as Font Awesome), loaded ONLY when a PDF is
+  // actually chosen — the page stays dependency-free otherwise.
+  let _pdfjs = null;
+  function loadPdfJs() {
+    if (_pdfjs) return _pdfjs;
+    _pdfjs = new Promise((res, rej) => {
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      s.onload = () => {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        res(window.pdfjsLib);
+      };
+      s.onerror = () => { _pdfjs = null; rej(new Error("pdf.js couldn't load — paste the text instead.")); };
+      document.head.appendChild(s);
+    });
+    return _pdfjs;
+  }
+
+  async function pdfToText(file) {
+    const lib = await loadPdfJs();
+    const doc = await lib.getDocument({ data: await file.arrayBuffer() }).promise;
+    const out = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const tc = await page.getTextContent();
+      // rebuild visual LINES by Y position so a course code and its grade
+      // stay on one line (transcripts are two-column — same-row merge is fine
+      // for parsing: each code's own hours/grade come first on its row)
+      const rows = new Map();
+      tc.items.forEach(it => {
+        const y = Math.round(it.transform[5]);
+        if (!rows.has(y)) rows.set(y, []);
+        rows.get(y).push(it);
+      });
+      [...rows.keys()].sort((a, b) => b - a).forEach(y => {
+        out.push(rows.get(y).sort((a, b) => a.transform[4] - b.transform[4]).map(it => it.str).join(" "));
+      });
+    }
+    return out.join("\n");
+  }
+
+  function renderScanResult(scan) {
+    const box = $("#tiResult");
+    const total = scan.graded.length + scan.inProgress.length + scan.excluded.length;
+    if (!total) {
+      box.innerHTML = `<p class="ti-none">No BYU courses recognized — make sure you pasted the transcript/MyMAP text itself.</p>`;
+      return;
+    }
+    const row = (e, group, checked, disabled) => {
+      const c = DATA.courses[e.id];
+      const already = wiz.completed.includes(e.id);
+      return `<label class="ti-row-item ${disabled || already ? "off" : ""}">
+        <input type="checkbox" data-id="${esc(e.id)}" data-grade="${esc(e.grade || "—")}"
+          ${already ? "checked disabled" : checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
+        <b>${esc(e.id)}</b><span>${esc(c ? c.name : "")}</span>
+        <i>${already ? "already added" : e.grade || (group === "prog" ? "no grade yet" : "")}</i>
+      </label>`;
+    };
+    box.innerHTML = `
+      ${scan.graded.length ? `<div class="ti-group"><h5>Completed — graded / transfer / AP (${scan.graded.length})</h5>
+        ${scan.graded.map(e => row(e, "done", true, false)).join("")}</div>` : ""}
+      ${scan.inProgress.length ? `<div class="ti-group"><h5>No grade yet — in progress or future semesters (${scan.inProgress.length})</h5>
+        <p class="ti-hint">Check only what you'll finish BEFORE this plan starts.</p>
+        ${scan.inProgress.map(e => row(e, "prog", false, false)).join("")}</div>` : ""}
+      ${scan.excluded.length ? `<div class="ti-group"><h5>Not counted — withdrawn / failed (${scan.excluded.length})</h5>
+        ${scan.excluded.map(e => row(e, "bad", false, true)).join("")}</div>` : ""}
+      ${(scan.unknown || []).length ? `<p class="ti-hint"><i class="fas fa-circle-info"></i> Not in the current catalog (likely discontinued — the credits still count toward your total, but they can't fill current requirements): ${scan.unknown.map(esc).join(", ")}</p>` : ""}
+      <button class="btn primary sm" id="tiAdd"><i class="fas fa-plus"></i> Add selected to completed courses</button>`;
+    $("#tiAdd").onclick = () => {
+      let n = 0;
+      box.querySelectorAll("input[type=checkbox]:checked:not(:disabled)").forEach(cb => {
+        const id = cb.dataset.id;
+        if (!wiz.completed.includes(id)) {
+          wiz.completed.push(id);
+          wiz.grades = wiz.grades || {};
+          wiz.grades[id] = cb.dataset.grade === "P" ? "P" : cb.dataset.grade;
+          n++;
+        }
+      });
+      renderWizard();
+      toast(`${n} course${n === 1 ? "" : "s"} imported from your transcript.`, "ok");
+    };
+  }
+
   function renderWizard() {
-    const steps = ["Programs", "History", "Constraints", "Priorities"];
+    const steps = ["Programs", "History", "Constraints"];
     $("#wizSteps").innerHTML = steps.map((s, i) =>
       `<span class="wstep ${i === wizStep ? "on" : i < wizStep ? "done" : ""}">${i + 1}. ${s}</span>`).join("");
     const b = $("#wizBody");
@@ -893,6 +1633,17 @@ const App = (() => {
         <div class="wiz-row">
           <select id="wsSeason">${["F", "W", "S", "U"].map(s => `<option value="${s}" ${wiz.startTerm.season === s ? "selected" : ""}>${Solver.SEASON_NAME[s]}</option>`).join("")}</select>
           <select id="wsYear">${years.map(y => `<option ${wiz.startTerm.year === y ? "selected" : ""}>${y}</option>`).join("")}</select>
+        </div>
+        <label class="wiz-lbl">Import from your transcript <span class="wiz-sub">(fastest — paste from MyMAP or the transcript preview, or upload the PDF)</span></label>
+        <div class="ti-box">
+          <textarea id="tiText" rows="4" placeholder="Paste your transcript text or MyMAP academic summary here — every course code is matched against the real BYU catalog."></textarea>
+          <div class="ti-actions">
+            <button class="btn primary sm" id="tiScan"><i class="fas fa-magnifying-glass"></i> Scan for courses</button>
+            <label class="btn ghost sm ti-file"><i class="fas fa-file-pdf"></i> Upload transcript PDF
+              <input type="file" id="tiFile" accept=".pdf,.txt" hidden></label>
+            <span class="ti-status" id="tiStatus"></span>
+          </div>
+          <div id="tiResult"></div>
         </div>
         <label class="wiz-lbl">Quick-add common courses <span class="wiz-sub">(tap to toggle)</span></label>
         <div class="chip-row">${DATA.commonCompleted.map(id => `
@@ -929,6 +1680,32 @@ const App = (() => {
       }));
       $("#wsSeason").onchange = e => wiz.startTerm.season = e.target.value;
       $("#wsYear").onchange = e => wiz.startTerm.year = parseInt(e.target.value, 10);
+      // transcript import: paste-and-scan, or PDF -> text -> same scanner
+      $("#tiScan").onclick = () => {
+        const t = $("#tiText").value;
+        if (t.trim().length < 20) { $("#tiStatus").textContent = "Paste your transcript text first."; return; }
+        $("#tiStatus").textContent = "";
+        renderScanResult(scanTranscript(t));
+      };
+      $("#tiFile").addEventListener("change", async e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const status = $("#tiStatus");
+        try {
+          let text;
+          if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") {
+            status.textContent = "Reading PDF…";
+            text = await pdfToText(file);
+          } else {
+            text = await file.text();
+          }
+          $("#tiText").value = text;
+          status.textContent = `Read ${file.name}.`;
+          renderScanResult(scanTranscript(text));
+        } catch (err) {
+          status.textContent = String(err.message || err);
+        }
+      });
       // searchable picker over the REAL course catalog — only known courses
       // can be selected, so a typo like "SPAN 320" can't silently do nothing
       const addInput = $("#wsAddCourse"), addList = $("#wsAddList");
@@ -970,20 +1747,8 @@ const App = (() => {
         </div>
         <p class="wiz-hint"><i class="fas fa-lightbulb"></i> A 12-month lease makes Spring/Summer classes cheap on the housing side — the cost dial knows this.</p>`;
     }
-    if (wizStep === 3) {
-      b.innerHTML = DIALS.map(([k, name, desc]) => `
-        <div class="dial">
-          <div class="dial-top"><b>${name}</b><span class="dial-val" id="wdv-${k}">${wiz.weights[k]}</span></div>
-          <input type="range" min="0" max="10" value="${wiz.weights[k]}" data-dial="${k}">
-          <p>${desc}</p>
-        </div>`).join("");
-      $$("#wizBody input[type=range]").forEach(r => r.addEventListener("input", () => {
-        wiz.weights[r.dataset.dial] = parseInt(r.value, 10);
-        $("#wdv-" + r.dataset.dial).textContent = r.value;
-      }));
-    }
     $("#wizBack").style.visibility = wizStep === 0 ? "hidden" : "visible";
-    $("#wizNext").innerHTML = wizStep === 3 ? `<i class="fas fa-wand-magic-sparkles"></i> Generate plan` : `Next <i class="fas fa-arrow-right"></i>`;
+    $("#wizNext").innerHTML = wizStep === 2 ? `<i class="fas fa-wand-magic-sparkles"></i> Generate plan` : `Next <i class="fas fa-arrow-right"></i>`;
   }
 
   function wizardCollect() {
@@ -1049,7 +1814,7 @@ const App = (() => {
     $("#wizNext").addEventListener("click", () => {
       wizardCollect();
       if (wizStep === 0 && !wiz.majorId) { toast("Pick a major first."); return; }
-      if (wizStep < 3) { wizStep++; renderWizard(); return; }
+      if (wizStep < 2) { wizStep++; renderWizard(); return; }
       // finish — update the existing plan in place, or create a new one
       const major = DATA.programIndex[wiz.majorId];
       const title = wiz.name && wiz.name !== "My plan"
@@ -1096,11 +1861,14 @@ const App = (() => {
       closeMenus();
       const menu = document.createElement("div");
       menu.className = "ctx-menu";
+      const nRemoved = (activePlan()?.profile.excluded || []).length;
       menu.innerHTML = `
         <button data-a="opt"><i class="fas fa-rotate"></i> Re-optimize</button>
+        <button data-a="whatif"><i class="fas fa-code-compare"></i> What if… (compare a change)</button>
         <button data-a="shuffle"><i class="fas fa-dice"></i> Try an alternative</button>
-        <button data-a="prio"><i class="fas fa-sliders"></i> Priorities & constraints…</button>
+        <button data-a="prio"><i class="fas fa-sliders"></i> Constraints…</button>
         <button data-a="pins"><i class="fas fa-thumbtack-slash"></i> Clear manual pins</button>
+        ${nRemoved ? `<button data-a="restore"><i class="fas fa-trash-arrow-up"></i> Restore removed (${nRemoved})</button>` : ""}
         <button data-a="print"><i class="fas fa-print"></i> Print / PDF</button>`;
       document.body.appendChild(menu);
       const r = e.currentTarget.getBoundingClientRect();
@@ -1110,6 +1878,7 @@ const App = (() => {
         const a = ev.target.closest("button")?.dataset.a;
         closeMenus();
         if (a === "opt") { solveActive(); toast("Re-optimized.", "ok"); }
+        if (a === "whatif") openWhatIf();
         if (a === "shuffle") { solveActive({ shuffleSeed: (Math.random() * 1e9) | 0 }); toast("Alternative schedule generated.", "ok"); }
         if (a === "prio") openPriorities();
         if (a === "pins") {
@@ -1122,7 +1891,12 @@ const App = (() => {
           }
           solveActive(); toast("Manual pins cleared (original pins kept).", "ok");
         }
-        if (a === "print") window.print();
+        if (a === "restore") {
+          const plan = activePlan();
+          if (plan) { plan.profile.excluded = []; plan.updatedAt = Date.now(); save(); }
+          solveActive(); toast("Restored all removed courses.", "ok");
+        }
+        if (a === "print") printPlan();
       });
     });
 
@@ -1144,6 +1918,13 @@ const App = (() => {
     const progNames = (result.programs || []).map(id => DATA.programIndex[id]?.name || id);
     const lines = [`Plan "${plan.name}" -- programs: ${progNames.join("; ")}`];
 
+    // mid-degree context: the advisor must know what's already done
+    const done = plan.profile.completed || [];
+    if (done.length) {
+      const doneCr = done.reduce((s, id) => s + (DATA.courses[id]?.credits ?? 3), 0);
+      lines.push(`Already completed BEFORE this plan: ${done.length} courses / ~${Math.round(doneCr)} credits (${done.slice(0, 24).join(", ")}${done.length > 24 ? ", …" : ""}). These are DONE — never suggest scheduling them; prerequisites they satisfy are satisfied.`);
+    }
+
     // HOW TO READ THIS PLAN — semantics the advisor keeps getting wrong
     // without them (placeholders read as extra hours, envelopes read as
     // student choices, religion pacing read as a mistake).
@@ -1153,6 +1934,26 @@ const App = (() => {
       "- Repeatable courses ('take 2/6') enroll once per semester by rule.",
       "- Religion is deliberately spread ~2 cr per semester (BYU norm) — do not suggest clustering it.",
       "- The planner has already verified every prerequisite chain and season offering against the live BYU catalog; the sequencing shown is valid unless a warning below says otherwise. Do not ask the student to re-verify prerequisites you cannot see.");
+
+    // WHY THE PLAN LOOKS THIS WAY — the solver's own decision log, so the
+    // advisor answers "why is X in semester N?" from facts, not guesses.
+    if ((result.planNotes || []).length) {
+      lines.push("WHY THE PLAN LOOKS THIS WAY (solver's own reasoning — cite these when asked why):");
+      result.planNotes.forEach(n => lines.push("- " + n));
+    }
+    const whyLines = [];
+    (result.placements || []).forEach(p => {
+      (p.why || []).forEach(w => {
+        // only the load-bearing reasons; sheet/slot provenance is implied above
+        if (whyLines.length < 14 && /prerequisite|admission|Only taught|Woven|chain|Pinned/.test(w)) {
+          whyLines.push(`- ${p.display} (${result.terms[p.termIndex].label}): ${w}`);
+        }
+      });
+    });
+    if (whyLines.length) {
+      lines.push("Placement notes for specific courses:");
+      lines.push(...whyLines);
+    }
     // locked flowchart cohorts (junior-core envelopes)
     const state = result.state;
     const blockLines = [];
@@ -1187,13 +1988,34 @@ const App = (() => {
     if (result.unscheduled?.length) {
       lines.push("Unscheduled: " + result.unscheduled.map(u => u.name).join(", "));
     }
+
+    // deadlines & opportunities (timeline layer) — so the advisor can answer
+    // "when do I apply / what scholarships or study abroad fit me?" factually
+    if (timeline.deadlines.length) {
+      lines.push("KEY DEADLINES (from BYU calendars + limited-enrollment admission notes — cite these):");
+      timeline.deadlines.slice(0, 6).forEach(e =>
+        lines.push(`- [${e.when}] ${e.title}${e.detail ? `: ${e.detail}` : ""}`.slice(0, 240)));
+    }
+    if (timeline.recs.length) {
+      lines.push("PLANNER RECOMMENDATIONS shown to the student (agree with or refine these, don't contradict them blindly):");
+      timeline.recs.forEach(r => lines.push(`- ${r.title} ${r.detail || ""}`.slice(0, 240)));
+    }
+    if (timeline.schols.length) {
+      lines.push("RELEVANT SCHOLARSHIPS for this student (deadlines recur annually):");
+      timeline.schols.slice(0, 6).forEach(s =>
+        lines.push(`- ${s.name} [due ${s.when}${s.gpa ? `; ${s.gpa}+ GPA` : ""}]${s.collegeMatch ? " (their college)" : ""}`.slice(0, 200)));
+    }
+    if (timeline.abroad.length) {
+      lines.push(`STUDY ABROAD matched to this student's college (${timeline.abroad.length} total): ` +
+        timeline.abroad.slice(0, 4).map(p => p.name).join("; ") + (timeline.abroad.length > 4 ? "; …" : ""));
+    }
     const warns = (result.flags || []).filter(f => f.level === "warn").slice(0, 4);
     if (warns.length) lines.push("Planner warnings: " + warns.map(f => f.text).join(" | "));
 
-    return lines.join("\n").slice(0, 5800);
+    return lines.join("\n").slice(0, 7800);   // server MAX_PLAN_CHARS = 8000
   }
 
-  return { init, planSummary };
+  return { init, planSummary, openWhatIf, scanTranscript };
 })();
 
 document.addEventListener("DOMContentLoaded", App.init);

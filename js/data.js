@@ -468,9 +468,22 @@ const DATA = (() => {
      tags for tag-based buckets). Hand-only pseudo-courses (GLOBAL XP)
      survive the merge.
      ---------------------------------------------------------------- */
+  /* Difficulty 1-10 the catalog doesn't give us. Base is course LEVEL
+     (1xx=3 … 5xx=7); quantitative / lab-science / engineering departments run
+     genuinely harder at every level, so they get a bump. Without this every
+     3xx reads 5 and every 4xx reads 6 — a whole semester of 400-level majors
+     looked uniform and the "hard-stacking" guard (diff≥7) never fired. */
+  const HARD_DEPT = /^(MATH|PHSCS|PHYS|CHEM|STAT|CS|ECEN|MEEN|CHEN|CEEN|MTHED|PHY S)$/;
+  const MOD_HARD  = /^(ACC|FIN|ECON|BIO|CELL|MMBIO|PDBIO|PWS|NEURO|IT|IS|GSCM|MSE|BIOL)$/;
   function defaultDiff(code) {
-    const m = code.match(/\b(\d)\d{2}/);          // course level: 1xx..5xx
-    return m ? Math.min(8, 2 + Number(m[1])) : 4; // 1xx=3 ... 5xx=7
+    const m = code.match(/^([A-Z][A-Z& ]*?)\s*(\d)(\d{2})/);
+    if (!m) return 4;
+    const dept = m[1].replace(/\s+/g, "");        // "C S"->"CS", "EC EN"->"ECEN"
+    const lvl = Number(m[2]);                      // 1..5
+    let d = 2 + lvl;                               // 1xx=3 … 5xx=7
+    if (HARD_DEPT.test(dept)) d += 1.5;
+    else if (MOD_HARD.test(dept)) d += 0.5;
+    return Math.max(1, Math.min(10, Math.round(d)));
   }
   if (HAVE_REAL) {
     const merged = {};
@@ -482,6 +495,16 @@ const DATA = (() => {
         // real prereq chains from the catalog (requisitesSimple) win; the
         // hand-entered chains remain as fallback for courses without them
         pre: (e.p && e.p.length ? e.p : hand?.pre) || [],
+        // concurrent-allowed prereqs (before-or-same term) and a hard minimum
+        // academic year (senior-standing / capstone courses) from the catalog
+        preCo: (e.pc && e.pc.length ? e.pc : hand?.preCo) || [],
+        // catalog's human-readable prerequisite line (incl. non-course
+        // requirements: standing, admission, instructor consent) for the card
+        preText: e.pt || hand?.preText || null,
+        minY: e.minY || hand?.minY || 0,
+        // variable-credit max per term (CPSE 486R 1-12): lets the solver raise
+        // per-term enrollment instead of laddering 12 one-credit semesters
+        vmax: e.vx || hand?.vmax || 0,
         off: e.off || hand?.off || "FW",
         diff: hand?.diff ?? defaultDiff(code),
         load: hand?.load ?? 1.0,
@@ -523,6 +546,13 @@ const DATA = (() => {
       IS_BS.flowchartPlan = catIS.flowchartPlan;
       IS_BS_MISM.flowchartPlan = catIS.flowchartPlan;
     }
+    // MAP-first: the official IS MAP sheet drives the plain IS (BS) draft
+    // (sheet placement outranks the hand cohort blocks where they disagree —
+    // e.g. the 2025-26 sheet's fall/winter junior-core split). The integrated
+    // MISM track deliberately does NOT take the sheet: its 5-year shape is
+    // hand-designed and the undergrad sheet would fight the MISM year.
+    if (catIS && catIS.mapPlan) IS_BS.mapPlan = catIS.mapPlan;
+    if (catIS && catIS.admit) IS_BS.admit = catIS.admit;
   }
 
   const majors = HAVE_REAL
@@ -570,11 +600,22 @@ const DATA = (() => {
     startTerm: { year: 2026, season: "F" },
     pins: { "IS 303": { year: 2027, season: "W" } },   // immovable: IS 303 in Winter 2027
     settings: {
-      // 18 = BYU flat-rate tuition band (and the registration cap). Spring/
-      // Summer are short terms — keep them light (6 cr) even when opted in.
-      maxCreditsFW: 18, minCreditsFW: 12, maxCreditsSpSu: 6,
-      // Fall/Winter fill first — Spring/Summer are OFF unless the student opts in.
-      allowSpring: false, allowSummer: false,
+      // 17 = the optimizer's Fall/Winter ceiling: terms TARGET <=16 credits
+      // (scoring penalizes every credit above 16) but may reach 17 when that
+      // keeps the plan inside the 8-10 semester shape — one 17-credit term
+      // beats a whole extra semester. 18 (BYU's registration cap) needs the
+      // student to raise this setting. Locked cohort envelopes may still
+      // exceed it — they're a forced exception. Spring/Summer stay light.
+      // fixed load policy (no user dials): every Fall/Winter targets 14-16
+      // credits, 17 allowed when it saves a semester; MAP-sheet terms follow
+      // their own printed totals even below 14
+      maxCreditsFW: 17, minCreditsFW: 14, maxCreditsSpSu: 6,
+      // The demo's 12-month lease makes Spring housing free, and the double
+      // degree (IS+MISM + 2 minors + cert, ~174 cr) can't fit 10 Fall/Winter
+      // terms at <=17 cr — so the demo opts INTO Spring terms: the cost dial
+      // routes a couple of light, lease-covered Springs instead of stretching
+      // to a 6th year. (New plans still default Spring/Summer OFF.)
+      allowSpring: true, allowSummer: false,
       housing: "off-campus-12mo",                       // Alpine Village 12-month lease
       scholarshipFullTime: true,
       doubleCountCap: 15,
@@ -590,9 +631,24 @@ const DATA = (() => {
     completed: [],
     startTerm: { year: 2026, season: "F" },
     pins: {},
-    settings: { ...DEMO_PROFILE.settings, housing: "on-campus" },
+    settings: { ...DEMO_PROFILE.settings, housing: "on-campus", allowSpring: false },
     weights: { speed: 5, cost: 5, risk: 5, load: 5, life: 5 },
   };
+
+  /* ---------------------------------------------------------------
+     CO-REQUISITES (concurrent enrollment) — must be taken the SAME term.
+     AUTO-EXTRACTED by generate_data.py from each course's
+     customFields.nonEnforcedPrerequisites (the 82 STRICT "Concurrent
+     enrollment in X" cases — the 137 "X or concurrent" and 18 consent cases
+     are deliberately excluded so they aren't wrongly rigid-blocked). The solver
+     bundles a present co-req set into a same-term movable cohort, so the CH EN
+     445 lab lands with its 436/476 lecture pair, AEROS 110 with AEROS 100, etc.
+     HAND_COREQS below overrides/augments the auto data for edge cases.
+     ---------------------------------------------------------------- */
+  const HAND_COREQS = {};   // add manual { "LAB": ["PARTNER", ...] } entries here
+  const COREQS = HAVE_REAL
+    ? { ...(CATALOG_DATA.coreqs || {}), ...HAND_COREQS }
+    : HAND_COREQS;
 
   return {
     courses: C,
@@ -602,5 +658,6 @@ const DATA = (() => {
     demoProfile: DEMO_PROFILE,
     defaultProfile: DEFAULT_PROFILE,
     colleges: COLLEGES,
+    coreqs: COREQS,
   };
 })();

@@ -28,7 +28,7 @@
   <!-- ================= NAV TABS ================= -->
   <nav class="tabs">
     <a href="#" class="tab active"><i class="fas fa-map-location-dot"></i> My Plan</a>
-    <a href="#" class="tab" id="navPriorities"><i class="fas fa-sliders"></i> Priorities &amp; Constraints</a>
+    <a href="#" class="tab" id="navPriorities"><i class="fas fa-sliders"></i> Constraints</a>
     <a href="#" class="tab" id="navHow"><i class="fas fa-circle-question"></i> How it works</a>
   </nav>
 
@@ -56,6 +56,10 @@
           <h3><i class="fas fa-flag"></i> Insights &amp; warnings</h3>
           <div id="flagList"></div>
         </div>
+        <div class="flag-sec" id="timelineSec" hidden>
+          <h3><i class="fas fa-lightbulb"></i> Recommended &amp; opportunities</h3>
+          <div id="timelineList"></div>
+        </div>
       </div>
     </aside>
 
@@ -68,7 +72,7 @@
         </div>
         <div class="board-tip">Tip: drag a class card to another semester — the solver validates every move against prerequisites, availability, and credit caps.</div>
         <div class="board-actions">
-          <button class="btn ghost sm" id="prioritiesBtn"><i class="fas fa-sliders"></i> Priorities</button>
+          <button class="btn ghost sm" id="prioritiesBtn"><i class="fas fa-sliders"></i> Constraints</button>
           <button class="btn primary sm" id="planOptionsBtn">Plan Options <i class="fas fa-chevron-down"></i></button>
         </div>
       </div>
@@ -118,10 +122,20 @@
   </div>
 
   <!-- ================= PRIORITIES MODAL ================= -->
+  <div class="modal" id="whatifModal">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <h3><i class="fas fa-code-compare"></i> What if…</h3>
+        <button class="modal-x" data-close="#whatifModal">&times;</button>
+      </div>
+      <div class="modal-body" id="whatifBody"></div>
+    </div>
+  </div>
+
   <div class="modal" id="prioModal">
     <div class="modal-box">
       <div class="modal-head">
-        <h2><i class="fas fa-sliders"></i> Priorities &amp; constraints</h2>
+        <h2><i class="fas fa-sliders"></i> Plan constraints</h2>
         <button class="modal-x" data-close="#prioModal">&times;</button>
       </div>
       <div class="modal-body" id="prioBody"></div>
@@ -216,6 +230,7 @@
   </div>
 
   <script src="js/catalog_data.js"></script>
+  <script src="js/timeline_data.js"></script>
   <script src="js/data.js"></script>
   <script src="js/solver.js"></script>
   <script src="js/app.js"></script>

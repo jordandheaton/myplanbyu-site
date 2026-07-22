@@ -74,6 +74,30 @@ for _var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUME
 
 DATA_PATH = Path(__file__).resolve().parent / "data" / "catalog.json"
 
+# opportunity -> college tagger (study abroad / grants / clubs) so the advisor can
+# answer "opportunities for a <major> student". Lives in sources/.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "sources"))
+try:
+    import opportunity_tags as _optags
+except Exception:
+    _optags = None
+
+_SUBJ2COL: Optional[Dict[str, str]] = None
+
+
+def _subject_college_map() -> Dict[str, str]:
+    """Cached subject-code -> college map, built once from catalog.json."""
+    global _SUBJ2COL
+    if _SUBJ2COL is None:
+        _SUBJ2COL = {}
+        if _optags and DATA_PATH.exists():
+            try:
+                cat = json.loads(DATA_PATH.read_text(encoding="utf-8"))
+                _SUBJ2COL = _optags.build_subject_college_map(cat.get("courses") or [])
+            except Exception as exc:
+                print(f"  [warn] subject->college map unavailable: {exc}")
+    return _SUBJ2COL
+
 INDEX_NAME = "myplanbyu-catalog"
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"   # 384-dim, free, runs locally
 EMBED_DIM = 384                          # must match the model's output size
@@ -553,16 +577,33 @@ def source_doc_to_record(doc: Dict[str, Any]) -> Optional[Record]:
     did, text = doc.get("id"), doc.get("text")
     if not did or not text:
         return None
+    name = doc.get("name") or did
+    dtype = doc.get("type", "document")
+    # Opportunity docs (study abroad / grants / clubs) carry no program field.
+    # Tag the relevant BYU colleges so the advisor can match them to a student's
+    # major, and fold a "Relevant to:" line INTO the embedded text so semantic
+    # retrieval ranks them for that college's queries too.
+    colleges: List[str] = []
+    if _optags and dtype in ("study_abroad", "opportunity", "research", "grant", "club"):
+        try:
+            colleges = _optags.college_tags(name, text, dtype, _subject_college_map())
+        except Exception:
+            colleges = []
+    embed_text = text
+    if colleges:
+        embed_text = f"{text}\n\nRelevant to students in: {', '.join(colleges)}."
     meta: Dict[str, Any] = {
         "source": doc.get("source", "external"),
-        "type": doc.get("type", "document"),
-        "id": doc.get("name") or did,
-        "name": doc.get("name") or did,
-        "text": text,
+        "type": dtype,
+        "id": name,
+        "name": name,
+        "text": embed_text,
     }
+    if colleges:
+        meta["colleges"] = colleges
     if doc.get("url"):
         meta["url"] = doc["url"]
-    return Record(id=str(did), text=text, metadata=meta)
+    return Record(id=str(did), text=embed_text, metadata=meta)
 
 
 def load_source_records(data_dir: Path) -> List[Record]:

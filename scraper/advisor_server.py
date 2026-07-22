@@ -98,9 +98,70 @@ def _load_force_docs():
                 continue
             _FORCE_DOCS.append({
                 "name": name, "text": text, "source": src,
+                "url": (d.get("url") or None),
                 "triggers": _stopword_tokens(name),
             })
     print(f"Force-context: loaded {len(_FORCE_DOCS)} docs from {_FORCE_SOURCES}.")
+
+
+# ---------------------------------------------------------------------------
+# Student-college inference -> major-matched opportunities
+# ---------------------------------------------------------------------------
+# Opportunity docs (study abroad / clubs / grants) are embedded with a
+# "Relevant to students in: College of X" line (embed_and_load). When a student
+# shares their plan AND asks about opportunities, we map their major(s) to a
+# college and fold it into the RETRIEVAL query so those college-tagged docs rank
+# up — "study abroad for me" as a Neuroscience major surfaces Life-Sciences
+# programs, not a random list.
+_PROGRAM_COLLEGE = {}   # normalized program name -> canonical college
+# prefix match (no trailing boundary) so plurals hit: "scholarships", "clubs"
+_OPP_RE = re.compile(
+    r"\b(?:study\s*abroad|abroad|scholarship|club|research|grant|opportunit|"
+    r"internship|get\s+involved|extracurricular|mentored|volunteer|funding)", re.I)
+
+
+def _norm_prog(s: str) -> str:
+    s = _re.sub(r"\s*\(.*?\)\s*", " ", s or "")
+    s = _re.sub(r"\b(minor|certificate|emphasis|track|bs|ba|bfa|bm|bgs|major)\b", " ", s, flags=_re.I)
+    return _re.sub(r"\s+", " ", s).strip().lower()
+
+
+def _load_program_colleges():
+    try:
+        import opportunity_tags as ot
+    except Exception:
+        print("  [warn] opportunity_tags unavailable; college matching off.")
+        return
+    cat_path = _DATA_DIR / "catalog.json"
+    if not cat_path.exists():
+        return
+    try:
+        cat = json.loads(cat_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        print(f"  [warn] program->college map: {exc}")
+        return
+    for p in cat.get("programs", []):
+        col = ot.normalize_college(p.get("college") or "")
+        nm = _norm_prog(p.get("name"))
+        if col and nm and nm not in _PROGRAM_COLLEGE:
+            _PROGRAM_COLLEGE[nm] = col
+    print(f"Program->college map: {len(_PROGRAM_COLLEGE)} programs.")
+
+
+def student_colleges(plan_context: str):
+    """Canonical colleges of the programs named in the shared plan summary."""
+    if not plan_context or not _PROGRAM_COLLEGE:
+        return []
+    m = _re.search(r"programs?:\s*(.+)", plan_context, _re.I)
+    if not m:
+        return []
+    cols, seen = [], set()
+    for part in _re.split(r"[;,]", m.group(1))[:6]:
+        col = _PROGRAM_COLLEGE.get(_norm_prog(part))
+        if col and col not in seen:
+            seen.add(col)
+            cols.append(col)
+    return cols
 
 
 def forced_context(question: str, plan_context: str, already: set, limit: int = 4):
@@ -116,7 +177,7 @@ def forced_context(question: str, plan_context: str, already: set, limit: int = 
             hits.append(d)
     hits = hits[:limit]
     blocks = [f"[forced:{d['source']}] {d['name']}\n{d['text'][:4000]}" for d in hits]
-    meta = [{"name": d["name"], "type": "forced", "score": 1.0} for d in hits]
+    meta = [{"name": d["name"], "type": "forced", "url": d.get("url"), "score": 1.0} for d in hits]
     return blocks, meta
 
 
@@ -125,7 +186,7 @@ def hardcoded_context(question: str, plan_context: str):
     return [note for key, note in HARDCODED_NOTES.items() if key in hay]
 
 MAX_HISTORY_TURNS = 8       # most recent turns forwarded to Claude
-MAX_PLAN_CHARS = 6000       # safety cap on the plan context blob
+MAX_PLAN_CHARS = 8000       # safety cap on the plan context blob (client sends ≤7800 incl. solver decision log)
 MAX_QUESTION_CHARS = 2000
 
 PLAN_PROMPT_ADDON = (
@@ -151,7 +212,21 @@ PLAN_PROMPT_ADDON = (
     "prerequisites unless the plan itself lists a warning.\n"
     "Never answer with 'my Context doesn't include X' and stop there: if the "
     "Context and plan lack something, use web search to find it on byu.edu / "
-    "catalog.byu.edu, and say what you found."
+    "catalog.byu.edu, and say what you found.\n\n"
+    "PROPOSED ACTIONS: the planner page can rebuild the student's plan and "
+    "show a side-by-side comparison. When (and ONLY when) your answer "
+    "concretely proposes one of these changes -- adding a minor, adding a "
+    "certificate, switching majors, dropping a minor, or enabling "
+    "Spring/Summer terms -- append as the VERY LAST line of your reply, on "
+    "its own line, no markdown, no code fence:\n"
+    'ACTION_JSON: {"type": "add_minor|add_cert|switch_major|remove_minor|'
+    'enable_spsu", "program": "<official program name or empty for '
+    'enable_spsu>"}\n'
+    "Exactly one action per reply, and only if the student is asking about "
+    "such a change (a what-if, 'should I add X', 'what would Y cost me'). "
+    "Never emit it for informational questions. The page renders it as a "
+    "'Try it' button that runs the comparison -- so DON'T claim exact "
+    "semester counts for the hypothetical; the comparison computes them."
 )
 
 # Anthropic server-side web search: the fallback when RAG has no answer.
@@ -186,8 +261,15 @@ def ask():
         return jsonify({"error": "question is required"}), 400
 
     # ---- retrieve grounded context from Pinecone --------------------------
+    # For opportunity questions with a shared plan, bias retrieval toward the
+    # student's college so major-matched study abroad / clubs / grants surface.
+    retrieval_query = question
+    if plan_context and _OPP_RE.search(question):
+        cols = student_colleges(plan_context)
+        if cols:
+            retrieval_query = f"{question} (for students in {', '.join(cols)})"
     try:
-        matches = retrieve(question, top_k=12, type_filter=None)
+        matches = retrieve(retrieval_query, top_k=12, type_filter=None)
     except Exception as exc:
         return jsonify({"error": f"retrieval failed: {exc}"}), 500
 
@@ -196,6 +278,7 @@ def ask():
         {
             "name": (m.get("metadata") or {}).get("name"),
             "type": (m.get("metadata") or {}).get("type"),
+            "url": (m.get("metadata") or {}).get("url") or None,
             "score": round(m.get("score", 0.0), 3),
         }
         for m in matches
@@ -270,6 +353,7 @@ def ask():
 
 if __name__ == "__main__":
     _load_force_docs()
+    _load_program_colleges()
     print("Warming up: loading embedding model + Pinecone connection ...")
     try:
         retrieve("warmup", top_k=1)   # loads + caches the model and index
