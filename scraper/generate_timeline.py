@@ -31,6 +31,85 @@ SCHOL_JS = HERE.parent.parent / "BYU Scholarship Matcher" / "data.js"
 
 SEASON = {"winter": "W", "spring": "S", "summer": "U", "fall": "F"}
 
+# ---------------------------------------------------------------------------
+# CURATED admission requirements — transcribed from each program's OWN online
+# admission page (not inferred from the plan). Keyed by RUNTIME program id
+# (the id the app uses at solve time: catalog majors are "major-<slug>", the
+# hand-curated IS majors in data.js are "is-bs" / "is-bs-mism"). Shape:
+#   prereqs  — the exact prerequisite courses the application requires
+#   criteria — GPA / grade / deadline / experience / portfolio requirements
+#   note     — one-line framing; url — the source page to "see full details".
+# Verified 2026-07-22. When a program has no entry here, the app falls back to
+# the catalog admission sentence + a "confirm with the department" pointer
+# (NOT a guessed course list).
+# ---------------------------------------------------------------------------
+ADMISSION_REQS = {
+    "major-nursing-bs": {
+        "note": "Competitive limited-enrollment major (~64 seats/cohort); apply after the prerequisite year.",
+        "prereqs": ["CHEM 285 — Bio-Organic Chemistry", "NDFS 100 — Essentials of Human Nutrition",
+                    "CELL 220 (or CELL 210) — Human Anatomy",
+                    "SFL 210 (or PSYCH 220) — Human Development"],
+        "criteria": ["Complete a minimum of 16 hours from the University Core before applying.",
+                     "Competitive GPA in the prerequisites; acceptance is not guaranteed by minimums alone."],
+        "url": "https://nursing.byu.edu/prospective-students",
+    },
+    "major-dietetics-bs": {
+        "note": "Holistic, limited-enrollment admission (~40 students/year); apply by Feb 15 for a fall start.",
+        "prereqs": ["CHEM 285 — Bio-Organic Chemistry", "CHEM 101 or 105 — General Chemistry",
+                    "CELL 210 or 220 — Human Anatomy", "CELL 305 — Human Physiology",
+                    "MMBIO 221 + 222 — General Microbiology", "NDFS 100 — Essentials of Human Nutrition",
+                    "NDFS 200 — Nutrient Metabolism", "NDFS 250 + 251 — Essentials of Food Science",
+                    "NDFS 290 — Intro to Dietetics", "STAT 121 — Principles of Statistics"],
+        "criteria": ["At least 4 prerequisite courses done at time of application; all done before the professional sequence.",
+                     "Major & cumulative GPA above 3.0; NDFS grades above B-.",
+                     "≥150 hours of dietetics-related work/volunteer experience.",
+                     "Personal statement, two letters of recommendation, and a faculty interview."],
+        "url": "https://ndfs.byu.edu/dietetics/dpd-admission-requirements-and-process",
+    },
+    "major-elementary-education-bs": {
+        "note": "Apply to the major after the pre-major courses; two admission rounds a year (Feb 15 and Oct 1).",
+        "prereqs": ["SFL 210 — Human Development", "EL ED 200 — Introduction to Education"],
+        "criteria": ["Declare the Elementary Education pre-major and attend a program orientation.",
+                     "Submit the online Program Entrance Application (Educator Preparation & Licensure System).",
+                     "Maintain a 2.7+ total GPA; C or better in every education, major, and minor course."],
+        "url": "https://education.byu.edu/advisement/program_entrance_application",
+    },
+    "major-accounting-bs": {
+        "note": "Junior Core is a competitive, limited-enrollment application (School of Accountancy).",
+        "prereqs": ["ACC 200 — Principles of Accounting", "ACC 310 — Principles of Accounting 2",
+                    "FIN 201 — Managerial Finance", "MKTG 201 — Marketing Management",
+                    "IS 201 — Intro to Information Systems"],
+        "criteria": ["Prerequisite GPA of 3.0 to apply (admitted median ~3.9); ACC 310 weighted most heavily.",
+                     "Apply online to the School of Accountancy; deadline is the last business day of June.",
+                     "Historically 50–75% of applicants are admitted."],
+        "url": "https://marriott.byu.edu/acc/admissions/bs-acc/admission-criteria/",
+    },
+    "major-finance-bs": {
+        "note": "Highly competitive, limited-enrollment major; all prerequisites done before the June deadline.",
+        "prereqs": ["ACC 200 — Principles of Accounting", "ACC 310 — Principles of Accounting 2",
+                    "IS 201 — Intro to Information Systems",
+                    "6 credits from: ECON 110, FIN 201, GSCM 201/211, IS 303, MKTG 201, or STAT 121"],
+        "criteria": ["Applications below a 3.0 prerequisite GPA are not considered.",
+                     "Weighted GPA (prereq, last 30 hrs, BYU, overall) — over half the weight on the prereq GPA.",
+                     "Application: four GPA measures, current resume, essay, and transcripts.",
+                     "Deadline: last business day of June."],
+        "url": "https://marriott.byu.edu/bsfin/",
+    },
+}
+# Both IS tracks share the Information Systems admission criteria.
+_IS_REQS = {
+    "note": "Competitive, limited-enrollment major (Junior Core); prerequisites must be done before the deadline.",
+    "prereqs": ["ACC 200 — Principles of Accounting", "IS 201 — Intro to Management Information Systems",
+                "IS 303 or C S 111 — Intro to Programming"],
+    "criteria": ["Minimum 3.0 GPA across the prerequisite courses.",
+                 "A grade below B in IS 201 and/or IS 303 is not accepted.",
+                 "Transferred or repeated prerequisites are discounted by 0.3 (e.g., A → A-).",
+                 "Deadline: last business day of June, 4:30 p.m. — all prereq grades must be posted."],
+    "url": "https://marriott.byu.edu/infosys/admissions/bsis/admission-criteria/",
+}
+ADMISSION_REQS["is-bs"] = _IS_REQS
+ADMISSION_REQS["is-bs-mism"] = _IS_REQS
+
 # Scholarship-matcher college keys -> the same canonical names opportunity_tags
 # uses, so ONE vocabulary matches programs, scholarships, and study abroad.
 SCHOL_COLLEGE = {
@@ -262,6 +341,7 @@ def main():
     timeline = {
         "academicDates": parse_academic_dates(),
         "admitNotes": parse_admission_notes(catalog),
+        "admissionReqs": ADMISSION_REQS,
         "programColleges": parse_program_colleges(catalog),
         "studyAbroad": parse_study_abroad(catalog),
         "scholarships": parse_scholarships(),
@@ -276,6 +356,7 @@ def main():
     print(f"Wrote {OUT}")
     print(f"  academicDates: {len(timeline['academicDates'])}")
     print(f"  admitNotes:    {len(timeline['admitNotes'])} majors")
+    print(f"  admissionReqs: {len(timeline['admissionReqs'])} curated programs")
     print(f"  programColleges: {len(timeline['programColleges'])}")
     print(f"  studyAbroad:   {len(timeline['studyAbroad'])} "
           f"({sum(1 for s in timeline['studyAbroad'] if s['colleges'])} college-tagged)")

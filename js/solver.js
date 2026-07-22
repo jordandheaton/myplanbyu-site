@@ -223,8 +223,31 @@ const Solver = (() => {
     // fifteen 1-cr slots).
     const poolTotalCr = optCreds.reduce((s, c) => s + c, 0);
     const underEnum = bucket.pick && bucket.pick.type === "credits" && poolTotalCr < bucket.pick.n - 2.5;
-    const slotCr = isRel ? 2 : underEnum ? 3
-      : Math.max(0.5, optCreds.length ? median(optCreds) : 3);
+    // For an "N hours" requirement, recommend the FEWEST classes the pool
+    // honestly supports: among credit sizes with a real choice of options
+    // (≥3 courses or ≥25% of the pool), pick the one needing the fewest
+    // slots, tie-broken by the cleanest fit (EC EN "8 hours": pools of 3s
+    // AND 4s → two 4-cr classes, not three 3s; a mostly-3s humanities pool
+    // still gets 3-cr slots because 4s aren't a real choice there).
+    const fewestSlotCr = () => {
+      if (!optCreds.length) return 3;
+      const need = bucket.pick && bucket.pick.type === "credits" ? bucket.pick.n : null;
+      if (need == null) return Math.max(0.5, median(optCreds));
+      const freq = new Map();
+      optCreds.forEach(c => freq.set(c, (freq.get(c) || 0) + 1));
+      const cands = [...freq.keys()].filter(c =>
+        freq.get(c) >= 3 || freq.get(c) >= optCreds.length * 0.25);
+      if (!cands.length) return Math.max(0.5, median(optCreds));
+      cands.sort((a, b) => {
+        const na = Math.ceil(need / a), nb = Math.ceil(need / b);
+        if (na !== nb) return na - nb;                     // fewest classes
+        const ra = na * a - need, rb = nb * b - need;
+        if (ra !== rb) return ra - rb;                     // least overshoot
+        return b - a;                                      // then bigger classes
+      });
+      return Math.max(0.5, cands[0]);
+    };
+    const slotCr = isRel ? 2 : underEnum ? 3 : fewestSlotCr();
     const alreadyDone = realPool.filter(id => completed.has(id)).length;
     // double-count awareness: a required program course that ALSO satisfies
     // this GE bucket covers a slot (within the double-count cap) — no extra
@@ -232,18 +255,28 @@ const Solver = (() => {
     let covered = [];
     if (_preRequired) {
       const pre = realPool.filter(id => _preRequired.has(id) && !completed.has(id));
-      if (program.id === "univ-core") {
-        // GE bucket auto-covered by a required major course (double-count,
-        // capped, and shown on the progress report)
-        covered = pre.filter(id => take(id, key, 1));
-      } else {
-        // a course this major REQUIRES outright (another bucket's pick:all, a
-        // sole option, a forced flowchart core) also satisfies this major's own
-        // "choose N / N hours" requirement — so don't spawn a redundant slot
-        // for it (GSCM Req 1.2 "3 hrs" already met by the required ACC 200 +
-        // ECON 110). Same-program overlap: reduce the need without consuming
-        // the cross-program double-count budget.
-        covered = pre;
+      // Cover only up to the bucket's NEED. A pool can hold several
+      // pre-required courses (the EE sheet codes PHSCS 121 AND CHEM 105, both
+      // in the 1-course Physical Science GE) — taking every one burns the
+      // cross-program double-count budget on a bucket a single course already
+      // satisfies, which starves legitimate double-counts elsewhere.
+      const isCredits = bucket.pick && bucket.pick.type === "credits";
+      const needN = isCredits ? bucket.pick.n
+        : (slots != null ? slots : (bucket.pick && bucket.pick.n) || 1);
+      let got = 0;
+      for (const id of pre) {
+        if (got >= needN) break;
+        if (program.id === "univ-core") {
+          // GE bucket auto-covered by a required major course (double-count,
+          // capped, and shown on the progress report)
+          if (!take(id, key, 1)) continue;
+        }
+        // else: a course this program REQUIRES outright (pick:all, sole
+        // option, forced flowchart core, MAP-coded) also satisfies its own
+        // "choose N / N hours" requirement — reduce the need without
+        // consuming the cross-program double-count budget.
+        covered.push(id);
+        got += isCredits ? (cat[id].credits || 3) : 1;
       }
     }
     // group slots record their fills under a per-group key so choosing a class
@@ -343,14 +376,21 @@ const Solver = (() => {
         // same program) forbids double counting, don't let the course share.
         const prog = bucketKey.split("::")[0];
         const guarded = noDblKeys.has(bucketKey);
+        let sameProg = false;
         for (const bk of rec.buckets) {
           if (bk.split("::")[0] !== prog) continue;
           if (guarded || noDblKeys.has(bk)) return false;   // no intra-program share
+          sameProg = true;
         }
-        // sharing across buckets = double counting
-        if (doubleCounted + cat[id].credits > cap) return false;
-        doubleCounted += cat[id].credits;
-        dcIds.add(id);
+        // The DOUBLE-COUNT budget meters CROSS-program sharing (a major course
+        // covering a GE, a course shared with a minor). Two keys of the SAME
+        // program (Requirement 1 + the ::map sheet view of one course) are one
+        // enrollment, not a double count — never spend budget on them.
+        if (!sameProg) {
+          if (doubleCounted + cat[id].credits > cap) return false;
+          doubleCounted += cat[id].credits;
+          dcIds.add(id);
+        }
       }
       rec.buckets.add(bucketKey);
       rec.instances = Math.max(rec.instances, instances);
@@ -374,6 +414,14 @@ const Solver = (() => {
       if (p.flowchartPlan) for (const code in p.flowchartPlan) {
         if (p.flowchartPlan[code].f && cat[code]) _preRequired.add(code);
       }
+      // MAP-sheet coded courses WILL be taken (Pass 2.45 forces them) — a
+      // choice bucket listing one must count it as covered, or the plan
+      // schedules the course AND a redundant slot (EE Req 2.1 spawned a 4-cr
+      // "CHEM 105 or 111" slot while CHEM 105 sat pinned in Winter Y1).
+      // Or-choice lines (it.alts) stay out — their bucket owns the choice.
+      if (p.mapPlan) p.mapPlan.forEach(t => (t.items || []).forEach(it => {
+        if (it.c && !it.alts && cat[it.c] && !cat[it.c].placeholder) _preRequired.add(it.c);
+      }));
     });
 
     /* Pass 1/2 — REQUIRED vs CHOICE (the LLM-guided pivot).
@@ -995,6 +1043,18 @@ const Solver = (() => {
         rest.forEach(inst => {
           if (state.assign.has(inst.uid)) return;
           if (skipBlocks && state.blockOf.has(inst.uid)) return;   // cohort blocks placed separately
+          // STABILITY: a re-solve after a small edit (a bucket pick, a drop)
+          // returns every course to its previous term when still legal — the
+          // plan must not reshuffle under the student mid-choice
+          // (opts.prevAssign; scorePlan defends the same preference).
+          const pv = state.prevAssign ? state.prevAssign.get(inst.uid) : undefined;
+          if (pv != null && canPlace(state, inst, pv)) { place(state, inst, pv); progress = true; return; }
+          // a lab lands beside its lecture whenever the lecture is placed
+          const mateUid = state.pairOf ? state.pairOf.get(inst.uid) : undefined;
+          if (mateUid != null) {
+            const mt = state.assign.get(mateUid);
+            if (mt != null && canPlace(state, inst, mt)) { place(state, inst, mt); progress = true; return; }
+          }
           // flowchart-hinted courses aim straight for their target year+season
           // (first instance only — repeats span semesters by definition)
           const hint = inst.k === 1 ? fc[baseId(inst.uid)] : null;
@@ -1362,6 +1422,28 @@ const Solver = (() => {
       if (jump > 7) structure += (jump - 7) * 0.7;
     }
 
+    // lab ↔ lecture split: a lab scheduled in a different semester than its
+    // lecture is a real-world scheduling error — penalize each split pair
+    if (state.pairOf && state.pairOf.size) {
+      state.pairOf.forEach((mateUid, labUid) => {
+        const a = assign.get(labUid), b = assign.get(mateUid);
+        if (a != null && b != null && a !== b) structure += 7;
+      });
+    }
+
+    // STABILITY on re-solves: each course moved away from its previous term
+    // costs — a bucket pick or drop must not reshuffle the rest of the plan.
+    // Strong enough to beat cosmetic preferences, weak enough that a genuine
+    // constraint (the new course needs the seat) still wins.
+    if (state.prevAssign && state.prevAssign.size) {
+      let moved = 0;
+      assign.forEach((t, uid) => {
+        const pv = state.prevAssign.get(uid);
+        if (pv != null && pv !== t) moved++;
+      });
+      structure += moved * 9;
+    }
+
     const total =
       (w.cost / 5) * cost + (w.risk / 5) * risk +
       (w.life / 5) * life + structure;
@@ -1533,7 +1615,10 @@ const Solver = (() => {
       const activeIdx = [...new Set(state.assign.values())];
       const fw = state.terms.filter(tm => tm.isFW && tm.enabled && activeIdx.includes(tm.index)).map(tm => tm.index);
       const totalFW = fw.reduce((s, t) => s + state.load[t], 0);
-      const ideal = Math.max(8, Math.round(totalFW / 15.5));
+      // NO hard 8-term floor: a transfer/mid-degree student with 60 credits
+      // left deserves a 4-term plan. A fresh 120-cr degree still computes to
+      // ~8 on its own (120/15.5 ≈ 7.7 → 8); caps + prereqs bound the rest.
+      const ideal = Math.max(1, Math.round(totalFW / 15.5));
       if (fw.length <= ideal) return;
       const cands = fw.filter(t => {
         const uids = [...state.assign].filter(([, tt]) => tt === t).map(([u]) => u);
@@ -2129,6 +2214,29 @@ const Solver = (() => {
       if (hard >= 3) flags.push({ level: "warn", icon: "layer-group", text: `${tm.label} stacks ${hard} historically hard courses (${names.join(", ")}) — finals week collision risk.` });
     });
 
+    // EXCESSIVE CREDITS — extra classes cost tuition and semesters. Two
+    // honest signals: open electives nothing requires, and a graduation
+    // total far beyond typical (135 clears legit heavy programs like ChemE).
+    {
+      let planCr = 0, elecCr = 0;
+      assign.forEach((t, uid) => {
+        const c = state.byUid.get(uid).course;
+        planCr += c.credits;
+        if (c.elective || /^ELECTIVE\+/.test(uid)) elecCr += c.credits;
+      });
+      let compCr = 0;
+      completed.forEach(id => {
+        compCr += (cat[id] || (typeof DATA !== "undefined" && DATA.courses[id]) || { credits: 3 }).credits;
+      });
+      const grandTotal = planCr + compCr;
+      if (elecCr >= 7) {
+        flags.push({ level: "warn", icon: "coins", text: `~${Math.round(elecCr)} credits of open electives pad this plan beyond your actual requirements — roughly ${elecCr >= 12 ? "a semester" : "half a semester"} of tuition. Swap them for a minor or certificate (What if… compares one), or ask advisement about graduating lighter.` });
+      }
+      if (grandTotal > 135) {
+        flags.push({ level: "warn", icon: "scale-unbalanced", text: `This path graduates with ~${Math.round(grandTotal)} total credits (completed + planned) — well beyond the 120 BYU requires. Check the progress report for requirements filled past their need, and verify double-counting with your advisor.` });
+      }
+    }
+
     // part-time Fall/Winter warning
     const minFW = profile.settings.minCreditsFW || 12;
     terms.forEach(tm => {
@@ -2136,6 +2244,15 @@ const Solver = (() => {
       if (active && tm.isFW && state.load[tm.index] < minFW) {
         flags.push({ level: profile.settings.scholarshipFullTime ? "warn" : "info", icon: "gauge-simple-low", text: `${tm.label} is below ${minFW} credits${profile.settings.scholarshipFullTime ? " — scholarship / full-time status risk" : ""}.` });
       }
+    });
+
+    // lab ↔ lecture split: the optimizer pairs free courses, but sheet-pinned
+    // ones keep the sheet's own pacing — either way the student should KNOW
+    if (state.pairOf) state.pairOf.forEach((lecUid, labUid) => {
+      const a = assign.get(labUid), b = assign.get(lecUid);
+      if (a == null || b == null || a === b) return;
+      const lab = state.byUid.get(labUid).course, lec = state.byUid.get(lecUid).course;
+      addCF(labUid, "warn", `${lab.display || labUid} is the lab for ${lec.display || lecUid}, which sits in ${terms[b].label} — most students take them the SAME semester. Drag one to pair them${state.pinnedUids.has(labUid) && state.pinnedUids.has(lecUid) ? " (the official MAP sheet splits them — verify with advisement)" : ""}.`);
     });
 
     // the official sheet schedules Spring work but Spring is off — the student
@@ -2418,6 +2535,32 @@ const Solver = (() => {
     const instances = buildInstances(expandRes.chosen, expandRes.completed, cat);
     const state = makeState(profile, terms, instances, cat, expandRes.completed);
     state.mapWantsSpring = mapNeedsSpring && !profile.settings.allowSpring;
+    // STABILITY: previous uid -> termIndex from the plan being re-solved
+    // (small edits keep everything else put; see seed + scorePlan)
+    if (opts.prevAssign) state.prevAssign = new Map(Object.entries(opts.prevAssign));
+    // ---- lab ↔ lecture pairing ---------------------------------------
+    // A small "... Lab" course belongs in the SAME semester as its lecture
+    // (EC EN 224 + 225 drifted a year apart). The catalog rarely encodes the
+    // link, so pair conservatively: ≤1.5 cr, "Lab" in the name, same subject,
+    // adjacent catalog number, and the partner is a real (≥2 cr) course in
+    // this plan. Seeding places the lab beside its lecture; scorePlan
+    // penalizes any split so the optimizer keeps them together.
+    state.pairOf = new Map();
+    {
+      const bySubjNum = new Map();
+      instances.forEach(i => {
+        const m = baseId(i.uid).match(/^([A-Z][A-Z& ]*?)\s+(\d+)[A-Z]*$/);
+        if (m && !i.course.placeholder) bySubjNum.set(`${m[1]}|${+m[2]}`, i);
+      });
+      instances.forEach(i => {
+        const c = i.course;
+        if (c.placeholder || c.credits > 1.5 || !/\blab\b/i.test(c.name || "")) return;
+        const m = baseId(i.uid).match(/^([A-Z][A-Z& ]*?)\s+(\d+)[A-Z]*$/);
+        if (!m) return;
+        const mate = bySubjNum.get(`${m[1]}|${+m[2] - 1}`) || bySubjNum.get(`${m[1]}|${+m[2] + 1}`);
+        if (mate && mate.uid !== i.uid && mate.course.credits >= 2) state.pairOf.set(i.uid, mate.uid);
+      });
+    }
     // HARD TERM BUDGET — the classic 8-10 semester shape. Plans target
     // max(8, credits/16) Fall/Winter semesters at a comfortable ~16-credit
     // pace, but rather than spill into an 11th semester, the budget clamps to
@@ -2829,10 +2972,14 @@ const Solver = (() => {
     });
     state.instances = state.instances.filter(i => !/^ELECTIVE\+/.test(i.uid));
     compact(state); closeGaps(state);
-    topUpFloor(state);
     enforceMapCaps(state);                     // sheet terms end at their printed totals
+    // weave BEFORE the floor top-up: padding the receiving terms to ≥12 first
+    // eats exactly the headroom the tail needs to fold forward (the EE+CS
+    // combo kept a 12-cr tail of three GE slots + C S 236 for that reason).
+    // The single topUpFloor afterwards guarantees ≥12 everywhere that's left.
     weaveTail(state);                          // fold leftover tail terms into sheet headroom
-    topUpFloor(state);                         // re-guarantee ≥12 on any surviving tail term
+    closeGaps(state);                          // a dissolved tail can leave an interior hole
+    topUpFloor(state);                         // guarantee ≥12 on every surviving term
 
     const score = scorePlan(state);
     const { flags, courseFlags } = analyze(state, expandRes, programs, problems);

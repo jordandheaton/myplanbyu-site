@@ -45,7 +45,10 @@
   <main class="layout">
 
     <!-- Progress report (left) -->
-    <aside class="panel panel-left">
+    <aside class="panel panel-left" id="panelLeft">
+      <button class="panel-collapse" id="collapseLeft" title="Collapse / expand this panel">
+        <i class="fas fa-angles-left"></i><span class="pc-label">Progress Report</span>
+      </button>
       <div class="panel-head">
         <h2>Draft Progress Report</h2>
         <button class="btn primary sm" id="refreshBtn"><i class="fas fa-rotate"></i> Re-optimize</button>
@@ -80,7 +83,10 @@
     </section>
 
     <!-- Saved plans (right) -->
-    <aside class="panel panel-right">
+    <aside class="panel panel-right" id="panelRight">
+      <button class="panel-collapse" id="collapseRight" title="Collapse / expand this panel">
+        <i class="fas fa-angles-right"></i><span class="pc-label">My Plans &amp; Drafts</span>
+      </button>
       <div class="panel-head">
         <h2>My Plans &amp; Drafts</h2>
         <button class="btn primary sm" id="newPlanBtn"><i class="fas fa-plus"></i> New plan</button>

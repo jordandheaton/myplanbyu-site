@@ -921,6 +921,135 @@ defaults to 127.0.0.1:5000, override via window.MYPLAN_ADVISOR_API). Sharing a
 localhost link reaches nobody — must deploy. Nothing committed/pushed yet (per
 standing "don't ship until it looks good").
 
+## Session 26 — user-feedback fixes from the live EE plan (pre-persona-sweep)
+
+Jordan used the LIVE site (EE BS + CS minor, 10 semesters/153cr printout) and
+filed 10+ issues. Fixed so far, each browser-verified:
+
+1. **CHEM 105 + Req 2.1 double-count** (course pinned Winter Y1 AND a 4-cr
+   "CHEM 105 or 111" slot in the tail): MAP-coded courses now join
+   `_preRequired` before bucket expansion, so choice buckets count them as
+   covered. Plus TWO follow-on fixes the first exposed: (a) coverage is CAPPED
+   at the bucket's need — the EE sheet codes PHSCS 121 AND CHEM 105, both sat
+   in the 1-course Physical Science GE and burned the double-count budget;
+   (b) take() no longer spends the double-count budget on SAME-program key
+   pairs (Requirement 1 + ::map are one enrollment) — the 15-cr cap now meters
+   only real cross-program sharing.
+2. **Pass order** (root of "2 extra semesters of electives + one class"):
+   topUpFloor ran BEFORE weaveTail, padding receiver terms to ≥12 and eating
+   exactly the headroom the tail needed to fold forward. Now: strip padding →
+   compact → closeGaps → enforceMapCaps → weaveTail → closeGaps → topUpFloor.
+   EE+CS: 12-cr GE-slot tail term dissolved; padding 24cr→3cr; interior-gap
+   closed. Regression: 175/175, 0 crashes, 133 majors at 8 terms, avg 123 cr.
+3. **Stability on picks** ("it was re-optimizing still"): solveActive passes
+   the previous uid→term assignment on same-plan re-solves; seed places each
+   course at its previous term first (when legal), scorePlan charges 9/moved
+   course. Explicit Re-optimize / Try-an-alternative / plan switch start
+   clean ({fresh:true}).
+4. **Lab ↔ lecture pairing** (EC EN 224 Fall / 225 Winter): conservative
+   pairing (≤1.5cr + "Lab" name + same subject + adjacent number + real
+   lecture in plan) — seeded together + 7/split scorePlan penalty. EC EN
+   224+225 now share Fall 2027. Sheet-pinned splits (Biology PHSCS 106/107 —
+   the sheet itself splits them) are respected but WARNED on the lab's card.
+5. **Slot sizing** ("recommend 2 4-credit classes"): credit buckets pick the
+   slot credit that completes the requirement in the FEWEST classes among
+   credit sizes with a real choice (≥3 options or ≥25% of pool), tie-broken
+   by least overshoot. EC EN Req 3 AND Req 4 ("8 hours"): two 4-cr slots each
+   (Req 4 was 3+3+2 because 3 was the mode).
+6. **Excessive-credit warnings**: ≥7cr of open electives → tuition-cost warn
+   with what-if pointer; >135 total (completed+planned) → over-need warn.
+7. **UI**: homepage demo button removed (New plan only); left/right panels
+   collapse to 34px rails (persisted, myplanbyu.ui); limited-enrollment
+   "Apply to X" chip is now a DROPDOWN listing the admission note + the
+   program's pre-admission courses with their terms (Nursing: NDFS 100,
+   CHEM 285 ✓).
+
+NEXT (task #47): 10-persona end-to-end sweep — build plan, make bucket picks
+like a real user (fills+pins via the UI flow), re-solve repeatedly; hunt
+redundant slots, drift, tail bloat, stuck 8-term floors for transfer
+students. Fix what surfaces; full report to Jordan afterwards.
+
+## Session 27 — 10-persona sweep: findings + fixes
+
+Simulated 10 students end-to-end IN the app's own flow (generate → pick
+bucket classes exactly as openBucketPicker does — fills + manual pins →
+re-solve like solveActive, incl. stability). Personas: EE+CSminor fresh (5
+picks), Psych+Business AP, Nursing fresh, Accounting ~29cr, Bio+Chem minor,
+MechE junior transfer, English+Editing, ExSci sophomore 34cr, CS+Math fresh,
+CS senior ~95cr.
+
+FOUND + FIXED during the sweep:
+- **compact()'s hard 8-term floor** (`ideal = max(8, cr/15.5)`) — Jordan's
+  exact suspicion. Removed (max(1,…)). Fresh 120-cr majors still compute to
+  8; transfer/senior plans now compress: ExSci sophomore 7t, MechE junior 5t,
+  **CS senior 4t (Winter 2028 grad)**. Only 1 fresh major lands under 8
+  (Geography Global Studies 7t/104cr — honest credit math).
+- **Moved-pick target selection** (openBucketPicker data-move): was
+  nearest-term-with-room-≤18 ANYWHERE — could mint a 9th semester and pin it
+  (Psych ARTHC, Bio WRTG 316, MechE AFRIK +25cr explosion). Now: within the
+  plan's span at the sheet-aware ceiling (mapCap stretched to 16 on F/W)
+  first, then span at hard cap, then beyond (with a heads-up toast).
+- **Stability must never COST a semester**: if the prevAssign re-solve ends
+  with MORE active terms than before the edit, solveActive re-solves fresh
+  and keeps the tighter plan (stability was blocking re-compaction in
+  slot-heavy plans — Bio+Chem 8→9 case; now holds 8).
+
+VERDICT after fixes (final state per persona): P1 EE+CS 8t/124cr through all
+5 picks, 0 padding (the live-site version of this same flow degraded to
+10t/153cr); P5 Bio+Chem 8t held; P6 MechE junior 5t/68cr held; P8 ExSci
+sophomore 7t; P9 CS+Math 8t through 5 picks; P10 CS senior 4t. Regression:
+175/175, 0 crashes, 138@8t, avg 123cr.
+
+KNOWN LIMITS (documented, deliberate):
+- <30 earned credits = freshman standing (offset 0): the full 8-term sheet
+  skeleton stays, terms run lighter (Accounting w/ 29cr: 8t/107cr). Standing
+  thresholds are BYU's real 30/60/90 bands.
+- Slot-heavy majors (English+Editing) can drift to 9t after many picks
+  (~13cr avg — loose but honest); placeholder-dominated plans churn more on
+  re-solve since slots are interchangeable.
+- Pre-existing sheet-vs-catalog concurrent-prereq warnings (ACC 402/405/409
+  need ACC 407 the sheet co-schedules) still surface — by design.
+- Nursing fresh: 10t/140cr with Spring off (sheet uses Spring; Recommended
+  offers the one-click opt-in; NURS 404 honestly unscheduled until then).
+- The picker already sinks + labels unmet-prereq options ("needs AFRIK 101
+  first") — a student who picks one anyway gets the prereq chain added and
+  a pin warning; that's informed choice, not a silent trap.
+
+NOT YET DEPLOYED — awaiting Jordan's review of this batch.
+
+## Session 28 — curated admission requirements + IS-core prereq wall
+
+**Admission requirements (replaces the inferred "have these done" list).**
+New `ADMISSION_REQS` dict in generate_timeline.py — transcribed from each
+program's OWN admission page (web-researched 2026-07-22), keyed by RUNTIME id
+(catalog "major-<slug>" + hand-curated "is-bs"/"is-bs-mism"). Baked to
+`TIMELINE.admissionReqs`. 7 curated: Nursing, IS (both tracks), Dietetics,
+Elementary Education, Accounting, Finance — each with exact `prereqs`,
+`criteria` (GPA/grades/deadline/experience), and the source `url`. The
+apply-chip dropdown now: curated → prereqs with ✓ (completed OR planned before
+the apply term) + criteria + "Full admission requirements" link; no curated
+entry → the catalog note + "confirm with the department" pointer (NOT a
+guessed course list). Curated-but-ungated majors (IS, Accounting) now get an
+apply chip too, attached to the F/W term before their first ≥300 major course.
+planSummary() feeds the curated reqs to the AI. Verified: Nursing shows
+Jordan's exact list (CHEM 285✓, NDFS 100✓, CELL 220/210, SFL 210/PSYCH 220 +
+16 core hrs); MISM shows the IS criteria (3.0 prereq GPA, B-min in IS 201/303);
+Advertising (uncurated) shows the note+pointer. 175/175 solve, 0 crashes.
+
+**IS-core "missing a whole bunch of prerequisites".** Root cause: a bucket
+picker for a requirement with an upper-level-heavy pool (Languages of Learning
+53/60, any 400-level elective slot placed early) rendered EVERY option's
+"needs X first" as a flat wall. Fix: split options into ready vs
+needs-prerequisite; the needs ones collapse behind a `<details>` "N more need
+a prerequisite you haven't planned yet" toggle (Languages now shows 7 clean +
+50 tucked). Also fixed a chain-visual false alarm: HRM 391→HRM 401 (sheet
+places the course without the prereq — AP/transfer assumed) now shows grey
+"assumed met" instead of red "not planned", matching the solver's stance.
+
+Deployed to GitHub Pages with the Session 26–27 tweaks (double-count slot fix,
+pass-order tail integration, pick stability + never-grow, lab pairing, slot
+sizing, credit warnings, no-8-term-floor, collapsible panels, no-demo home).
+
 ## Pipeline map (who produces what)
 
 - `sources/*.py` → `data/*.json` raw scrapes (`catalog.json`, `maps.json` +

@@ -55,10 +55,38 @@ const App = (() => {
   }
 
   /* ------------------------------ solving ---------------------------- */
+  let resultPlanId = null;   // which plan the live `result` belongs to
   function solveActive(opts = {}) {
     const plan = activePlan();
-    if (!plan) { result = null; render(); return; }
+    if (!plan) { result = null; resultPlanId = null; render(); return; }
+    // STABILITY: re-solving the SAME plan after a small edit (bucket pick,
+    // drop, added class) keeps every other course in its current term unless
+    // the edit genuinely demands otherwise. An explicit Re-optimize
+    // ({fresh:true}), an alternative shuffle, or switching plans starts clean.
+    if (result && resultPlanId === plan.id && !opts.fresh && !opts.shuffleSeed) {
+      const prev = {};
+      result.placements.forEach(p => { prev[p.uid] = p.termIndex; });
+      const prevTermCount = new Set(Object.values(prev)).size;
+      const stable = Solver.solve(plan.profile, { ...opts, prevAssign: prev });
+      const stableTerms = new Set(stable.placements.map(p => p.termIndex)).size;
+      // stability must never COST a semester: if holding courses in place
+      // blocked re-compaction, take the freshly packed plan instead
+      if (stableTerms > prevTermCount) {
+        const fresh = Solver.solve(plan.profile, opts);
+        const freshTerms = new Set(fresh.placements.map(p => p.termIndex)).size;
+        result = freshTerms < stableTerms ? fresh : stable;
+      } else {
+        result = stable;
+      }
+      resultPlanId = plan.id;
+      plan.updatedAt = Date.now();
+      save();
+      checkFlowchartGaps(plan.profile);
+      render();
+      return;
+    }
     result = Solver.solve(plan.profile, opts);
+    resultPlanId = plan.id;
     plan.updatedAt = Date.now();
     save();
     checkFlowchartGaps(plan.profile);
@@ -177,10 +205,8 @@ const App = (() => {
         <p>Click <b>+ New plan</b> to choose a major, up to two minors, and certificates —
         then the solver builds an optimized semester-by-semester sequence around your life.</p>
         <button class="btn primary" id="emptyNewPlan"><i class="fas fa-plus"></i> New plan</button>
-        <button class="btn ghost" id="emptyDemo"><i class="fas fa-wand-magic-sparkles"></i> Load the demo (IS + MISM + Ballroom + Spanish + Global Business)</button>
       </div>`;
       $("#emptyNewPlan").onclick = () => openWizard();
-      $("#emptyDemo").onclick = () => { newPlanFromProfile(DATA.demoProfile, "Jordan's integrated MISM plan"); solveActive(); };
       return;
     }
     const byTerm = new Map();
@@ -214,9 +240,10 @@ const App = (() => {
         ${overCap ? `<div class="col-warnbar">${over18
           ? `<i class="fas fa-triangle-exclamation"></i> ${credits} cr — over BYU's 18-credit cap (needs college approval)`
           : `<i class="fas fa-triangle-exclamation"></i> ${credits} cr — over your ${tm.cap}-credit limit`}</div>` : ""}
-        ${(timeline.byTerm.get(tm.index) || []).map(ev => `
-          <div class="col-event ${ev.cls || ""}" title="${esc(ev.detail || "")}">
-            <i class="fas ${ev.icon}"></i> ${esc(ev.text)}</div>`).join("")}
+        ${(timeline.byTerm.get(tm.index) || []).map((ev, ci) => `
+          <div class="col-event ${ev.cls || ""} ${ev.expand ? "ev-expandable" : ""}"
+               ${ev.expand ? `data-evt="${tm.index}" data-evi="${ci}"` : ""} title="${esc(ev.detail || "")}">
+            <i class="fas ${ev.icon}"></i> ${esc(ev.text)}${ev.expand ? ` <i class="fas fa-chevron-down ev-caret"></i>` : ""}</div>`).join("")}
         <div class="col-body" data-term="${tm.index}">
           ${items.map(cardHtml).join("")}
           ${items.length ? "" : `<div class="col-hint">open — drag a class here</div>`}
@@ -235,6 +262,30 @@ const App = (() => {
       </div>`;
     }
     board.innerHTML = html;
+
+    // expandable event chips (limited-enrollment "what the application needs")
+    $$("#board .col-event.ev-expandable").forEach(el => el.addEventListener("click", () => {
+      const open = el.nextElementSibling && el.nextElementSibling.classList.contains("col-event-detail");
+      $$("#board .col-event-detail").forEach(d => d.remove());
+      $$("#board .ev-caret").forEach(c => c.style.transform = "");
+      if (open) return;
+      const ev = (timeline.byTerm.get(+el.dataset.evt) || [])[+el.dataset.evi];
+      if (!ev || !ev.expand) return;
+      const ex = ev.expand;
+      const d = document.createElement("div");
+      d.className = "col-event-detail";
+      d.innerHTML = `
+        <p>${esc(ex.note)}</p>
+        ${(ex.prereqs && ex.prereqs.length) ? `<b>Prerequisite courses</b>
+          <ul class="ev-prereqs">${ex.prereqs.map(pr => `<li class="${pr.done ? "ev-done" : ""}">${pr.done ? '<i class="fas fa-check"></i>' : '<i class="far fa-circle"></i>'} ${esc(pr.text)}</li>`).join("")}</ul>` : ""}
+        ${(ex.criteria && ex.criteria.length) ? `<b>Also required</b>
+          <ul>${ex.criteria.map(c => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+        ${ex.pointer ? `<p class="ev-pointer">${esc(ex.pointer)}</p>` : ""}
+        ${ex.url ? `<a href="${esc(ex.url)}" target="_blank" rel="noopener">Full admission requirements <i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}`;
+      el.after(d);
+      const caret = el.querySelector(".ev-caret");
+      if (caret) caret.style.transform = "rotate(180deg)";
+    }));
 
     // drag & drop wiring
     $$("#board .card[draggable]").forEach(card => {
@@ -413,15 +464,24 @@ const App = (() => {
     allPool.forEach(code => { preOf[code] = unmetPre(code); });
     const rank = code => prefScore(code) + (preOf[code] ? 50 : 0);   // unmet-prereq options sink
     const free = allPool.filter(code => !inPlan.has(code));
-    const opts = free
+    // Options whose OWN prerequisites aren't planned/completed can't be taken
+    // for this slot as-is (SPAN 355 needs SPAN 202; a 400-level IS elective
+    // needs IS 303). They stay available but are TUCKED behind a toggle so a
+    // requirement like Languages of Learning doesn't read as "53 missing
+    // prerequisites" — the student sees the handful they can actually take.
+    const allOpts = free
       .filter(code => DATA.courses[code].off.includes(season))
-      .sort((a, b) => rank(a) - rank(b))
-      .slice(0, 40);
+      .sort((a, b) => rank(a) - rank(b)).slice(0, 45);
+    const opts = allOpts.filter(code => !preOf[code]).slice(0, 40);
+    const optsNeedPre = allOpts.filter(code => preOf[code]).slice(0, 30);
     // other-term options are now ALWAYS shown (not just when nothing fits this
     // term) — picking one moves the slot to a term where it IS taught.
-    const optSet = new Set(opts);
-    const alts = free.filter(code => !optSet.has(code))
-      .sort((a, b) => rank(a) - rank(b)).slice(0, 20);
+    const optSet = new Set([...opts, ...optsNeedPre]);
+    const altsAll = free.filter(code => !optSet.has(code))
+      .sort((a, b) => rank(a) - rank(b)).slice(0, 30);
+    const alts = altsAll.filter(code => !preOf[code]).slice(0, 20);
+    const altsNeedPre = altsAll.filter(code => preOf[code]).slice(0, 20);
+    const needPre = [...optsNeedPre, ...altsNeedPre];
     // pool courses already scheduled (often pulled in as a prerequisite of some
     // other class) — surfaced so the requirement's full option list is visible.
     const inPlanPool = allPool.filter(code => inPlan.has(code))
@@ -451,6 +511,9 @@ const App = (() => {
         ${opts.map(code => itemHtml(code, false)).join("")}
         ${alts.length ? `<div class="bp-grouphdr">taught another term — picking moves this slot</div>` : ""}
         ${alts.map(code => itemHtml(code, true)).join("")}
+        ${needPre.length ? `<details class="bp-needpre"><summary>${needPre.length} more need a prerequisite you haven't planned yet</summary>
+          ${optsNeedPre.map(code => itemHtml(code, false)).join("")}
+          ${altsNeedPre.map(code => itemHtml(code, true)).join("")}</details>` : ""}
         ${inPlanPool.length ? `<div class="bp-grouphdr">already in your plan</div>
           ${inPlanPool.map(code => { const c = DATA.courses[code];
             return `<div class="bp-item bp-inplan" title="Already scheduled elsewhere in your plan — often a prerequisite of another class"><b>${esc(code)}</b><span>${esc(c.name)}</span><em><i class="fas fa-check"></i> in plan</em></div>`; }).join("")}` : ""}
@@ -473,13 +536,26 @@ const App = (() => {
       closeMenus();
       let year = result.terms[p.termIndex].year, ssn = season;
       if (btn.dataset.move) {
-        // find the nearest enabled term (to the slot) where this IS taught
+        // find the nearest enabled term (to the slot) where this IS taught —
+        // INSIDE the plan's current span first (a moved pick must not mint a
+        // 9th semester when an existing term has room at the 14-16 band)
         const terms = result.terms, state = result.state;
+        const lastActive = Math.max(...result.placements.map(x => x.termIndex));
+        // a sheet term's REAL ceiling: its printed total (stretchable to 16 on
+        // F/W) — ignoring it pins the course somewhere the solver must then
+        // evict from, cascading into a brand-new semester
+        const ceilOf = tm => state.mapCap && state.mapCap.has(tm.index)
+          ? (tm.isFW ? Math.max(state.mapCap.get(tm.index), 16) : state.mapCap.get(tm.index))
+          : Math.min(16, tm.cap);
         const byDist = terms.map(tm => tm).filter(tm => tm.enabled && c.off.includes(tm.season))
           .sort((a, b) => Math.abs(a.index - p.termIndex) - Math.abs(b.index - p.termIndex));
-        const target = byDist.find(tm => state.load[tm.index] + c.credits <= tm.cap) || byDist[0];
+        const target =
+          byDist.find(tm => tm.index <= lastActive && state.load[tm.index] + c.credits <= ceilOf(tm)) ||
+          byDist.find(tm => tm.index <= lastActive && state.load[tm.index] + c.credits <= tm.cap) ||
+          byDist.find(tm => state.load[tm.index] + c.credits <= tm.cap) || byDist[0];
         if (!target) { toast(`${code} has no available term in your plan window.`); return; }
         year = target.year; ssn = target.season;
+        if (target.index > lastActive) toast(`Heads up: ${code} only fits in a NEW semester (${Solver.SEASON_NAME[ssn]} ${year}) — every existing term is full.`, "err");
       }
       prof.fills = prof.fills || {};
       const arr = (prof.fills[fillKey] = prof.fills[fillKey] || []);
@@ -560,28 +636,53 @@ const App = (() => {
 
     // 1) limited-enrollment admission — the make-or-break deadline (chips stay
     //    on the board; scholarships/abroad live in the panel sections only)
+    // which of a curated prereq line's course codes the student has done or has
+    // planned before applying — drives the ✓ next to each requirement
+    const doneOrPlannedBefore = (codes, applyIdx) => codes.some(code =>
+      result.state.completed.has(code) ||
+      result.placements.some(p => p.courseId === code && (applyIdx == null || p.termIndex < applyIdx)));
+    const codesIn = s => (s.match(/\b[A-Z][A-Z&]{0,3}(?:\s[A-Z&]{1,4})?\s\d{3}[A-Z]?\b/g) || []);
+
     (result.programs || []).forEach(pid => {
       const prog = DATA.programIndex[pid];
       if (!prog || pid === "univ-core") return;
       const g = state.admitGate && state.admitGate[pid] != null ? state.admitGate[pid] : null;
       const note = (TIMELINE.admitNotes || {})[pid];
-      if (g == null && !note) return;
+      const req = (TIMELINE.admissionReqs || {})[pid];   // CURATED, from the dept's page
+      if (g == null && !note && !req) return;
       const short = prog.name.replace(/\s*\(.*\)$/, "");
-      if (g != null) {
-        // application happens DURING the academic year before the professional
-        // phase (acadYear g); chip on that year's Winter term when in plan
-        const applyTm = result.terms.find(tm => tm.enabled && tm.isFW &&
-          tm.season === "W" && tm.index <= lastT && acadYearOf(tm) === g - 1) ||
-          result.terms.find(tm => tm.index === activeT[0]);
-        chip(applyTm && applyTm.index, { icon: "fa-lock", cls: "ev-admit",
-          text: `Apply to ${short}`, detail: note || `Limited enrollment — professional phase starts the following Fall. Confirm the exact deadline with the college advisement center.` });
-        deadlines.push({ when: applyTm ? applyTm.label : `Year ${g}`, icon: "fa-lock",
-          title: `${short} application`, detail: note || "Limited-enrollment program — apply the year before the professional phase begins.", cls: "ev-admit" });
-      } else {
-        chip(activeT[0], { icon: "fa-lock", cls: "ev-admit", text: `${short}: application required`,
-          detail: note });
-        deadlines.push({ when: "Early", icon: "fa-lock", title: `${short} requires an application/audition`, detail: note, cls: "ev-admit" });
+
+      // apply term: the year before the professional phase for gated majors;
+      // for curated-but-ungated ones (IS, Accounting) the term before the
+      // first ≥300-level major course (the junior core the application gates)
+      let applyTm = g != null
+        ? result.terms.find(tm => tm.enabled && tm.isFW && tm.season === "W" &&
+            tm.index <= lastT && acadYearOf(tm) === g - 1)
+        : null;
+      if (!applyTm && req) {
+        const firstPro = result.placements
+          .filter(p => !p.placeholder && (p.buckets || []).some(b => b.split("::")[0] === pid) &&
+            /\b[34]\d\d\b/.test(p.courseId))
+          .sort((a, b) => a.termIndex - b.termIndex)[0];
+        if (firstPro) applyTm = [...result.terms].filter(tm => tm.enabled && tm.isFW &&
+          tm.index < firstPro.termIndex && activeT.includes(tm.index)).pop();
       }
+      applyTm = applyTm || result.terms.find(tm => tm.index === activeT[Math.min(2, activeT.length - 1)]);
+
+      // curated dropdown (prereqs with ✓ + criteria + source), else the
+      // catalog note + a "confirm with the department" pointer — NOT a guess
+      const expand = req ? {
+        note: req.note, url: req.url,
+        prereqs: (req.prereqs || []).map(line => ({ text: line, done: doneOrPlannedBefore(codesIn(line), applyTm && applyTm.index) })),
+        criteria: req.criteria || [],
+      } : {
+        note: note || "This is a limited-enrollment (application) major.",
+        pointer: "Confirm the exact prerequisite courses, GPA, and deadline on the department's admission page or with your college advisement center.",
+      };
+      chip(applyTm && applyTm.index, { icon: "fa-lock", cls: "ev-admit",
+        text: `Apply to ${short}`, expand, detail: "Click to see what the application needs." });
+      deadlines.push({ when: applyTm ? applyTm.label : `Year ${g || 2}`, icon: "fa-lock",
+        title: `${short} application`, detail: (req && req.note) || note || "Limited-enrollment — apply before the professional phase.", cls: "ev-admit" });
     });
 
     // 2) academic dates for terms with real calendar data (chips + deadline rows)
@@ -1201,6 +1302,11 @@ const App = (() => {
       const planned = opts.map(g => ({ g, t: placedAt(g) })).filter(x => x.t !== null)
         .sort((a, b) => a.t - b.t)[0];
       if (planned) return { label: planned.g, cls: "", note: result.terms[planned.t].label };
+      // Absent AND the course itself is placed by the official sheet → the
+      // sheet scheduled it without this prereq on purpose (AP / placement /
+      // transfer assumed). Match the solver's stance instead of a red alarm.
+      if (p.pinned && result.state.mapCodes && result.state.mapCodes.has(p.courseId))
+        return { label: opts[0] + (opts.length > 1 ? ` (or ${opts.length - 1} more)` : ""), cls: "assume", note: "assumed met" };
       return { label: opts[0] + (opts.length > 1 ? ` (or ${opts.length - 1} more)` : ""), cls: "miss", note: "not planned" };
     });
     // downstream: planned courses whose prereqs list this one
@@ -1809,6 +1915,21 @@ const App = (() => {
   function init() {
     load();
 
+    // collapsible side panels (state persisted across visits)
+    const uiPrefs = (() => { try { return JSON.parse(localStorage.getItem("myplanbyu.ui")) || {}; } catch { return {}; } })();
+    const wireCollapse = (btnSel, panelSel, key) => {
+      const btn = $(btnSel), panel = $(panelSel);
+      if (!btn || !panel) return;
+      panel.classList.toggle("collapsed", !!uiPrefs[key]);
+      btn.addEventListener("click", () => {
+        uiPrefs[key] = !panel.classList.contains("collapsed");
+        panel.classList.toggle("collapsed", uiPrefs[key]);
+        localStorage.setItem("myplanbyu.ui", JSON.stringify(uiPrefs));
+      });
+    };
+    wireCollapse("#collapseLeft", "#panelLeft", "leftCollapsed");
+    wireCollapse("#collapseRight", "#panelRight", "rightCollapsed");
+
     $("#newPlanBtn").addEventListener("click", () => openWizard());
     $("#wizBack").addEventListener("click", () => { wizardCollect(); if (wizStep > 0) { wizStep--; renderWizard(); } });
     $("#wizNext").addEventListener("click", () => {
@@ -1877,7 +1998,7 @@ const App = (() => {
       menu.addEventListener("click", ev => {
         const a = ev.target.closest("button")?.dataset.a;
         closeMenus();
-        if (a === "opt") { solveActive(); toast("Re-optimized.", "ok"); }
+        if (a === "opt") { solveActive({ fresh: true }); toast("Re-optimized.", "ok"); }
         if (a === "whatif") openWhatIf();
         if (a === "shuffle") { solveActive({ shuffleSeed: (Math.random() * 1e9) | 0 }); toast("Alternative schedule generated.", "ok"); }
         if (a === "prio") openPriorities();
@@ -1996,6 +2117,17 @@ const App = (() => {
       timeline.deadlines.slice(0, 6).forEach(e =>
         lines.push(`- [${e.when}] ${e.title}${e.detail ? `: ${e.detail}` : ""}`.slice(0, 240)));
     }
+    // curated admission requirements for this student's limited-enrollment
+    // program(s) — verbatim from the department, so the advisor answers
+    // "what do I need to apply?" accurately
+    (result.programs || []).forEach(pid => {
+      const req = (typeof TIMELINE !== "undefined" && TIMELINE.admissionReqs) ? TIMELINE.admissionReqs[pid] : null;
+      if (!req) return;
+      const nm = (DATA.programIndex[pid]?.name || pid).replace(/\s*\(.*\)$/, "");
+      lines.push(`ADMISSION REQUIREMENTS — ${nm} (from ${req.url || "the department"}):`);
+      (req.prereqs || []).forEach(p => lines.push(`- prerequisite: ${p}`));
+      (req.criteria || []).forEach(c => lines.push(`- ${c}`));
+    });
     if (timeline.recs.length) {
       lines.push("PLANNER RECOMMENDATIONS shown to the student (agree with or refine these, don't contradict them blindly):");
       timeline.recs.forEach(r => lines.push(`- ${r.title} ${r.detail || ""}`.slice(0, 240)));
