@@ -1050,6 +1050,61 @@ Deployed to GitHub Pages with the Session 26–27 tweaks (double-count slot fix,
 pass-order tail integration, pick stability + never-grow, lab pairing, slot
 sizing, credit warnings, no-8-term-floor, collapsible panels, no-demo home).
 
+## Session 29 — prereq accuracy + full scraper audit (Jordan: "scrapers are
+## the most important part")
+
+**FIN 201/ECON 110 (the named bug).** Verified live: FIN 201 has NO enforced
+prereqs (ACC 200 is "Recommended" only). Root cause: data.js's merge used
+hand-entered `pre` as a FALLBACK whenever the scrape had none — but the
+scrape's absence is authoritative. Audited all 31 hand-`pre` courses: 26
+conflicted with the current catalog, incl. the whole 2024-era IS-core chain
+(the 2026 catalog resequenced it: IS 404 now requires IS 414 — hand had the
+REVERSE). Fix: merged courses use ONLY scraped p/pc; hand `pre` survives only
+for hand-only courses (SPAN 339 etc.); FIN 201's hand line now carries just
+preText "Recommended: ACC 200." (add() learned preText). MISM demo: 0 prereq
+warnings, cohorts intact, envelope still overrides the catalog's intra-core
+ordering.
+
+**Requisite parser: 390 courses were silently unenforced.** Coursedog stores
+structured requisites under BOTH `requisites` AND `prerequisites` (BIO/ANES/
+ACC-440 style uses the latter with nested anyOf→subRules→completedAllOf).
+course_prereq_groups read only the first field and only flat rules. New
+recursive `_rule_prereq_groups` walks both fields + nesting; anyOf of
+singleton branches → one OR-group (exact); OR-of-ANDs (unrepresentable in
+CNF) deliberately stays text-only. Result: 2,805 courses with enforced chains
+(+~800); remaining 108 "text-only" cases are all soft escapes ("or
+equivalent", "instructor's consent") — correctly unenforced. Spot checks:
+BIO 220 [[CELL 120|BIO 130|MMBIO 121]], ANES 310 [[HIST 238|239]], ANTHR 499
+5-way OR; FIN 201 still clean.
+
+**analyze() aligned with sheet doctrine.** New chains exposed sheet-pinned
+courses whose prereqs are ENTIRELY absent (Music's per-instrument ladders,
+Dietetics "Chem 101 or equivalent") — those now get a calm info note ("the
+department assumes it's covered"), matching canPlace/seed-4b/the chain
+visual. Warn only when the prereq is PRESENT but late. Census: 140 warns in
+83 majors → 46 in 31 (all genuine, e.g. ACC core co-scheduling).
+
+**All 12 scrapers run live, clean** (2026-07-22): academic_dates 8,
+tuition_graduation 5, research_grants 3 (1 thin page correctly skipped),
+marriott_business 9, language_certs 21, transfer_credit 41, policies 23 (±2
+churn upstream), clubs 373 (-1 upstream), kennedy/study_abroad 131 (+1 new),
+flowcharts 28, catalog full re-pull + maps via refresh_maps.ps1 (6 min,
+completed OK; incremental PDF cache worked — no sheet re-downloads).
+Validation harness (scratchpad/validate_scrapes.py): counts stable, 0
+replacement chars (earlier "�" was cp1252 console rendering, data is clean
+UTF-8), catalog "dup ids" = multi-catalog-year entries (handled by
+dedup_latest). MAP parse audit: 180/194 sheets full-fidelity (14 known
+interleaved-column fallbacks), ALL real terms within 3.5cr of printed totals
+(flagged rows were inert y=None residue blocks the app never binds).
+NOTE: refresh_maps.log couldn't append while my tail -f monitor held it
+(Windows file lock) — harmless, but don't tail the log during a run.
+
+Post-refresh: 175/175 solve, 0 crashes, 138@8t. generate_timeline re-run
+(admissionReqs preserved, 107 college-tagged study abroad). Advisor synced:
+targeted re-embed of study_abroad/clubs/policies/academic_dates/
+transfer_credit (576 vectors, index 8365) + server restart. NOT yet pushed —
+awaiting Jordan's go.
+
 ## Pipeline map (who produces what)
 
 - `sources/*.py` → `data/*.json` raw scrapes (`catalog.json`, `maps.json` +

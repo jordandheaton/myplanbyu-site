@@ -28,6 +28,7 @@ const DATA = (() => {
       demand: o.demand || "med",
       rare: !!o.rare,
       testOut: o.testOut || null,
+      preText: o.preText || null,  // human-readable requisite line (recommendations, standing)
       repeatMax: o.repeatMax || 1, // repeatable R-courses
       note: o.note || null,
     };
@@ -91,7 +92,10 @@ const DATA = (() => {
   /* ---- Marriott pre-core / IS pre-core ---- */
   add("IS 201", "Introduction to Information Systems", 3, { tags: ["msb-precore"], off: "FWSU", diff: 4, demand: "high" });
   add("ACC 200", "Principles of Accounting", 3, { tags: ["msb-precore"], off: "FWSU", diff: 6, load: 1.2, demand: "high" });
-  add("FIN 201", "Principles of Finance", 3, { tags: ["msb-precore"], pre: ["ACC 200", "ECON 110"], off: "FWSU", diff: 7, load: 1.2, demand: "high" });
+  // No enforced prereqs per the official catalog — ACC 200 is "Recommended"
+  // only (verified live 2026-07-22); the old ["ACC 200","ECON 110"] chain was
+  // wrong and leaked into plans as phantom "missing prerequisite" warnings.
+  add("FIN 201", "Principles of Finance", 3, { tags: ["msb-precore"], off: "FWSU", diff: 7, load: 1.2, demand: "high", preText: "Recommended: ACC 200." });
   add("MKTG 201", "Marketing Management", 3, { tags: ["msb-precore"], off: "FWS", diff: 4 });
   add("STAT 121", "Principles of Statistics", 3, { tags: ["msb-precore", "qr"], off: "FWSU", diff: 5, testOut: "AP Statistics (4+) may substitute." });
   add("IS 303", "Introduction to Computer Programming", 3, { tags: ["is-precore"], pre: ["IS 201"], off: "FW", diff: 6.5, load: 1.4, demand: "high", note: "B or better strongly recommended for IS admission." });
@@ -492,12 +496,17 @@ const DATA = (() => {
       merged[code] = {
         id: code, name: e.n || code, credits: e.c ?? 3,
         tags: hand?.tags || [],
-        // real prereq chains from the catalog (requisitesSimple) win; the
-        // hand-entered chains remain as fallback for courses without them
-        pre: (e.p && e.p.length ? e.p : hand?.pre) || [],
+        // The SCRAPED catalog is authoritative for prereqs — including their
+        // ABSENCE. A course whose official requisites are empty ("Recommended:
+        // Acc 200" on FIN 201, "Acceptance into the IS major" on IS 401) must
+        // NOT inherit stale hand-entered chains: the 2026 catalog resequenced
+        // the IS core (IS 404 now requires IS 414), and the old hand chains
+        // were flat wrong there. Hand `pre` applies only to hand-ONLY courses
+        // (merged in below); the official text still shows via preText.
+        pre: e.p || [],
         // concurrent-allowed prereqs (before-or-same term) and a hard minimum
         // academic year (senior-standing / capstone courses) from the catalog
-        preCo: (e.pc && e.pc.length ? e.pc : hand?.preCo) || [],
+        preCo: e.pc || [],
         // catalog's human-readable prerequisite line (incl. non-course
         // requirements: standing, admission, instructor consent) for the card
         preText: e.pt || hand?.preText || null,

@@ -2180,6 +2180,19 @@ const Solver = (() => {
             return false;
           });
           if (!ok) {
+            // Sheet doctrine (same as canPlace/seed-4b/the chain visual): a
+            // MAP-coded pinned course whose prereq is ENTIRELY ABSENT from
+            // the plan was placed that way by the advisement center on
+            // purpose (AP/placement/track split — Music's per-instrument
+            // ladders, Dietetics' "Chem 101 or equivalent"). Only a prereq
+            // that IS in the plan but sits late is a real ordering problem.
+            const anyPresent = opts.some(g => [...assign].some(([u]) => baseId(u) === g));
+            const sheetAssumed = !anyPresent && state.pinnedUids.has(uid) &&
+              state.mapCodes && state.mapCodes.has(baseId(uid));
+            if (sheetAssumed) {
+              addCF(uid, "info", `The official sheet schedules this without ${opts.map(g => cat[g]?.display || g).join(" or ")} — the department assumes it's covered (AP, placement, or your track). Verify with advisement if unsure.`);
+              return;
+            }
             const names = opts.map(g => cat[g]?.display || g).join(" or ");
             addCF(uid, "warn", `Prerequisite not planned: needs ${names} in an earlier semester (or already completed).`);
           }

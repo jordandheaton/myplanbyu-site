@@ -726,35 +726,79 @@ def rule_codes(rule, id2code, by_code) -> List[str]:
     return out
 
 
+def _group_codes(grp, id2code, by_code) -> List[str]:
+    """Resolve one {value:[ids], logic} group to canonical course codes."""
+    codes: List[str] = []
+    for item in grp.get("value") or []:
+        item = str(item).strip()
+        code = id2code.get(item)
+        if code is None and BASE_ID_RE.match(item):
+            code = id2code.get(BASE_ID_RE.match(item).group(1))
+        if code is None and item in by_code:
+            code = item
+        if code and code not in codes:
+            codes.append(code)
+    return codes
+
+
+def _rule_prereq_groups(rule, id2code, by_code) -> Optional[List[List[str]]]:
+    """One requisite rule -> CNF prereq groups (AND of OR-groups), recursing
+    through anyOf/allOf subRules. Returns None when a rule is genuinely
+    unrepresentable in CNF (an anyOf whose branches each require MULTIPLE
+    courses) — better to leave those text-only than to over-constrain."""
+    v = rule.get("value")
+    if isinstance(v, dict) and v.get("values") is not None:
+        return [g for g in (_group_codes(grp, id2code, by_code)
+                            for grp in v.get("values") or []) if g]
+    subs = rule.get("subRules") or []
+    if not subs:
+        return []
+    cond = str(rule.get("condition") or "").lower()
+    sub_groups = [_rule_prereq_groups(s, id2code, by_code) for s in subs]
+    if "any" in cond or cond == "or":
+        # ANY branch satisfies: exactly representable only when every branch
+        # reduces to a single OR-group — union them into ONE alternatives
+        # group (BIO 220: anyOf(CELL 120, BIO 130, MMBIO 121) -> [[all 3]])
+        merged: List[str] = []
+        for gs in sub_groups:
+            if gs is None or len(gs) > 1:
+                return None                      # OR-of-ANDs — skip, keep text
+            if gs:
+                merged.extend(c for c in gs[0] if c not in merged)
+        return [merged] if merged else []
+    # allOf / default: every branch required — concatenate their CNF groups
+    merged_all: List[List[str]] = []
+    for gs in sub_groups:
+        if gs:
+            merged_all.extend(gs)
+    return merged_all
+
+
 def course_prereq_groups(raw: Dict[str, Any], id2code, by_code) -> List[List[str]]:
-    """A course's requisitesSimple -> prereq groups for the planner.
+    """A course's structured requisites -> prereq groups for the planner.
 
     Shape: completedAllOf {values: [{value:[ids], logic:'or'}, ...]} means
     every group is required, courses within a group are alternatives — which
     is exactly the planner's `pre` model: [["A","B"], ["C"]] = (A or B) and C.
-    Only 'Prerequisite'-type blocks count (corequisites can share a term).
+    Coursedog stores these under BOTH `requisites` AND `prerequisites` (BIO
+    courses use the latter with nested anyOf/subRules — 390 courses were
+    silently unenforced before reading both). Only 'Prerequisite'-type blocks
+    count (corequisites can share a term).
     """
     groups: List[List[str]] = []
-    for blk in (raw.get("requisites") or {}).get("requisitesSimple") or []:
-        if str(blk.get("type") or "").lower() != "prerequisite":
-            continue
-        for rule in blk.get("rules") or []:
-            v = rule.get("value")
-            if not isinstance(v, dict):
+    seen = set()
+    for field in ("requisites", "prerequisites"):
+        fv = raw.get(field)
+        blocks = (fv.get("requisitesSimple") or []) if isinstance(fv, dict) else []
+        for blk in blocks:
+            if str(blk.get("type") or "").lower() != "prerequisite":
                 continue
-            for grp in v.get("values") or []:
-                codes = []
-                for item in grp.get("value") or []:
-                    item = str(item).strip()
-                    code = id2code.get(item)
-                    if code is None and BASE_ID_RE.match(item):
-                        code = id2code.get(BASE_ID_RE.match(item).group(1))
-                    if code is None and item in by_code:
-                        code = item
-                    if code and code not in codes:
-                        codes.append(code)
-                if codes:
-                    groups.append(codes)
+            for rule in blk.get("rules") or []:
+                for g in _rule_prereq_groups(rule, id2code, by_code) or []:
+                    key = tuple(g)
+                    if key not in seen:
+                        seen.add(key)
+                        groups.append(g)
     return groups[:8]   # sanity cap
 
 
