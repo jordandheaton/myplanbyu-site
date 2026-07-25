@@ -85,13 +85,27 @@ The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
 ```powershell
 .\setup_schedule.ps1 -Status
 Get-Content data\_last_run.json | ConvertFrom-Json
-Get-Content refresh_core.log -Tail 40
+Get-Content "$env:LOCALAPPDATA\myplanBYU\logs\refresh_core.log" -Tail 40
 ```
 
-`data/_last_run.json` is the single answer to "did it run, did it work, did it
-ship?" — outcome, per-step results, counts, and the commit SHA if it pushed.
-Failures raise a Windows toast; success is deliberately silent, because a weekly
-notification is one you stop reading.
+`_last_run.json` is the single answer to "did it run, did it work, did it ship?"
+— outcome, per-step results, counts, and the commit SHA if it pushed. It is
+written to **both** `data/` (convenient while working in the repo) and the log
+directory (survives a sync lock). Failures raise a Windows toast; success is
+deliberately silent, because a weekly notification is one you stop reading.
+
+### Logs live outside OneDrive
+
+`%LOCALAPPDATA%\myplanBYU\logs\` — deliberately, for the same reason the venv
+does. A log inside the synced folder gets locked the moment anything else opens
+it (OneDrive's own sync, an editor, a `tail -f`), `Add-Content` then throws, and
+**the run loses its entire log** — you get the first two lines and no verdict.
+
+That is exactly what `refresh_maps.log` showed after the 2026-07-22 run, and a
+verification run reproduced it on 2026-07-24: the pipeline itself succeeded and
+the gate passed, but the log recorded nothing past line two. A scheduled job
+whose log can vanish is a job that fails invisibly, which is the whole thing
+this setup exists to prevent. Writes are also retried on a transient lock.
 
 ## Why it runs logged-on only
 
@@ -128,8 +142,8 @@ when the interpreter itself can't launch, so a stale `0` read as success.
 | `setup_schedule.ps1` | Task registration / `-Status` / `-Remove` |
 | `_sanity_check.py` | The publish gate |
 | `refresh_baseline.json` | Last known-good metrics (tracked) |
-| `data/_last_run.json` | Last run's outcome (local only) |
-| `refresh_core.log`, `refresh_full.log` | Appended run logs (local only) |
+| `data/_last_run.json` | Last run's outcome (local only; mirrored to the log dir) |
+| `%LOCALAPPDATA%\myplanBYU\logs\*.log` | Appended run logs — outside OneDrive on purpose |
 
 The `.ps1` files are **ASCII-only** on purpose: PowerShell 5.1 reads a no-BOM
 script as ANSI, so a smart quote or em dash breaks string parsing.

@@ -24,6 +24,17 @@ $REPO_ROOT   = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $SCRAPER_DIR = $PSScriptRoot
 $DATA_DIR    = Join-Path $PSScriptRoot "data"
 
+# Logs live OUTSIDE OneDrive, for the same reason the venv does.
+#
+# This is not hypothetical. A run whose log sits in the synced folder loses the
+# ENTIRE log the moment anything else holds the file open -- OneDrive's own sync,
+# an editor, a 'tail -f' -- because Add-Content cannot open it for write. The
+# result is a log containing the first two lines and no verdict, which is
+# precisely what refresh_maps.log showed after the 2026-07-22 run and what a
+# verification run reproduced on 2026-07-24. Losing the log defeats the whole
+# point of scheduling: the failure becomes invisible.
+$LOG_DIR = Join-Path $env:LOCALAPPDATA "myplanBYU\logs"
+
 # Files the jobs are allowed to commit. Explicit list, never 'git add -A' --
 # the working tree routinely holds unrelated in-progress portfolio work.
 $PUBLISH_PATHS = @(
@@ -39,6 +50,9 @@ $script:LogPath  = $null
 $script:JobName  = $null
 $script:Steps    = @()
 $script:StartedAt = $null
+# Lines not yet on disk. Never dropped: a blocked write leaves them queued and
+# the next successful write drains them in order. See Flush-LogQueue.
+$script:Pending  = New-Object System.Collections.Generic.List[string]
 
 function Start-RefreshRun {
   <#
@@ -48,31 +62,112 @@ function Start-RefreshRun {
     [Parameter(Mandatory = $true)][string]$JobName,
     [Parameter(Mandatory = $true)][string]$LogFile
   )
-  $script:JobName   = $JobName
-  $script:LogPath   = Join-Path $SCRAPER_DIR $LogFile
+  $script:JobName = $JobName
+  if (-not (Test-Path $LOG_DIR)) {
+    New-Item -ItemType Directory -Force -Path $LOG_DIR | Out-Null
+  }
+  # ONE FILE PER RUN, stamped. Appending to a single long-lived log is what made
+  # the log loseable: whatever was watching or syncing it held the handle. A name
+  # that did not exist a moment ago has no other readers, so there is nothing to
+  # contend with. It also makes each run individually inspectable.
+  $stamp = (Get-Date -Format "yyyyMMdd-HHmmss")
+  $base  = [System.IO.Path]::GetFileNameWithoutExtension($LogFile)
+  $script:LogPath   = Join-Path $LOG_DIR ("{0}-{1}.log" -f $base, $stamp)
   $script:Steps     = @()
   $script:StartedAt = Get-Date
+  $script:Pending   = New-Object System.Collections.Generic.List[string]
+  Remove-OldLogs -BaseName $base
   Write-Log ("=== {0} run started ===" -f $JobName)
+  Write-Log ("log: {0}" -f $script:LogPath)
+}
+
+function Remove-OldLogs {
+  # Keep the last 30 runs of each job; they are a few KB each.
+  param([Parameter(Mandatory = $true)][string]$BaseName)
+  try {
+    Get-ChildItem -Path $LOG_DIR -Filter ($BaseName + "-*.log") -File -ErrorAction Stop |
+      Sort-Object LastWriteTime -Descending |
+      Select-Object -Skip 30 |
+      ForEach-Object { Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue }
+  } catch {
+    # Never let log housekeeping affect a run.
+  }
+}
+
+function Flush-LogQueue {
+  <#
+    Drains $script:Pending to disk, in order, stopping at the first line that
+    cannot be written so ordering is preserved and nothing is lost.
+
+    Retries alone are NOT enough -- a verification run on 2026-07-24 proved it:
+    against a handle held open for the whole run, every line written during the
+    lock was lost and the log ended up with two lines and no verdict, the same
+    signature as 2026-07-22. Queueing is what actually guarantees delivery: the
+    lines simply wait for the lock to clear.
+
+    -Final raises the effort for the last flush of a run and, if the log is still
+    unreachable, spills to a fallback file so a verdict is never lost to a lock.
+  #>
+  param([switch]$Final)
+  if (-not $script:LogPath) { return }
+
+  $attempts = 3
+  if ($Final) { $attempts = 12 }
+
+  while ($script:Pending.Count -gt 0) {
+    $line = $script:Pending[0]
+    $wrote = $false
+    for ($i = 0; $i -lt $attempts; $i++) {
+      try {
+        # FileShare.ReadWrite so our handle never blocks a reader in turn.
+        $fs = New-Object System.IO.FileStream(
+                $script:LogPath, [System.IO.FileMode]::Append,
+                [System.IO.FileAccess]::Write, [System.IO.FileShare]::ReadWrite)
+        try {
+          $sw = New-Object System.IO.StreamWriter($fs, [System.Text.Encoding]::UTF8)
+          try { $sw.WriteLine($line) } finally { $sw.Dispose() }
+        } finally { $fs.Dispose() }
+        $wrote = $true
+        break
+      } catch {
+        if ($Final) { Start-Sleep -Milliseconds 250 }
+      }
+    }
+    if (-not $wrote) { break }
+    $script:Pending.RemoveAt(0)
+  }
+
+  if ($Final -and $script:Pending.Count -gt 0) {
+    # Last resort: a file nothing could possibly have open yet.
+    $fallback = [System.IO.Path]::ChangeExtension($script:LogPath, $null) +
+                ("fallback-{0}.log" -f (Get-Date -Format "HHmmssfff"))
+    try {
+      [System.IO.File]::WriteAllLines($fallback, $script:Pending,
+                                      [System.Text.Encoding]::UTF8)
+      Write-Host ("NOTE: log was locked; {0} line(s) spilled to {1}" -f `
+                  $script:Pending.Count, $fallback)
+      $script:Pending.Clear()
+    } catch {
+      Write-Host ("WARNING: {0} log line(s) could not be written anywhere; " +
+                  "the console transcript above is the only record." -f $script:Pending.Count)
+    }
+  }
 }
 
 function Write-Log {
   param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$Message)
   $line = "[{0}] {1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $Message
   Write-Host $line
-  if ($script:LogPath) {
-    Add-Content -Path $script:LogPath -Value $line -Encoding utf8
-  }
+  $script:Pending.Add($line)
+  Flush-LogQueue
 }
 
 function Write-LogDetail {
   # Indented child lines: a step's captured stdout/stderr.
   param([AllowEmptyString()][string[]]$Lines)
   if (-not $Lines) { return }
-  foreach ($l in $Lines) {
-    if ($script:LogPath) {
-      Add-Content -Path $script:LogPath -Value ("    {0}" -f $l) -Encoding utf8
-    }
-  }
+  foreach ($l in $Lines) { $script:Pending.Add("    " + $l) }
+  Flush-LogQueue
 }
 
 function Initialize-ScraperEnv {
@@ -394,9 +489,28 @@ function Write-RunStatus {
     $status.commit       = $Publish.Sha
     $status.publish_note = $Publish.Reason
   }
-  $path = Join-Path $DATA_DIR "_last_run.json"
-  ($status | ConvertTo-Json -Depth 6) | Set-Content -Path $path -Encoding utf8
-  Write-Log ("status: wrote data\_last_run.json (outcome={0})" -f $Outcome)
+  $json = $status | ConvertTo-Json -Depth 6
+  # Written to both places on purpose: data\ is where you look while working in
+  # the repo, and the log dir is outside OneDrive so it survives a sync lock.
+  # Retried for the same reason Write-Log is -- this is the run's verdict, and a
+  # verdict lost to a file lock is the failure mode this whole system exists to
+  # eliminate.
+  $targets = @((Join-Path $DATA_DIR "_last_run.json"),
+               (Join-Path $LOG_DIR  "_last_run.json"))
+  foreach ($path in $targets) {
+    $written = $false
+    for ($i = 0; $i -lt 5; $i++) {
+      try {
+        [System.IO.File]::WriteAllText($path, $json, [System.Text.Encoding]::UTF8)
+        $written = $true
+        break
+      } catch {
+        Start-Sleep -Milliseconds (100 * ($i + 1))
+      }
+    }
+    if (-not $written) { Write-Host ("WARNING: could not write " + $path) }
+  }
+  Write-Log ("status: wrote _last_run.json (outcome={0})" -f $Outcome)
 }
 
 function Send-FailureToast {
@@ -457,6 +571,7 @@ function Complete-RefreshRun {
     Send-FailureToast -Title ("myplanBYU refresh blocked (" + $script:JobName + ")") `
                       -Message (($gate.Reasons | Select-Object -First 2) -join "; ")
     Write-Log "=== run FAILED the sanity gate -- live site unchanged ==="
+    Flush-LogQueue -Final
     return 2
   }
 
@@ -471,6 +586,7 @@ function Complete-RefreshRun {
     Write-RunStatus -Outcome "ok" -Detail "gate passed; publish skipped (-NoPublish)" `
                     -Metrics $gate.Metrics
     Write-Log "=== run completed OK (not published) ==="
+    Flush-LogQueue -Final
     return 0
   }
 
@@ -486,6 +602,7 @@ function Complete-RefreshRun {
 
   Write-RunStatus -Outcome "ok" -Detail "gate passed" -Metrics $gate.Metrics -Publish $pub
   Write-Log "=== run completed OK ==="
+  Flush-LogQueue -Final
   return 0
 }
 
@@ -497,5 +614,6 @@ function Stop-RefreshRunWithError {
   Send-FailureToast -Title ("myplanBYU refresh FAILED (" + $script:JobName + ")") `
                     -Message $Message
   Write-Log "=== run FAILED ==="
+  Flush-LogQueue -Final
   return 1
 }
