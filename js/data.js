@@ -595,19 +595,12 @@ const DATA = (() => {
     "PSYCH 111", "HIST 201", "MUSIC 101", "SPAN 321",
   ];
 
-  /* ---------------------------------------------------------------
-     DEMO PROFILE — Jordan's dogfood scenario
-     ---------------------------------------------------------------- */
-  /* resolve demo program ids against whichever catalog is loaded */
-  const byName = (list, re) => (list.find(p => re.test(p.name)) || {}).id;
-  const DEMO_PROFILE = {
-    name: "Jordan (demo)",
-    majorId: "is-bs-mism",
-    minorIds: [byName(minors, /^Ballroom/i), byName(minors, /^Spanish$/i)].filter(Boolean),
-    certIds: ["gbc-cert"],
-    completed: ["IS 201", "REL A 275", "REL C 225", "STAT 121", "SPAN 321", "MATH 110"],
+  const DEFAULT_PROFILE = {
+    name: "My plan",
+    majorId: null, minorIds: [], certIds: [],
+    completed: [],
     startTerm: { year: 2026, season: "F" },
-    pins: { "IS 303": { year: 2027, season: "W" } },   // immovable: IS 303 in Winter 2027
+    pins: {},
     settings: {
       // 17 = the optimizer's Fall/Winter ceiling: terms TARGET <=16 credits
       // (scoring penalizes every credit above 16) but may reach 17 when that
@@ -619,32 +612,16 @@ const DATA = (() => {
       // credits, 17 allowed when it saves a semester; MAP-sheet terms follow
       // their own printed totals even below 14
       maxCreditsFW: 17, minCreditsFW: 14, maxCreditsSpSu: 6,
-      // The demo's 12-month lease makes Spring housing free, and the double
-      // degree (IS+MISM + 2 minors + cert, ~174 cr) can't fit 10 Fall/Winter
-      // terms at <=17 cr — so the demo opts INTO Spring terms: the cost dial
-      // routes a couple of light, lease-covered Springs instead of stretching
-      // to a 6th year. (New plans still default Spring/Summer OFF.)
-      allowSpring: true, allowSummer: false,
-      housing: "off-campus-12mo",                       // Alpine Village 12-month lease
+      allowSpring: false, allowSummer: false,
+      housing: "on-campus",
       scholarshipFullTime: true,
       doubleCountCap: 15,
       religionPacing: true,
       horizonYears: 6,
       // Fall/Winter semesters the student wants the plan to fit in. 0 = no
-      // target, which leaves the solver's own 8-10 semester heuristic in
-      // charge. The demo states no target, so its shape is unchanged.
+      // target, which leaves the solver's own 8-10 semester heuristic in charge.
       targetSemesters: 0,
     },
-    weights: { speed: 6, cost: 8, risk: 7, load: 5, life: 6 },
-  };
-
-  const DEFAULT_PROFILE = {
-    name: "My plan",
-    majorId: null, minorIds: [], certIds: [],
-    completed: [],
-    startTerm: { year: 2026, season: "F" },
-    pins: {},
-    settings: { ...DEMO_PROFILE.settings, housing: "on-campus", allowSpring: false },
     weights: { speed: 5, cost: 5, risk: 5, load: 5, life: 5 },
   };
 
@@ -668,7 +645,6 @@ const DATA = (() => {
     univCore: UNIV_CORE,
     majors, minors, certs, programIndex,
     commonCompleted: COMMON_COMPLETED,
-    demoProfile: DEMO_PROFILE,
     defaultProfile: DEFAULT_PROFILE,
     colleges: COLLEGES,
     coreqs: COREQS,

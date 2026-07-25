@@ -1745,12 +1745,10 @@ const App = (() => {
         <label class="wiz-lbl">Minors <span class="wiz-sub">(up to 2)</span></label>
         <div id="wsMinors"></div>
         <label class="wiz-lbl">Certificates</label>
-        <div id="wsCerts"></div>
-        <button class="btn ghost demo-btn" id="wizDemo"><i class="fas fa-wand-magic-sparkles"></i> Load Jordan's demo profile (IS/MISM + Ballroom + Spanish + Global Business)</button>`;
+        <div id="wsCerts"></div>`;
       searchSelect("#wsMajor", DATA.majors, wiz.majorId ? [wiz.majorId] : [], 1, ids => wiz.majorId = ids[0] || null);
       searchSelect("#wsMinors", DATA.minors, wiz.minorIds, 2, ids => wiz.minorIds = ids);
       searchSelect("#wsCerts", DATA.certs, wiz.certIds, 8, ids => wiz.certIds = ids);
-      $("#wizDemo").onclick = () => { wiz = JSON.parse(JSON.stringify(DATA.demoProfile)); renderWizard(); };
     }
     if (wizStep === 1) {
       const years = [2024, 2025, 2026, 2027, 2028];

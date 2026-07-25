@@ -2699,6 +2699,7 @@ const Solver = (() => {
     // (violations surface as warnings, never re-sequencing).
     state.mapCap = new Map();
     state.mapLabels = new Map();      // uid -> sheet slot label (board cards)
+    const bindOf = new Map();         // mapPlan row index -> plan term index
     if (mapProg) {
       state.mapName = mapProg.name;
       // sheet-coded courses OWN their placement — they leave any flowchart
@@ -2709,20 +2710,81 @@ const Solver = (() => {
       mapProg.mapPlan.forEach(mt => (mt.items || []).forEach(it => {
         if (it.c) state.mapCodes.add(it.c);
       }));
-      // mid-degree only: each coded course's bound term, so a shifted Y3 row
-      // can check whether a prereq is itself coded EARLIER on the sheet
-      const sheetT = new Map();
-      if (terms.yearOffset > 0) mapProg.mapPlan.forEach(mt => {
-        const t2 = terms.findIndex(tm => tm.enabled && tm.season === mt.s &&
-          acadYearIdx(terms, tm.index) === mt.y - 1);
-        if (t2 < 0) return;
-        (mt.items || []).forEach(it => { if (it.c && !sheetT.has(it.c)) sheetT.set(it.c, t2); });
-      });
+      // ---- SHEET BINDING ------------------------------------------------
+      // Walk the sheet IN ORDER and give every row the earliest plan term it
+      // can legally occupy. Two rules do all the work:
+      //   * a row whose coded courses are ALL earned consumes NO plan term —
+      //     finished work is the only thing that legitimately shortens a plan;
+      //   * a row is only pulled back to where its courses can actually run:
+      //     it keeps the sheet's season, and any prerequisite the sheet itself
+      //     schedules EARLIER must already be bound to an earlier term.
+      // Because the cursor never moves backwards, the sheet's own sequence
+      // survives by construction: no row can overtake one it used to follow.
+      //
+      // This replaced an offset derived from earned credits (~1 year per 30).
+      // Standing is the wrong ruler for indexing into a sheet — 30 credits of
+      // AP/transfer GE makes a student a sophomore without touching the
+      // sheet's Y1 major sequence — and shifting by it bound Y2/Y3 rows to the
+      // first plan terms while the still-owed Y1 rows resolved to t < 0 and
+      // dropped out of the skeleton entirely, to be re-seeded wherever they
+      // fit. That is how MATH 303 landed a year before MATH 302, how PHSCS 318
+      // was scheduled alongside the PHSCS 123 it requires, and how the IS
+      // junior core got split across three years.
+      const firstRow = new Map();     // code -> first sheet row it appears on
+      mapProg.mapPlan.forEach((mt, si) => (mt.items || []).forEach(it => {
+        if (it.c && !firstRow.has(it.c)) firstRow.set(it.c, si);
+      }));
+      const boundAt = new Map();      // code -> plan term it is bound to
+      {
+        let cursor = 0;
+        mapProg.mapPlan.forEach((mt, si) => {
+          const coded = (mt.items || []).filter(it => it.c).map(it => it.c);
+          const owed = coded.filter(c => !expandRes.completed.has(c));
+          // A row whose coded courses are ALL earned costs no semester — that
+          // is the whole of legitimate compression. Its GE/religion slots do
+          // not hold the row open; backfill re-places them in the compressed
+          // plan wherever capacity allows.
+          if (coded.length && !owed.length) return;
+          // A row keeps the sheet's own SEASON. That is what makes compression
+          // land on whole academic years: skipping both halves of a finished
+          // year moves the next Fall row a year earlier, while skipping a
+          // single term can't silently flip a Fall course into Winter.
+          // The season comes from the sheet, never from catalog `off` data —
+          // the sheet is authoritative, and enforcing `off` here re-sequenced
+          // rows wholesale wherever the scraped offering string disagreed.
+          const fits = t => {
+            const term = terms[t];
+            if (!term || !term.enabled || term.season !== mt.s) return false;
+            return owed.every(c => {
+              const cs = cat[c];
+              if (!cs) return true;
+              return (cs.pre || []).every(group => {
+                const opts = Array.isArray(group) ? group : [group];
+                if (!opts.length) return true;
+                if (opts.some(g => expandRes.completed.has(g))) return true;
+                // Only a prerequisite the SHEET puts earlier can gate the row.
+                // One that is absent from the sheet is assumed satisfied
+                // outside it (AP / transfer / placement — ChemE's CHEM 111 vs
+                // MATH 110), and one the sheet puts later or alongside is the
+                // sheet's own call. The sheet stays authoritative either way.
+                const gating = opts.filter(g => firstRow.has(g) && firstRow.get(g) < si);
+                if (!gating.length) return true;
+                return gating.some(g => boundAt.has(g) && boundAt.get(g) < t);
+              });
+            });
+          };
+          let t = cursor;
+          while (t < terms.length && !fits(t)) t++;
+          if (t >= terms.length) return;   // sheet year beyond horizon / Sp disabled
+          bindOf.set(si, t);
+          owed.forEach(c => { if (!boundAt.has(c)) boundAt.set(c, t); });
+          cursor = t + 1;
+        });
+      }
       const occ = new Map();          // code -> occurrence # seen so far
-      mapProg.mapPlan.forEach(mt => {
-        const t = terms.findIndex(tm => tm.enabled && tm.season === mt.s &&
-          acadYearIdx(terms, tm.index) === mt.y - 1);
-        if (t < 0) return;            // sheet year beyond horizon / Sp disabled
+      mapProg.mapPlan.forEach((mt, si) => {
+        const t = bindOf.get(si);
+        if (t == null) return;
         if (mt.total != null) state.mapCap.set(t, mt.total);
         (mt.items || []).forEach(it => {
           if (!it.c) return;
@@ -2733,21 +2795,6 @@ const Solver = (() => {
           if (!inst || state.assign.has(inst.uid)) return;
           // student pin (profile.pins) outranks the sheet for that course
           if ((profile.pins || {})[baseId(inst.uid)]) return;
-          // MID-DEGREE GUARD: the sheet's authoritative pin assumes years 1-2
-          // happened. A standing-shifted student may still owe a prereq (EC EN
-          // 340's MATH 213) — blind-pinning the Y3 row into the FIRST plan
-          // term would schedule the course before its prerequisite. If any
-          // prereq group has no satisfier among completed courses or sheet
-          // rows bound earlier, skip the pin: prereq-ordered seeding places it
-          // (still counted in mapCodes, so Pass-3 suppression is unchanged).
-          if (terms.yearOffset > 0 && inst.k === 1) {
-            const unmet = (inst.course.pre || []).some(group => {
-              const opts = Array.isArray(group) ? group : [group];
-              return opts.length && !opts.some(g => expandRes.completed.has(g) ||
-                (sheetT.get(g) != null && sheetT.get(g) < t));
-            });
-            if (unmet) return;
-          }
           place(state, inst, t);
           state.pinnedUids.add(inst.uid);
         });
@@ -2911,10 +2958,9 @@ const Solver = (() => {
       // consumed by a GENERIC line ("General Education courses") in an earlier
       // term: bind single-target slots first, multi-target/elective last.
       const jobs = [];
-      mapProg.mapPlan.forEach(mt => {
-        const t = terms.findIndex(tm => tm.enabled && tm.season === mt.s &&
-          acadYearIdx(terms, tm.index) === mt.y - 1);
-        if (t < 0) return;
+      mapProg.mapPlan.forEach((mt, si) => {
+        const t = bindOf.get(si);
+        if (t == null) return;
         (mt.items || []).forEach(it => {
           if (!it.slot && !it.alts) return;       // coded singles handled above
           const keys = slotKeys(it);

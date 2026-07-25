@@ -325,7 +325,6 @@ body {
 .wiz-row { display: flex; gap: 8px; align-items: center; }
 .wiz-hint { font-size: .76rem; color: var(--ink-2); background: var(--royal-soft); border-radius: 8px; padding: 8px 11px; margin-top: 12px; }
 .wiz-hint i { color: var(--royal); margin-right: 5px; }
-.demo-btn { margin-top: 18px; width: 100%; justify-content: center; font-size: .8rem; }
 select, input[type="text"], input[type="number"] {
   font: inherit; font-size: .84rem; padding: 8px 10px; border: 1px solid #cfd5db; border-radius: 8px;
   background: var(--white); color: var(--ink);
