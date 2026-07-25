@@ -124,7 +124,11 @@ function Flush-LogQueue {
                 $script:LogPath, [System.IO.FileMode]::Append,
                 [System.IO.FileAccess]::Write, [System.IO.FileShare]::ReadWrite)
         try {
-          $sw = New-Object System.IO.StreamWriter($fs, [System.Text.Encoding]::UTF8)
+          # UTF8Encoding($false) = no BOM. StreamWriter emits the preamble only
+          # at position 0, so the default would leave a BOM on the log's first
+          # line and break line-anchored greps against it.
+          $enc = New-Object System.Text.UTF8Encoding($false)
+          $sw = New-Object System.IO.StreamWriter($fs, $enc)
           try { $sw.WriteLine($line) } finally { $sw.Dispose() }
         } finally { $fs.Dispose() }
         $wrote = $true
@@ -143,7 +147,7 @@ function Flush-LogQueue {
                 ("fallback-{0}.log" -f (Get-Date -Format "HHmmssfff"))
     try {
       [System.IO.File]::WriteAllLines($fallback, $script:Pending,
-                                      [System.Text.Encoding]::UTF8)
+                                      (New-Object System.Text.UTF8Encoding($false)))
       Write-Host ("NOTE: log was locked; {0} line(s) spilled to {1}" -f `
                   $script:Pending.Count, $fallback)
       $script:Pending.Clear()
@@ -387,6 +391,20 @@ function Publish-Refresh {
 
   Push-Location $REPO_ROOT
   try {
+    # Guard the branch FIRST. Without this, a run that fires while you are on a
+    # feature branch would commit the refresh there and then rebase that branch
+    # onto origin/main and push it to main -- publishing unrelated in-progress
+    # work. The refresh only ever belongs on main.
+    $branch = (& git rev-parse --abbrev-ref HEAD 2>&1) -join ""
+    if ($LASTEXITCODE -ne 0) {
+      return [pscustomobject]@{ Published = $false; Reason = "could not read current branch"; Sha = $null }
+    }
+    if ($branch -ne "main") {
+      Write-Log ("publish: SKIPPED -- on branch '{0}', not main" -f $branch)
+      Write-Log "publish: the data is refreshed locally; it will go out on the next run from main"
+      return [pscustomobject]@{ Published = $false; Reason = ("not on main (on " + $branch + ")"); Sha = $null }
+    }
+
     $staged = & git diff --cached --name-only 2>&1
     if ($LASTEXITCODE -ne 0) {
       return [pscustomobject]@{ Published = $false; Reason = "git diff --cached failed"; Sha = $null }

@@ -70,6 +70,9 @@ always describes what is actually live.
 
 The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
 
+- **only publishes from `main`.** On any other branch it refreshes the data and
+  stops — otherwise a run firing while you're on a feature branch would commit
+  the refresh there and then rebase and push *that* branch onto main;
 - adds **explicit paths only** — never `git add -A`, because the working tree
   routinely holds unrelated in-progress portfolio work;
 - **aborts if the index already has staged changes**, rather than sweeping your
