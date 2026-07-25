@@ -185,7 +185,7 @@ const App = (() => {
       <div class="sb-chips">
         <div class="sb-chip"><span class="sb-lbl">Standing</span><span class="pill green">GOOD</span></div>
         <div class="sb-chip"><span class="sb-lbl">Solver</span><span class="pill green">${result ? result.solveMs + " ms" : "—"}</span></div>
-        <div class="sb-chip"><span class="sb-lbl">Housing</span><span class="pill blue">${prof.settings.housing === "off-campus-12mo" ? "12-mo lease" : prof.settings.housing === "off-campus" ? "Off campus" : "On campus"}</span></div>
+        <div class="sb-chip"><span class="sb-lbl">Target</span><span class="pill blue">${(+prof.settings.targetSemesters || 0) === 0 ? "None" : (+prof.settings.targetSemesters) + " sem"}</span></div>
         <div class="sb-chip"><span class="sb-lbl">Double-counted</span><span class="pill amber">${result ? result.doubleCounted : 0} cr</span></div>
         <div class="sb-chip"><span class="sb-lbl">Plan score</span><span class="pill navy">${result ? result.score.total.toFixed(1) : "—"}</span></div>
       </div>`;
@@ -1457,6 +1457,30 @@ const App = (() => {
 
   /* letter grades for the completed-courses checklist (record only) */
   const GRADES = ["—", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "P"];
+  /* How many Fall/Winter semesters the student wants the plan to take. 0 means
+     "no target" — the solver then picks the classic 8-10 semester shape itself.
+     Labelled with the term each count lands on, since students think in both
+     ("four more semesters" and "done by April 2029" are the same sentence). */
+  const TARGET_SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  function targetTermLabel(startTerm, n) {
+    // Walk the season cycle from the start term, counting Fall/Winter only.
+    const order = ["F", "W", "S", "U"];
+    let { year, season } = startTerm, si = order.indexOf(season), seen = 0;
+    for (let i = 0; i < 48; i++) {
+      const s = order[si];
+      if (s === "F" || s === "W") {
+        seen++;
+        if (seen === n) return `${Solver.SEASON_NAME[s]} ${year}`;
+      }
+      si = (si + 1) % 4;
+      if (s === "F") year++;
+    }
+    return "";
+  }
+  const targetOptions = (startTerm, current) =>
+    `<option value="0" ${!current ? "selected" : ""}>No target — as fast as the requirements allow</option>` +
+    TARGET_SEMESTERS.map(n =>
+      `<option value="${n}" ${+current === n ? "selected" : ""}>${n} semester${n === 1 ? "" : "s"} — finish ${targetTermLabel(startTerm, n)}</option>`).join("");
 
   /* ------------------------- constraints modal ------------------------ */
   // (Preference dials removed: the solver runs a fixed policy — MAP-sheet
@@ -1484,12 +1508,8 @@ const App = (() => {
         <label class="chk"><input type="checkbox" id="pcSummer" ${prof.settings.allowSummer ? "checked" : ""}> Allow Summer terms</label>
         <label class="chk"><input type="checkbox" id="pcSchol" ${prof.settings.scholarshipFullTime ? "checked" : ""}> Scholarship requires full-time</label>
         <label class="chk"><input type="checkbox" id="pcRel" ${prof.settings.religionPacing ? "checked" : ""}> Pace religion credits yearly</label>
-        <label>Housing
-          <select id="pcHousing">
-            <option value="on-campus" ${prof.settings.housing === "on-campus" ? "selected" : ""}>On campus</option>
-            <option value="off-campus" ${prof.settings.housing === "off-campus" ? "selected" : ""}>Off campus (school-year)</option>
-            <option value="off-campus-12mo" ${prof.settings.housing === "off-campus-12mo" ? "selected" : ""}>Off campus (12-month lease)</option>
-          </select></label>
+        <label class="wide">When do you want to be done?
+          <select id="pcTarget">${targetOptions(prof.startTerm, prof.settings.targetSemesters)}</select></label>
       </div>`;
     $("#prioModal").classList.add("open");
     $("#prioApply").onclick = () => {
@@ -1500,7 +1520,7 @@ const App = (() => {
         doubleCountCap: parseInt($("#pcDcCap").value, 10) || 15,
         allowSpring: $("#pcSpring").checked, allowSummer: $("#pcSummer").checked,
         scholarshipFullTime: $("#pcSchol").checked, religionPacing: $("#pcRel").checked,
-        housing: $("#pcHousing").value,
+        targetSemesters: parseInt($("#pcTarget").value, 10) || 0,
       });
       closeModal("#prioModal");
       solveActive();
@@ -1740,6 +1760,10 @@ const App = (() => {
           <select id="wsSeason">${["F", "W", "S", "U"].map(s => `<option value="${s}" ${wiz.startTerm.season === s ? "selected" : ""}>${Solver.SEASON_NAME[s]}</option>`).join("")}</select>
           <select id="wsYear">${years.map(y => `<option ${wiz.startTerm.year === y ? "selected" : ""}>${y}</option>`).join("")}</select>
         </div>
+        <label class="wiz-lbl">When do you want to be done? <span class="wiz-sub">(the planner aims for this; it will tell you if the requirements don't fit)</span></label>
+        <div class="wiz-row">
+          <select id="wsTarget">${targetOptions(wiz.startTerm, wiz.settings.targetSemesters)}</select>
+        </div>
         <label class="wiz-lbl">Import from your transcript <span class="wiz-sub">(fastest — paste from MyMAP or the transcript preview, or upload the PDF)</span></label>
         <div class="ti-box">
           <textarea id="tiText" rows="4" placeholder="Paste your transcript text or MyMAP academic summary here — every course code is matched against the real BYU catalog."></textarea>
@@ -1784,8 +1808,18 @@ const App = (() => {
       $$("#wsDoneList .done-grade").forEach(sel => sel.addEventListener("change", () => {
         wiz.grades[sel.dataset.c] = sel.value;
       }));
-      $("#wsSeason").onchange = e => wiz.startTerm.season = e.target.value;
-      $("#wsYear").onchange = e => wiz.startTerm.year = parseInt(e.target.value, 10);
+      // Re-render on a start-term change: the finish-target labels name concrete
+      // terms ("8 semesters — finish Winter 2030"), so they go stale otherwise.
+      $("#wsSeason").onchange = e => {
+        wiz.startTerm.season = e.target.value;
+        wiz.settings.targetSemesters = parseInt($("#wsTarget").value, 10) || 0;
+        renderWizard();
+      };
+      $("#wsYear").onchange = e => {
+        wiz.startTerm.year = parseInt(e.target.value, 10);
+        wiz.settings.targetSemesters = parseInt($("#wsTarget").value, 10) || 0;
+        renderWizard();
+      };
       // transcript import: paste-and-scan, or PDF -> text -> same scanner
       $("#tiScan").onclick = () => {
         const t = $("#tiText").value;
@@ -1844,14 +1878,8 @@ const App = (() => {
           <label class="chk"><input type="checkbox" id="wcSummer" ${wiz.settings.allowSummer ? "checked" : ""}> I can take Summer terms</label>
           <label class="chk"><input type="checkbox" id="wcSchol" ${wiz.settings.scholarshipFullTime ? "checked" : ""}> My scholarship requires full-time (12+ cr)</label>
           <label class="chk"><input type="checkbox" id="wcRel" ${wiz.settings.religionPacing ? "checked" : ""}> Pace religion credits across years</label>
-          <label>Housing situation
-            <select id="wcHousing">
-              <option value="on-campus" ${wiz.settings.housing === "on-campus" ? "selected" : ""}>On campus</option>
-              <option value="off-campus" ${wiz.settings.housing === "off-campus" ? "selected" : ""}>Off campus (school-year contract)</option>
-              <option value="off-campus-12mo" ${wiz.settings.housing === "off-campus-12mo" ? "selected" : ""}>Off campus (12-month lease)</option>
-            </select></label>
         </div>
-        <p class="wiz-hint"><i class="fas fa-lightbulb"></i> A 12-month lease makes Spring/Summer classes cheap on the housing side — the cost dial knows this.</p>`;
+        <p class="wiz-hint"><i class="fas fa-lightbulb"></i> Spring and Summer terms are optional — turning them on lets the planner finish sooner, at the cost of a shorter break.</p>`;
     }
     $("#wizBack").style.visibility = wizStep === 0 ? "hidden" : "visible";
     $("#wizNext").innerHTML = wizStep === 2 ? `<i class="fas fa-wand-magic-sparkles"></i> Generate plan` : `Next <i class="fas fa-arrow-right"></i>`;
@@ -1864,12 +1892,12 @@ const App = (() => {
         maxCreditsSpSu: parseInt($("#wcMaxSS").value, 10) || 8,
         allowSpring: $("#wcSpring").checked, allowSummer: $("#wcSummer").checked,
         scholarshipFullTime: $("#wcSchol").checked, religionPacing: $("#wcRel").checked,
-        housing: $("#wcHousing").value,
       });
     }
     if (wizStep === 1) {
       wiz.startTerm.season = $("#wsSeason").value;
       wiz.startTerm.year = parseInt($("#wsYear").value, 10);
+      wiz.settings.targetSemesters = parseInt($("#wsTarget").value, 10) || 0;
     }
   }
 

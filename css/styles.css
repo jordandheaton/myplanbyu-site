@@ -372,6 +372,9 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 .prio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
 .prio-grid label { font-size: .74rem; font-weight: 700; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
 .prio-grid label.chk { flex-direction: row; align-items: center; gap: 8px; }
+/* the finish-target row spans both columns: its options name a term
+   ("8 semesters — finish Winter 2030") and truncate in a half-width cell */
+.prio-grid label.wide { grid-column: 1 / -1; }
 .prio-grid input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--royal); }
 
 /* course modal */

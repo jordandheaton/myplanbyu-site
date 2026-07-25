@@ -630,6 +630,10 @@ const DATA = (() => {
       doubleCountCap: 15,
       religionPacing: true,
       horizonYears: 6,
+      // Fall/Winter semesters the student wants the plan to fit in. 0 = no
+      // target, which leaves the solver's own 8-10 semester heuristic in
+      // charge. The demo states no target, so its shape is unchanged.
+      targetSemesters: 0,
     },
     weights: { speed: 6, cost: 8, risk: 7, load: 5, life: 6 },
   };
