@@ -16,6 +16,8 @@ IS 303 pinned to Winter 2027, 12-month off-campus lease.
 - `js/app.js` / `css/styles.css` — MyMAP-style UI (board, progress report, plans, wizard)
 - `docs/ARCHITECTURE.md` — full design write-up
 - `docs/solver_reference.py` — OR-Tools CP-SAT reference model for a V2 backend
+- `scraper/REFRESH.md` — the scheduled scrapers that keep the data current
+  (weekly + monthly, gated so a broken scrape can't reach the live site)
 
 Independent student project — not affiliated with BYU. Course data is an
 illustrative snapshot; verify everything with official MyMAP and an advisor.

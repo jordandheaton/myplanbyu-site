@@ -1,0 +1,28 @@
+{
+  "_readme": "Last known-good scrape metrics. Written by _sanity_check.py --update after a successful publish; the gate compares each new scrape against these numbers.",
+  "generated": "2026-07-22",
+  "metrics": {
+    "catalog_js_parsed": true,
+    "js_courses": 7130,
+    "js_programs": 313,
+    "js_coreqs": 84,
+    "js_generated": "2026-07-22",
+    "timeline_js_parsed": true,
+    "timeline_academic_dates": 4,
+    "catalog_programs": 626,
+    "catalog_courses": 7894,
+    "catalog_scraped_at": "2026-07-22T16:36:30-0800",
+    "src_academic_dates": 8,
+    "src_clubs": 373,
+    "src_flowcharts": 28,
+    "src_language_certs": 21,
+    "src_maps": 194,
+    "src_marriott_business": 9,
+    "src_policies": 23,
+    "src_research_grants": 3,
+    "src_study_abroad": 131,
+    "src_transfer_credit": 41,
+    "src_tuition_graduation": 5,
+    "health_findings": 24
+  }
+}

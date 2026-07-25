@@ -78,12 +78,35 @@ Rules for a new source:
 
 ## Running
 
+The venv lives **outside** OneDrive (`C:\Users\jorda\venvs\myplan-scraper`) — a
+torch-sized venv inside a synced folder is what corrupted the old
+`scraper\.venv`. Activate it with `. .\activate-venv.ps1`, or call it directly:
+
 ```powershell
-# from the scraper/ folder, using the venv Python
-.\.venv\Scripts\python.exe sources\catalog.py            # refresh the catalog
-.\.venv\Scripts\python.exe sources\marriott_business.py  # refresh Marriott
-.\.venv\Scripts\python.exe embed_and_load.py             # embed everything -> Pinecone
+# from the scraper/ folder
+$py = "C:\Users\jorda\venvs\myplan-scraper\Scripts\python.exe"
+& $py sources\catalog.py            # refresh the catalog
+& $py sources\marriott_business.py  # refresh Marriott
+& $py embed_and_load.py             # embed everything -> Pinecone
 ```
 
-The scheduled job just runs the source scripts on their cadence, then
-`embed_and_load.py`. Upserts overwrite by ID, so re-running refreshes cleanly.
+Upserts overwrite by ID, so re-running refreshes cleanly.
+
+## Scheduled refreshes
+
+Two Windows scheduled tasks run these on their cadence — see
+[`../REFRESH.md`](../REFRESH.md) for the full setup:
+
+| Task | When | Runs |
+|---|---|---|
+| `myplanBYU\weekly core refresh` | Sunday 03:00 | `refresh_core.ps1` — catalog, academic dates, MAP sheets, regenerate |
+| `myplanBYU\monthly full refresh` | 1st Sunday 04:00 | `refresh_full.ps1` — every source, flowchart extraction, regenerate, re-embed |
+
+`academic_dates.py` is promoted to the **weekly** tier despite the "each
+semester" cadence below: add/drop and withdraw deadlines are the most perishable
+data here, `generate_timeline.py` reads them, and the scrape is 8 documents off
+two pages.
+
+Neither job publishes blindly — `_sanity_check.py` gates the commit on record
+counts and health findings, so a scraper that breaks silently cannot push a
+half-empty catalog to the live site.
