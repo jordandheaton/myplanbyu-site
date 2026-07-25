@@ -66,6 +66,14 @@ LIST_SOURCES = [
 # "unreadable" -- a misleading gate reason for what is really a 0-record scrape.
 READ_ENCODING = "utf-8-sig"
 
+# Metrics that describe the RUN rather than the data. They change on every
+# scrape by definition, so writing them into the baseline would make the file
+# differ every week even when BYU changed nothing -- an automated commit and a
+# Pages redeploy per run, burying the weeks the catalog actually moved. They
+# stay in the verdict, and so in _last_run.json, which is where "when did this
+# run" belongs.
+VOLATILE_KEYS = ("catalog_scraped_at",)
+
 
 def parse_js_object(path: Path) -> Optional[Dict[str, Any]]:
     """Pull the object literal out of a `const NAME = {...};` generated file."""
@@ -246,7 +254,8 @@ def main() -> int:
                            "publish; the gate compares each new scrape "
                            "against these numbers.",
                 "generated": metrics.get("js_generated"),
-                "metrics": metrics,
+                "metrics": {k: v for k, v in metrics.items()
+                            if k not in VOLATILE_KEYS},
             }, indent=2) + "\n",
             encoding="utf-8")
 

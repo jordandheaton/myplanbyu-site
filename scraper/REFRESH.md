@@ -63,8 +63,10 @@ Run the gate by hand any time:
 # exit 0 = would publish, 2 = blocked (reasons in the JSON), 1 = check broke
 ```
 
-`refresh_baseline.json` ratchets forward only after a successful publish, so it
-always describes what is actually live.
+`refresh_baseline.json` ratchets forward only when the refresh is actually going
+to publish — the branch and index are checked first — so it always describes what
+is live. A run on a feature branch refreshes the data and leaves the baseline
+alone.
 
 ## Publishing
 
@@ -77,7 +79,12 @@ The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
   routinely holds unrelated in-progress portfolio work;
 - **aborts if the index already has staged changes**, rather than sweeping your
   work into an automated commit;
-- no-ops on an empty diff, which is most weekly runs;
+- no-ops on an empty diff, which is most weekly runs. That only holds because
+  the generated output is **date-stable**: `generate_data.py` keeps the previous
+  `generated` date when nothing else changed, and the baseline omits
+  `catalog_scraped_at`. Without both, the embedded dates alone would be a real
+  diff and every single run would commit and redeploy the site, burying the
+  weeks BYU actually changed something;
 - rebases onto `origin/main` first, and aborts rather than resolving a conflict
   unattended;
 - writes the counts into the message:
