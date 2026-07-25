@@ -477,6 +477,29 @@ function Update-SanityBaseline {
   }
 }
 
+function Get-PublishBlocker {
+  <#
+    Returns a reason string if publishing cannot happen, or $null if it can.
+
+    Exists so the caller can test the publish preconditions BEFORE ratcheting
+    the baseline. Publish-Refresh re-checks the same things itself: the checks
+    are cheap, and a guard that lives in only one caller is a guard the next
+    caller forgets.
+  #>
+  Push-Location $REPO_ROOT
+  try {
+    $branch = (& git rev-parse --abbrev-ref HEAD 2>&1) -join ""
+    if ($LASTEXITCODE -ne 0) { return "could not read current branch" }
+    if ($branch -ne "main") { return ("not on main (on " + $branch + ")") }
+    $staged = & git diff --cached --name-only 2>&1
+    if ($LASTEXITCODE -ne 0) { return "git diff --cached failed" }
+    if ($staged) { return "index not clean" }
+    return $null
+  } finally {
+    Pop-Location
+  }
+}
+
 function Write-RunStatus {
   <#
     Overwrites data\_last_run.json -- the one place to look to answer "did it
@@ -608,10 +631,26 @@ function Complete-RefreshRun {
     return 0
   }
 
+  # The baseline may only ratchet if the data is actually going to ship, so test
+  # the publish preconditions first. A run that refreshes while the repo sits on
+  # a feature branch must leave refresh_baseline.json alone: otherwise the
+  # baseline describes numbers that never reached the live site, and the file
+  # stays dirty in the working tree with nothing to commit it.
+  $blocker = Get-PublishBlocker
+  if ($null -ne $blocker) {
+    Write-Log ("publish: SKIPPED -- {0}" -f $blocker)
+    Write-Log "publish: data refreshed locally; baseline untouched until a run from main ships it"
+    Write-RunStatus -Outcome "ok" -Detail "gate passed; publish skipped" -Metrics $gate.Metrics `
+                    -Publish ([pscustomobject]@{ Published = $false; Reason = $blocker; Sha = $null })
+    Write-Log "=== run completed OK (not published) ==="
+    Flush-LogQueue -Final
+    return 0
+  }
+
   # Baseline BEFORE publish, so the new known-good numbers ride in the same
   # commit as the data they describe. Updating it afterwards would leave
-  # refresh_baseline.json permanently dirty in the working tree and always one
-  # run behind the data it is supposed to describe.
+  # refresh_baseline.json permanently dirty and always one run behind the data
+  # it is supposed to describe.
   # When the data did not change, the rewritten file is byte-identical, so this
   # adds nothing to the diff and the run still no-ops.
   Update-SanityBaseline -Python $Python
