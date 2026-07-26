@@ -1,6 +1,10 @@
 # Secrets -- never commit your Pinecone API key
 .env
 
+# Advisor spend/quota state (per-deployment runtime data, not source)
+advisor_usage.json
+advisor_usage.tmp
+
 # Python
 .venv/
 __pycache__/

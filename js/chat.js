@@ -23,6 +23,8 @@ const Chat = (() => {
 
   const history = [];   // [{role, content}] — session memory for follow-ups
   let online = null;    // null = unknown, true/false after a health check
+  let remaining = null; // advisor questions left for this visitor (server-told)
+  let budgetOut = false; // server is up but has hit its monthly spend cap
 
   const $ = sel => document.querySelector(sel);
   const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
@@ -65,6 +67,44 @@ const Chat = (() => {
     addMsg("bot", offlineHtml(), "err");
   }
 
+  /* The advisor costs real money per question, so it ships with two limits:
+     a per-visitor question quota and a monthly spend cap. Both are normal
+     states, not errors — say plainly what happened and what still works. */
+  function showLimit(status, serverMsg) {
+    const msg = esc(serverMsg || "");
+    if (status === 429) {
+      addMsg("bot", `<b>That's all your advisor questions.</b><br>${msg}<br>` +
+        "Your plan, the progress report and every warning keep working — " +
+        "the advisor is the only part with a limit.", "err");
+    } else {
+      // On panel-open we learn this from /health, which carries no prose — so
+      // the explanation has to live here too, not only server-side. When the
+      // server did send one, use it alone rather than saying it twice.
+      addMsg("bot", "<b>The advisor is paused for now.</b><br>" + (msg ||
+        "It has reached its usage budget for the month and comes back when the " +
+        "new month starts. The planner itself is unaffected — your plan, the " +
+        "progress report and every warning still work."), "err");
+    }
+    updateQuotaHint();
+  }
+
+  /* A quiet "N questions left" line above the composer, so running out is
+     never a surprise. Only appears once the server has told us a number. */
+  function updateQuotaHint() {
+    const row = $("#chatQuota");
+    if (!row) return;
+    if (remaining == null) { row.hidden = true; return; }
+    row.hidden = false;
+    row.textContent = remaining > 0
+      ? `${remaining} advisor question${remaining === 1 ? "" : "s"} left`
+      : "No advisor questions left";
+    row.classList.toggle("out", remaining === 0);
+    $("#chatSend").disabled = remaining === 0;
+    $("#chatInput").placeholder = remaining === 0
+      ? "You've used all your advisor questions."
+      : "Ask about requirements, deadlines, scholarships, your plan...";
+  }
+
   /* Quick health probe (short timeout) so we can tell "server down" from a
      real error, and disable the composer cleanly when offline. */
   async function checkHealth() {
@@ -75,6 +115,12 @@ const Chat = (() => {
       const r = await fetch(`${API}/health`, { signal: ctrl.signal });
       clearTimeout(t);
       online = r.ok;
+      // A server that's up but out of budget is "online" — surface that as its
+      // own state rather than letting the student burn a question finding out.
+      if (online) {
+        const h = await r.json().catch(() => ({}));
+        budgetOut = !!(h.limits && h.limits.budget_exhausted);
+      }
     } catch { online = false; }
     return online;
   }
@@ -110,10 +156,21 @@ const Chat = (() => {
       const data = await resp.json();
       typing.remove();
 
+      // Out of questions (429) or out of monthly budget (503) are expected
+      // states with their own wording — not the generic error.
+      if (resp.status === 429 || resp.status === 503) {
+        online = true;
+        if (resp.status === 429) remaining = 0;
+        if (resp.status === 503) budgetOut = true;
+        history.pop();                       // the question never reached Claude
+        showLimit(resp.status, data.error);
+        return;
+      }
       if (!resp.ok || data.error) {
         addMsg("bot", `<b>Hmm, something went wrong.</b><br>${esc(data.error || resp.statusText)}`, "err");
         return;
       }
+      if (typeof data.remaining === "number") { remaining = data.remaining; updateQuotaHint(); }
 
       // PROPOSED ACTION: the advisor may end with one machine-readable line
       // (ACTION_JSON: {...}) proposing a plan change. Strip it from the shown
@@ -145,7 +202,8 @@ const Chat = (() => {
       online = false;
       showOffline();
     } finally {
-      $("#chatSend").disabled = false;
+      // re-enable unless the visitor just used their last question
+      $("#chatSend").disabled = remaining === 0;
       input.focus();
     }
   }
@@ -196,7 +254,10 @@ const Chat = (() => {
       // say so immediately rather than after the user types a question.
       if (!probed) {
         probed = true;
-        checkHealth().then(ok => { if (!ok) showOffline(); });
+        checkHealth().then(ok => {
+          if (!ok) showOffline();
+          else if (budgetOut) showLimit(503);
+        });
       }
     }
   }

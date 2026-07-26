@@ -27,6 +27,22 @@ Keys come from the same .env as ask_advisor.py (PINECONE_API_KEY,
 ANTHROPIC_API_KEY). Claude is called with plain requests (no anthropic SDK --
 see the note in ask_advisor.answer about Smart App Control and jiter).
 
+COST GUARDRAILS (advisor_limits.py) -- every question spends real money, so
+/api/ask enforces two limits: 10 questions per visitor (429) and a hard
+monthly spend cap measured from Anthropic's reported token counts (503).
+Both persist across restarts in advisor_usage.json.
+
+    Exposing this publicly? Set ADVISOR_TRUSTED_PROXIES to the number of
+    reverse proxies / tunnels in front of it (usually 1). Left at 0, the
+    quota keys on the direct peer -- which behind a proxy is the proxy, so
+    ALL visitors share one 10-question pool. See client_ip() for why the
+    header is not trusted by default.
+
+    Two known limits of an IP-based quota, both deliberate: visitors sharing
+    a NAT (campus wi-fi, a dorm) share a pool, and anyone on mobile data can
+    get a fresh pool by cycling their address. It is a cost guardrail, not
+    authentication -- the spend cap is what actually bounds the bill.
+
 Author: Jordan Heaton
 """
 
@@ -44,7 +60,11 @@ from flask import Flask, jsonify, request
 import ask_advisor
 from ask_advisor import MODEL, MAX_TOKENS, SYSTEM_PROMPT, build_context, retrieve
 
+# Cost guardrails: 10 questions per visitor + a hard monthly spend cap.
+from advisor_limits import Guard, client_ip
+
 app = Flask(__name__)
+guard = Guard()
 
 # ---------------------------------------------------------------------------
 # Forced context — belt-and-suspenders over vector retrieval
@@ -244,7 +264,9 @@ def cors(resp):
 
 @app.route("/api/health")
 def health():
-    return jsonify({"ok": True, "model": MODEL})
+    """Also reports the guardrail state so the chat panel can say 'the advisor
+    is paused for the month' instead of just failing on the next question."""
+    return jsonify({"ok": True, "model": MODEL, "limits": guard.status()})
 
 
 @app.route("/api/ask", methods=["POST", "OPTIONS"])
@@ -259,6 +281,18 @@ def ask():
 
     if not question:
         return jsonify({"error": "question is required"}), 400
+
+    # ---- guardrails: visitor quota, then monthly spend cap -----------------
+    # Checked BEFORE retrieval so a blocked visitor costs nothing at all -- not
+    # a Pinecone query, not an embedding.
+    ip = client_ip(request.remote_addr, request.headers.get("X-Forwarded-For"))
+    gate = guard.check(ip)
+    if not gate["ok"]:
+        resp = jsonify({"error": gate["error"], "limit": gate["status"],
+                        "remaining": 0})
+        if gate.get("retry_after"):
+            resp.headers["Retry-After"] = str(gate["retry_after"])
+        return resp, gate["status"]
 
     # ---- retrieve grounded context from Pinecone --------------------------
     # For opportunity questions with a shared plan, bias retrieval toward the
@@ -312,6 +346,10 @@ def ask():
     if not api_key:
         return jsonify({"error": "ANTHROPIC_API_KEY not set on the server"}), 500
 
+    # Claim the question now that we're committed to spending money on it; any
+    # failure below refunds it, so an outage never costs the visitor one of ten.
+    remaining = guard.consume(ip)
+
     try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",
@@ -330,9 +368,11 @@ def ask():
             timeout=180,
         )
     except requests.RequestException as exc:
+        guard.refund(ip)
         return jsonify({"error": f"Claude API unreachable: {exc}"}), 502
 
     if resp.status_code != 200:
+        guard.refund(ip)
         return jsonify({"error": f"Claude API {resp.status_code}: {resp.text[:300]}"}), 502
 
     data = resp.json()
@@ -343,10 +383,14 @@ def ask():
     usage = data.get("usage", {})
     web_searches = (usage.get("server_tool_use") or {}).get("web_search_requests", 0)
 
+    # Bill the month from Anthropic's own token counts, never an estimate.
+    guard.record(usage, web_searches)
+
     return jsonify({
         "answer": answer,
         "sources": sources,
         "web_searches": web_searches,
+        "remaining": remaining,
         "usage": {"in": usage.get("input_tokens"), "out": usage.get("output_tokens")},
     })
 
@@ -354,6 +398,16 @@ def ask():
 if __name__ == "__main__":
     _load_force_docs()
     _load_program_colleges()
+    st = guard.status()
+    print(f"Guardrails: {st['questions_per_visitor']} questions per visitor"
+          + (f" per {st['quota_window_hours']}h" if st["quota_window_hours"] else " (lifetime)")
+          + f"; ${st['spent_usd']:.4f} of ${st['budget_usd']:.2f} spent this month"
+          + f" ({st['questions_this_month']} questions).")
+    if not int(os.environ.get("ADVISOR_TRUSTED_PROXIES", 0)):
+        print("  [note] ADVISOR_TRUSTED_PROXIES=0 -- X-Forwarded-For is ignored "
+              "and the quota keys on the direct peer address. Behind a reverse "
+              "proxy or tunnel, set it to the number of hops or every visitor "
+              "will look like one IP.")
     print("Warming up: loading embedding model + Pinecone connection ...")
     try:
         retrieve("warmup", top_k=1)   # loads + caches the model and index

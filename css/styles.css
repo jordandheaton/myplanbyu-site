@@ -844,6 +844,13 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 .done-x:hover { color: var(--red-ink); background: var(--red); }
 .done-empty { color: var(--ink-3); font-size: 12.5px; padding: 4px 2px; }
 
+/* advisor question quota — quiet until it matters */
+.chat-quota {
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  margin: 0 0 7px 1px; letter-spacing: .01em;
+}
+.chat-quota.out { color: var(--red-ink); }
+
 /* ------------------- chat quick-action chips ------------------------- */
 .chat-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .chat-quick button {
