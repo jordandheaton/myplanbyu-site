@@ -254,11 +254,49 @@ PLAN_PROMPT_ADDON = (
 WEB_SEARCH_TOOL = {"type": "web_search_20250305", "name": "web_search", "max_uses": 3}
 
 
+# ---------------------------------------------------------------------------
+# CORS -- who is allowed to spend this server's Anthropic budget
+# ---------------------------------------------------------------------------
+# "Access-Control-Allow-Origin: *" means ANY page on the internet can call this
+# endpoint from a visitor's browser and bill the questions to you. Once the
+# server is reachable beyond localhost that is the whole cost model, gone.
+#
+# So: localhost is always allowed (local development, any port), and everything
+# else must be named explicitly.
+#
+#     ADVISOR_ALLOWED_ORIGINS=https://jordandheaton.github.io
+#
+# Comma-separated for more than one. Set it to "*" only if you genuinely want an
+# open public API. Origins are matched exactly (scheme + host + port) because
+# that is what the browser sends -- no substring matching, which is the classic
+# way these checks get bypassed ("evil-jordandheaton.github.io.attacker.com").
+_ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in
+                    os.environ.get("ADVISOR_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+_LOCAL_ORIGIN_RE = re.compile(r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$", re.I)
+
+
+def _origin_allowed(origin: str) -> bool:
+    if not origin:
+        return False
+    origin = origin.rstrip("/")
+    if "*" in _ALLOWED_ORIGINS:
+        return True
+    if origin in _ALLOWED_ORIGINS:
+        return True
+    return bool(_LOCAL_ORIGIN_RE.match(origin))
+
+
 @app.after_request
 def cors(resp):
-    resp.headers["Access-Control-Allow-Origin"] = "*"
-    resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    origin = request.headers.get("Origin", "")
+    if _origin_allowed(origin):
+        resp.headers["Access-Control-Allow-Origin"] = origin
+        resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        resp.headers["Access-Control-Max-Age"] = "600"
+    # Responses differ by Origin, so caches and CDNs must not serve one
+    # visitor's allowed response to a disallowed origin.
+    resp.headers["Vary"] = "Origin"
     return resp
 
 
@@ -395,9 +433,9 @@ def ask():
     })
 
 
-if __name__ == "__main__":
-    _load_force_docs()
-    _load_program_colleges()
+def _startup_report():
+    """Print the settings that decide what this server costs and who can reach
+    it, so a misconfigured deploy is obvious in the first ten lines of log."""
     st = guard.status()
     print(f"Guardrails: {st['questions_per_visitor']} questions per visitor"
           + (f" per {st['quota_window_hours']}h" if st["quota_window_hours"] else " (lifetime)")
@@ -408,10 +446,71 @@ if __name__ == "__main__":
               "and the quota keys on the direct peer address. Behind a reverse "
               "proxy or tunnel, set it to the number of hops or every visitor "
               "will look like one IP.")
+    if "*" in _ALLOWED_ORIGINS:
+        print("  [WARN] ADVISOR_ALLOWED_ORIGINS=* -- ANY website can call this "
+              "endpoint and spend your Anthropic budget.")
+    elif _ALLOWED_ORIGINS:
+        print(f"  CORS: localhost + {', '.join(_ALLOWED_ORIGINS)}")
+    else:
+        print("  [note] ADVISOR_ALLOWED_ORIGINS unset -- only localhost pages "
+              "may call this. Set it to your site's origin before deploying.")
+
+
+if __name__ == "__main__":
+    _load_force_docs()
+    _load_program_colleges()
+    _startup_report()
     print("Warming up: loading embedding model + Pinecone connection ...")
     try:
         retrieve("warmup", top_k=1)   # loads + caches the model and index
         print("Ready.")
     except Exception as exc:
         print(f"WARNING: warmup failed ({exc}); first request will retry.")
-    app.run(host="127.0.0.1", port=5000, debug=False)
+
+    # 127.0.0.1 stays the default: a server that binds every interface the
+    # moment you run it is how a laptop ends up serving a paid API to the LAN.
+    # Containers need 0.0.0.0, so that's an explicit opt-in.
+    host = os.environ.get("ADVISOR_HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT") or os.environ.get("ADVISOR_PORT") or 5000)
+
+    # Flask's built-in server is single-threaded-ish and explicitly not for
+    # production ("do not use in a production deployment"). Waitress is a pure-
+    # Python WSGI server that runs the same on Windows and Linux, so the thing
+    # you test locally is the thing that deploys. Fall back only if it's absent.
+    try:
+        from waitress import serve
+    except ImportError:
+        print("  [WARN] waitress not installed (pip install -r requirements.txt) "
+              "-- falling back to the Flask development server, which should NOT "
+              "face the internet.")
+        app.run(host=host, port=port, debug=False)
+    else:
+        # PROXY HEADERS. Waitress STRIPS X-Forwarded-For by default (a good
+        # default: it stops a client inventing one). But that also means the
+        # per-visitor quota would see only the proxy's address and put every
+        # visitor in one shared pool of 10 -- the limit silently collapsing to
+        # useless, which is worse than having none. So when the operator says
+        # there ARE proxies in front, tell waitress the same thing: it then
+        # validates the chain, rewrites REMOTE_ADDR to the real client, and
+        # discards anything the client prepended, before our own client_ip()
+        # re-checks the same rule. Two layers, one setting.
+        hops = int(os.environ.get("ADVISOR_TRUSTED_PROXIES", 0))
+        proxy_kw = {}
+        if hops > 0:
+            proxy_kw = dict(
+                # the upstream is whatever terminates TLS for us (tunnel,
+                # nginx, platform router); its address isn't stable, so trust
+                # any peer and rely on the server NOT being publicly reachable
+                # except through that proxy
+                trusted_proxy="*",
+                trusted_proxy_count=hops,
+                trusted_proxy_headers={"x-forwarded-for"},
+                clear_untrusted_proxy_headers=True,
+            )
+        # Each request holds a Claude call open for up to 180s, so threads are
+        # about concurrent WAITING, not CPU. channel_timeout must outlive that
+        # call or slow answers get cut off mid-flight.
+        print(f"Serving on http://{host}:{port} (waitress"
+              + (f", trusting {hops} proxy hop{'' if hops == 1 else 's'})" if hops else ")"))
+        serve(app, host=host, port=port, threads=8, channel_timeout=200,
+              ident="myplanBYU-advisor", **proxy_kw)

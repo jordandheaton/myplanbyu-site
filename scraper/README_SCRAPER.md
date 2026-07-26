@@ -132,4 +132,12 @@ because they vary slightly per tenant. After your first `catalog.json`:
   Network tab; copy the `Authorization` header from a real request into
   `session.headers` in `build_session()`.
 - Re-run periodically to refresh; the `meta.scraped_at` timestamp records when.
+
+---
+
+## Related
+
+- **[README_ADVISOR_DEPLOY.md](README_ADVISOR_DEPLOY.md)** — putting the AI
+  Advisor (`advisor_server.py`) online: CORS, the per-visitor quota, the monthly
+  spend cap, and the pre-launch checklist.
 ```
