@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>myplanBYU — Degree Sequence Optimizer</title>
   <meta name="description" content="myplanBYU: a multi-objective degree-sequencing optimizer for BYU students. Pick a major, up to two minors, and certificates — a constraint solver builds the semester plan around your life." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,6 +22,10 @@
     <div class="topbar-right">
       <button class="topbar-link" id="topbarChatBtn" title="Ask the AI Advisor"><i class="fas fa-comments"></i> AI Advisor</button>
       <span class="topbar-user"><i class="fas fa-circle-user"></i> Student</span>
+      <!-- phone-only utility icons: the nav tabs are hidden in app mode, so
+           How-it-works and Feedback move up here (they forward to the tabs) -->
+      <button class="topbar-icon m-only" id="topbarHowBtn" title="How it works"><i class="fas fa-circle-question"></i></button>
+      <button class="topbar-icon m-only" id="topbarFbBtn" title="Send feedback"><i class="fas fa-comment-dots"></i></button>
     </div>
   </header>
 
@@ -218,6 +222,14 @@
     </div>
   </div>
 
+  <!-- ============ BOTTOM APP BAR (phones only — see mobile.js) ============ -->
+  <nav class="mnav" id="mnav" aria-label="App sections">
+    <button data-view="plan" class="on"><i class="fas fa-map-location-dot"></i><span>Plan</span></button>
+    <button data-view="progress"><i class="fas fa-chart-simple"></i><span>Progress</span></button>
+    <button data-view="plans"><i class="fas fa-folder-open"></i><span>My Plans</span></button>
+    <button data-view="advisor" id="mnavAdvisor"><i class="fas fa-comments"></i><span>Advisor</span></button>
+  </nav>
+
   <div id="toasts"></div>
 
   <!-- ================= AI ADVISOR CHAT ================= -->
@@ -258,6 +270,7 @@
   <script src="js/solver.js"></script>
   <script src="js/app.js"></script>
   <script src="js/chat.js"></script>
+  <script src="js/mobile.js"></script>
   <script>document.getElementById("topbarChatBtn").addEventListener("click", () => Chat.toggle(true));</script>
 </body>
 </html>

@@ -637,17 +637,6 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   .board-wrap { order: -1; min-height: 60vh; }
   .board-tip { display: none; }
 }
-/* phones: keep the header on one tidy line (the tagline is decorative) and
-   give the board columns near-full width so a semester is readable */
-@media (max-width: 640px) {
-  .topbar { padding: 0 12px; }
-  .topbar-brand { gap: 7px; }
-  .topbar-brand .tagline { display: none; }
-  .topbar-right { gap: 12px; font-size: .8rem; }
-  .topbar-user span, .topbar-user { gap: 5px; }
-  .col { min-width: 78vw; }
-  .chat-panel { right: 10px; bottom: 10px; }
-}
 
 /* -------------------------------- print ------------------------------- */
 @media print {
@@ -863,3 +852,144 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   font-weight: 600; cursor: pointer; white-space: nowrap;
 }
 .chat-quick button:hover { background: var(--royal); color: #fff; }
+
+/* ===================== PHONE APP MODE (≤ 740px) ========================
+   The site stops being a three-pane page and becomes an app: one view at
+   a time, switched by a navy bottom bar (BYU navy bookends the screen).
+   The semester board turns into a vertical roadmap; menus become
+   thumb-reach action sheets; modals become bottom sheets; the advisor
+   chat goes full screen. mobile.js owns body[data-mview] + the bar.
+   ======================================================================= */
+.mnav, .m-only { display: none; }   /* phone chrome stays off elsewhere */
+
+@media (max-width: 740px) {
+  body { overflow: hidden; height: 100dvh; }
+  * { -webkit-tap-highlight-color: transparent; }
+
+  /* -------- chrome swap: hide desktop furniture, show app furniture ---- */
+  .tabs, .foot, .topbar-user, #topbarChatBtn, .chat-fab,
+  .panel-collapse, .board-tip, .col-hint { display: none !important; }
+  .m-only { display: grid; }
+
+  .topbar { padding: 0 6px 0 14px; }
+  .topbar-brand { gap: 7px; }
+  .topbar-brand .tagline { display: none; }
+  .topbar-right { gap: 2px; }
+  .topbar-icon {
+    place-items: center; width: 40px; height: 40px;
+    background: none; border: none; color: #cfe0f3; font-size: 1.05rem;
+    border-radius: 10px; cursor: pointer;
+  }
+  .topbar-icon:active { background: rgba(255, 255, 255, .12); color: #fff; }
+
+  .notice { font-size: .68rem; padding: 4px 12px; }
+
+  /* ---------------- one view at a time (body[data-mview]) -------------- */
+  .layout > .panel-left, .layout > .panel-right, .layout > .board-wrap { display: none; }
+  body[data-mview="plan"] .board-wrap { display: flex; order: 0; min-height: 0; }
+  body[data-mview="progress"] .panel-left { display: flex; }
+  body[data-mview="plans"] .panel-right { display: flex; }
+  .panel-left, .panel-right {
+    flex: 1 1 auto; max-height: none; border: none; min-height: 0;
+  }
+  /* a panel the desktop left collapsed must still open as a full view */
+  .panel.collapsed { flex: 1 1 auto !important; min-width: 0; max-width: none; }
+  .panel.collapsed .panel-head { display: flex; }
+  .panel.collapsed .panel-scroll { display: block; }
+  /* the band + notice are plan context — give the other views the room */
+  body[data-mview="progress"] .student-band, body[data-mview="plans"] .student-band,
+  body[data-mview="progress"] .notice,       body[data-mview="plans"] .notice { display: none; }
+
+  /* ------------- the plan as a vertical semester roadmap --------------- */
+  .student-band {
+    gap: 14px; padding: 7px 14px; min-height: 0;
+    overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none;
+  }
+  .student-band::-webkit-scrollbar { display: none; }
+  .sb-name { flex: 0 0 auto; }
+  .sb-name .sb-link { font-size: .92rem; white-space: nowrap; }
+  .sb-name .sb-sub { white-space: nowrap; }
+  .sb-chips { gap: 14px; flex-wrap: nowrap; }
+  .sb-chip { flex-direction: row; align-items: center; gap: 6px; white-space: nowrap; }
+  /* the band already names the plan — the board head becomes a toolbar */
+  .board-head { padding: 10px 14px 4px; }
+  .board-head > div:first-child { display: none; }
+  .board-actions { flex: 1; }
+  .board-actions .btn { flex: 1; justify-content: center; padding: 9px 12px; font-size: .84rem; }
+  .board {
+    flex-direction: column; align-items: stretch; overflow-x: hidden;
+    gap: 12px; padding: 8px 12px 18px;
+  }
+  .col { flex: none; width: 100%; }
+  .board-empty { margin: 26px auto; padding: 30px 22px; }
+
+  /* --------------------- bottom app bar (in flow) ---------------------- */
+  .mnav {
+    display: flex; flex: 0 0 auto; z-index: 60;
+    background: var(--navy); border-top: 1px solid rgba(255, 255, 255, .08);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .mnav button {
+    flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer; padding: 6px 0 4px;
+    color: rgba(255, 255, 255, .62); font: inherit; border-radius: 12px;
+  }
+  .mnav button i { font-size: 1.05rem; }
+  .mnav button span { font-size: .62rem; font-weight: 700; letter-spacing: .02em; }
+  .mnav button.on, .mnav button.lit { color: #fff; background: rgba(255, 255, 255, .13); }
+
+  /* ------------- context menus become bottom action sheets ------------- */
+  .ctx-menu {
+    top: auto !important; left: 10px !important; right: 10px; width: auto;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    max-height: 65dvh; overflow-y: auto;
+    border-radius: 16px; box-shadow: 0 -8px 40px rgba(16, 24, 40, .3);
+    animation: sheetUp .2s ease;
+  }
+  .ctx-menu button { padding: 12px 14px; font-size: .88rem; }
+  .bucket-picker { width: auto; max-height: 65dvh; }
+
+  /* --------------------- modals become bottom sheets ------------------- */
+  .modal { padding: 0; align-items: flex-end; }
+  .modal-box, .modal-box.wide {
+    width: 100%; max-width: 100%; max-height: 93dvh;
+    border-radius: 18px 18px 0 0; animation: sheetUp .22s ease;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .modal-box::before {   /* grab-handle cue */
+    content: ""; flex: 0 0 4px; width: 38px; border-radius: 2px;
+    background: var(--line); align-self: center; margin-top: 8px;
+  }
+  .modal-head { padding: 10px 16px 10px; }
+  .modal-body { padding: 14px 16px; }
+  .modal-foot { padding: 10px 16px; }
+  .modal-foot .btn { flex: 1 1 auto; justify-content: center; }
+  .wiz-steps { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 10px 16px 0; }
+  .wiz-steps::-webkit-scrollbar { display: none; }
+  .wstep { white-space: nowrap; }
+  .prio-grid, .wi-grid { grid-template-columns: 1fr; }
+
+  /* --------------------- advisor chat goes full screen ------------------ */
+  .chat-panel {
+    inset: 0; width: 100%; max-width: 100%; height: 100dvh; max-height: none;
+    border-radius: 0; border: none; z-index: 120;
+  }
+  .chat-head { padding-top: calc(12px + env(safe-area-inset-top)); }
+  .chat-compose { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+
+  /* ------------------------------ fit & polish -------------------------- */
+  #toasts { bottom: calc(74px + env(safe-area-inset-bottom)); width: calc(100vw - 28px); }
+  .toast { max-width: 100%; }
+  /* 16px keeps iOS from zooming the page on input focus */
+  select, textarea, input[type="text"], input[type="number"], input[type="email"],
+  .col-search input, .chat-inrow textarea { font-size: 16px; }
+  .card { padding: 10px; }
+  .cm-move select { flex: 1 1 100%; }   /* the term picker gets its own row */
+  .cm-move .btn { flex: 1 1 auto; justify-content: center; }
+}
+@keyframes sheetUp { from { transform: translateY(24px); opacity: .4; } to { transform: none; opacity: 1; } }
+
+:focus-visible { outline: 2px solid var(--royal); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
