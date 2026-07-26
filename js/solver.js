@@ -947,6 +947,15 @@ const Solver = (() => {
         problems.push({ type: "pin", text: `Pinned course ${cid} cannot be placed in ${SEASON_NAME[when.season]} ${when.year} (term unavailable or course not offered that season).` });
         return;
       }
+      // The MAP sheet's labeled-slot pass (takeSlot) runs BEFORE seed() and may
+      // already have placed this instance into a sheet slot. The student's pin
+      // outranks the sheet — but it must RELOCATE that placement, not add a
+      // second one: place() blindly adds credits to state.load, so pinning an
+      // already-placed course counted it twice and every capacity guard
+      // (canPlace, the 12-credit floor, MAP caps, the part-time warning) then
+      // read the term as fuller than it is. Symptom: real electives went
+      // unscheduled and plans finished under the 120 credits BYU requires.
+      unplace(state, inst);
       place(state, inst, t);
       state.pinnedUids.add(cid);
     });
@@ -971,7 +980,10 @@ const Solver = (() => {
       // seasons/prereqs (which can be stale in the catalog). Over-cap shows as
       // a warning; genuine prereq gaps are flagged by analyze(), not blocked.
       const placeAt = (t) => {
-        blk.uids.forEach(u => place(state, state.byUid.get(u), t));
+        // unplace first: a member the sheet's slot pass already placed would
+        // otherwise have its credits added to state.load a second time (see
+        // the pin pass above for what that corrupts)
+        blk.uids.forEach(u => { const i = state.byUid.get(u); unplace(state, i); place(state, i, t); });
         blockTerm[blk.id] = t;
         return true;
       };
@@ -2268,7 +2280,20 @@ const Solver = (() => {
         compCr += (cat[id] || (typeof DATA !== "undefined" && DATA.courses[id]) || { credits: 3 }).credits;
       });
       const grandTotal = planCr + compCr;
-      if (elecCr >= 7) {
+      // THE 120-CREDIT FLOOR. Filling every requirement is not enough to
+      // graduate — BYU also wants 120 hours, and a plan can satisfy a lean
+      // major and still land short. This is the one warning a student cannot
+      // discover by reading their own plan, so it leads.
+      // tolerance is float-noise only: BYU counts half credits, and a 119.5
+      // plan really does leave the student half a credit short of graduating
+      if (grandTotal < UG_TARGET_CREDITS - 0.01) {
+        const need = Math.ceil(UG_TARGET_CREDITS - grandTotal);
+        flags.push({ level: "error", icon: "triangle-exclamation", text: `This plan totals ~${Math.round(grandTotal)} credits (completed + planned) — short of the ${UG_TARGET_CREDITS} BYU requires to graduate. Add about ${need} more credit${need === 1 ? "" : "s"}: a minor, a certificate, or open electives.` });
+      }
+      // Only call electives "padding" when the plan can actually AFFORD to lose
+      // them. Below ~127 those credits are what carries the student to 120, and
+      // telling them to cut electives there is advice that prevents graduation.
+      if (elecCr >= 7 && grandTotal - elecCr >= UG_TARGET_CREDITS) {
         flags.push({ level: "warn", icon: "coins", text: `~${Math.round(elecCr)} credits of open electives pad this plan beyond your actual requirements — roughly ${elecCr >= 12 ? "a semester" : "half a semester"} of tuition. Swap them for a minor or certificate (What if… compares one), or ask advisement about graduating lighter.` });
       }
       if (grandTotal > 135) {
@@ -2284,6 +2309,36 @@ const Solver = (() => {
         flags.push({ level: profile.settings.scholarshipFullTime ? "warn" : "info", icon: "gauge-simple-low", text: `${tm.label} is below ${minFW} credits${profile.settings.scholarshipFullTime ? " — scholarship / full-time status risk" : ""}.` });
       }
     });
+
+    // A Fall/Winter term with NOTHING in it, sandwiched between enrolled terms.
+    // scorePlan penalizes these but can't always avoid one, and sitting out a
+    // semester costs continuous enrollment, scholarships and often housing —
+    // too expensive to leave for the student to notice on their own.
+    {
+      const activeT = [...new Set(assign.values())].sort((a, b) => a - b);
+      const first = activeT[0], last = activeT[activeT.length - 1];
+      const empty = terms.filter(tm => tm.isFW && tm.enabled && tm.index > first &&
+        tm.index < last && !state.load[tm.index]).map(tm => tm.label);
+      if (empty.length) {
+        flags.push({ level: "warn", icon: "calendar-xmark", text: `${empty.join(" and ")} ${empty.length > 1 ? "are" : "is"} empty in the middle of this plan — sitting out a semester can break continuous enrollment and scholarship eligibility. Drag work into ${empty.length > 1 ? "those terms" : "that term"} or finish a semester sooner.` });
+      }
+    }
+
+    // MAP-SHEET COVERAGE. The sheet is authoritative, so a course printed on it
+    // that ended up in neither the plan nor the completed list is a conflict
+    // between the sheet and the scraped catalog requirements. We surface it
+    // rather than force-scheduling it: the catalog may legitimately have
+    // dropped the requirement, and only an advisor can say which is current.
+    if (state.mapCodes && state.mapCodes.size) {
+      const inPlan = new Set([...assign.keys()].map(baseId));
+      const gone = [...state.mapCodes].filter(c =>
+        !inPlan.has(c) && !completed.has(c) && cat[c] &&
+        !(profile.excluded || []).includes(c));
+      if (gone.length) {
+        const names = gone.slice(0, 4).map(c => cat[c].display || c).join(", ");
+        flags.push({ level: "warn", icon: "map", text: `Your ${state.mapName || "MAP"} sheet lists ${names}${gone.length > 4 ? ` and ${gone.length - 4} more` : ""}, but ${gone.length > 1 ? "they aren't" : "it isn't"} in this plan — the online catalog doesn't tie ${gone.length > 1 ? "them" : "it"} to a requirement, or another class you picked covers it. Worth confirming with your advisor.` });
+      }
+    }
 
     // lab ↔ lecture split: the optimizer pairs free courses, but sheet-pinned
     // ones keep the sheet's own pacing — either way the student should KNOW
@@ -2932,13 +2987,20 @@ const Solver = (() => {
       };
       const takeSlot = (keys, t, budget, label) => {
         let guard = 0;
+        // A sheet slot says "a GE course here" / "a major elective here", not
+        // WHICH one — so the class we drop in must actually be taught that
+        // semester. Without this a Summer-only class (HLTH 481) or a
+        // Winter-only one (NORWE 340) got slotted into the wrong season and
+        // the plan shipped a class the student cannot register for. Sheet
+        // authority covers courses the sheet NAMES, not our choice of filler.
+        const taughtNow = i => (i.course.off || "FW").includes(state.terms[t].season);
         while (budget > 0.4 && guard++ < 6) {
           let cand = null;
           for (const key of keys) {
             if (key === "__elective__") {
-              cand = state.instances.find(i => !state.assign.has(i.uid) && i.course.elective);
+              cand = state.instances.find(i => !state.assign.has(i.uid) && i.course.elective && taughtNow(i));
             } else {
-              cand = state.instances.find(i => !state.assign.has(i.uid) &&
+              cand = state.instances.find(i => !state.assign.has(i.uid) && taughtNow(i) &&
                 (i.buckets || []).includes(key) && i.course.credits <= budget + 0.6);
             }
             if (cand) break;
