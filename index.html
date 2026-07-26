@@ -30,6 +30,7 @@
     <a href="#" class="tab active"><i class="fas fa-map-location-dot"></i> My Plan</a>
     <a href="#" class="tab" id="navPriorities"><i class="fas fa-sliders"></i> Constraints</a>
     <a href="#" class="tab" id="navHow"><i class="fas fa-circle-question"></i> How it works</a>
+    <a href="#" class="tab" id="navFeedback"><i class="fas fa-comment-dots"></i> Feedback</a>
   </nav>
 
   <!-- ================= NOTICE ================= -->
@@ -98,6 +99,7 @@
   <footer class="foot">
     myplanBYU is an independent student project — not affiliated with BYU or MyMAP.
     Requirements shown are illustrative snapshots; official sources govern.
+    <a href="#" id="footFeedback">Spot something wrong? Send feedback</a>
   </footer>
 
   <!-- ================= WIZARD MODAL ================= -->
@@ -135,6 +137,21 @@
         <button class="modal-x" data-close="#whatifModal">&times;</button>
       </div>
       <div class="modal-body" id="whatifBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= FEEDBACK MODAL ================= -->
+  <div class="modal" id="feedbackModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2><i class="fas fa-comment-dots"></i> Send feedback</h2>
+        <button class="modal-x" data-close="#feedbackModal">&times;</button>
+      </div>
+      <div class="modal-body" id="feedbackBody"></div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="fbCopy"><i class="fas fa-copy"></i> Copy instead</button>
+        <button class="btn primary" id="fbSend"><i class="fas fa-paper-plane"></i> Send feedback</button>
+      </div>
     </div>
   </div>
 

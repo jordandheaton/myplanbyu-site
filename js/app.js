@@ -1453,6 +1453,175 @@ const App = (() => {
   }
   function closeModal(sel) { $(sel).classList.remove("open"); }
 
+  /* ----------------------------- feedback ----------------------------- */
+  /* WHERE RESPONSES GO. This is a static site with no backend, so there are
+     only two honest options and this picks the one that needs no setup and
+     no third party:
+
+       endpoint === ""  ->  opens the student's own mail client with the whole
+                            report pre-written, addressed to `email`. Works
+                            today, nothing to configure, and the student's
+                            coursework never passes through anyone else.
+
+       endpoint === url ->  POSTs the report as JSON instead (Formspree,
+                            FormSubmit, a Cloud Function — anything that takes
+                            a JSON body). Higher completion rate, because the
+                            student never leaves the page.
+
+     To switch, paste the URL into `endpoint` and nothing else changes. Worth
+     knowing before you do: a form service means every report — including the
+     completed-course list, if the student leaves the snapshot ticked — passes
+     through that company. That is a call for you to make, not me, which is
+     why the no-third-party path is the default. */
+  const FEEDBACK = {
+    endpoint: "",
+    email: "jordandheaton@gmail.com",
+  };
+  const FEEDBACK_KINDS = [
+    ["requirement", "A requirement is wrong, missing, or shouldn't be there"],
+    ["sequence", "A class is in the wrong semester / prerequisite order"],
+    ["course", "A course's details are wrong (credits, when it's offered, name)"],
+    ["admission", "Application or admission info is wrong"],
+    ["ui", "Something was confusing or broken in the app"],
+    ["idea", "An idea or a feature request"],
+    ["other", "Something else"],
+  ];
+
+  /* The PROFILE is the reproduction: major + completed + settings re-solves to
+     the exact plan being complained about. So the snapshot stays compact — no
+     board dump — and a report can be replayed by pasting it back in. */
+  function feedbackSnapshot() {
+    const plan = activePlan();
+    if (!plan) return null;
+    const p = plan.profile;
+    const name = id => (DATA.programIndex[id] || {}).name || id;
+    const snap = {
+      major: p.majorId ? name(p.majorId) : null,
+      majorId: p.majorId,
+      minors: (p.minorIds || []).map(name),
+      certs: (p.certIds || []).map(name),
+      start: `${p.startTerm.season}${p.startTerm.year}`,
+      completed: p.completed || [],
+      pinned: Object.keys(p.pins || {}),
+      settings: p.settings,
+    };
+    if (result) {
+      const used = new Set(result.placements.map(x => x.termIndex));
+      snap.terms = used.size;
+      snap.ends = result.terms[Math.max(...used)].label;
+      snap.unscheduled = result.unscheduled.length;
+      // Two warnings, trimmed. The profile above re-solves to this exact plan,
+      // so the full list is always one paste away — and the whole report has
+      // to survive a mailto: URL, where every character counts.
+      snap.warnings = (result.flags || []).filter(f => f.level === "warn")
+        .slice(0, 2).map(f => f.text.slice(0, 120));
+    }
+    return snap;
+  }
+
+  function feedbackReport(fields, snap) {
+    const L = [];
+    L.push(`Type: ${(FEEDBACK_KINDS.find(k => k[0] === fields.kind) || [, fields.kind])[1]}`);
+    if (fields.where) L.push(`Where: ${fields.where}`);
+    L.push("", "What happened:", fields.what);
+    if (fields.expected) L.push("", "What should have happened:", fields.expected);
+    L.push("", `Reply to: ${fields.email || "(not given)"}`);
+    if (snap) {
+      L.push("", "--- plan snapshot (paste back into the app to reproduce) ---");
+      L.push(JSON.stringify(snap));
+    }
+    L.push("", `myplanBYU ${location.host} · ${new Date().toISOString()}`);
+    return L.join("\n");
+  }
+
+  function openFeedback() {
+    const snap = feedbackSnapshot();
+    $("#feedbackBody").innerHTML = `
+      <p class="fb-intro">This is a student project and the catalog data is
+      messy in places — if the planner got something wrong, telling me is what
+      makes it better. Everything here is optional except what happened.</p>
+      <label class="wiz-lbl">What kind of feedback?</label>
+      <select id="fbKind">${FEEDBACK_KINDS.map(([v, t]) =>
+        `<option value="${v}">${esc(t)}</option>`).join("")}</select>
+      <label class="wiz-lbl">Which class or semester? <span class="wiz-sub">(if it's about one — e.g. "IS 401" or "Fall 2028")</span></label>
+      <input type="text" id="fbWhere" placeholder="IS 401, Winter 2029…" autocomplete="off">
+      <label class="wiz-lbl">What happened?</label>
+      <textarea id="fbWhat" rows="4" placeholder="The planner put IS 401 in the fall, but my advisor says it's a winter-only class."></textarea>
+      <label class="wiz-lbl">What should it have done? <span class="wiz-sub">(optional)</span></label>
+      <textarea id="fbExpected" rows="2" placeholder="Scheduled it in Winter with the rest of the winter core."></textarea>
+      <label class="wiz-lbl">Your email <span class="wiz-sub">(optional — only so I can ask a follow-up question)</span></label>
+      <input type="email" id="fbEmail" placeholder="you@byu.edu" autocomplete="off">
+      ${snap ? `<label class="chk fb-snap"><input type="checkbox" id="fbSnap" checked>
+        Include my plan so it can be reproduced
+        <span class="wiz-sub">${esc(snap.major || "no major")}${snap.completed.length ? `, ${snap.completed.length} completed course${snap.completed.length === 1 ? "" : "s"}` : ""}${snap.terms ? `, ${snap.terms} semesters` : ""} — your name is never included.</span></label>`
+        : `<p class="fb-note"><i class="fas fa-circle-info"></i> No plan open, so this will be sent on its own.</p>`}
+      <p class="fb-note" id="fbHow"></p>`;
+    $("#fbHow").innerHTML = FEEDBACK.endpoint
+      ? `<i class="fas fa-paper-plane"></i> Sends straight from this page.`
+      : `<i class="fas fa-envelope"></i> Opens your email app with everything filled in — you still have to press send there.`;
+    $("#feedbackModal").classList.add("open");
+    setTimeout(() => $("#fbWhat").focus(), 30);
+  }
+
+  function collectFeedback() {
+    const fields = {
+      kind: $("#fbKind").value,
+      where: $("#fbWhere").value.trim(),
+      what: $("#fbWhat").value.trim(),
+      expected: $("#fbExpected").value.trim(),
+      email: $("#fbEmail").value.trim(),
+    };
+    if (!fields.what) { toast("Tell me what happened first — the rest is optional.", "err"); $("#fbWhat").focus(); return null; }
+    const snapEl = $("#fbSnap");
+    const snap = snapEl && snapEl.checked ? feedbackSnapshot() : null;
+    return { fields, snap, report: feedbackReport(fields, snap) };
+  }
+
+  async function submitFeedback() {
+    const f = collectFeedback();
+    if (!f) return;
+    const subject = `myplanBYU feedback: ${f.fields.kind}${f.fields.where ? ` — ${f.fields.where}` : ""}`;
+    if (FEEDBACK.endpoint) {
+      try {
+        const res = await fetch(FEEDBACK.endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ subject, ...f.fields, snapshot: f.snap, report: f.report }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        closeModal("#feedbackModal");
+        toast("Thanks — feedback sent.", "ok");
+      } catch (e) {
+        // Never swallow it: the student typed a real report, so hand it back
+        // rather than pretending it went somewhere.
+        copyFeedback(f, "Couldn't reach the form. Your feedback is on the clipboard — email it to " + FEEDBACK.email);
+      }
+      return;
+    }
+    const href = `mailto:${FEEDBACK.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(f.report)}`;
+    // Mail clients silently truncate long mailto: URLs, and a half-sent bug
+    // report is worse than none. Past a conservative ceiling, don't fire one —
+    // hand the student the full text and let them paste it.
+    if (href.length > 1900) {
+      copyFeedback(f, `That's a long one — it's on your clipboard. Paste it into an email to ${FEEDBACK.email}.`);
+      return;
+    }
+    // Under the ceiling the clipboard is still a safety net for clients that
+    // clip anyway, so a paste always fixes it.
+    navigator.clipboard && navigator.clipboard.writeText(f.report).catch(() => {});
+    window.location.href = href;
+    closeModal("#feedbackModal");
+    toast("Opening your email app — the full text is also on your clipboard.", "ok");
+  }
+
+  function copyFeedback(f, msg) {
+    f = f || collectFeedback();
+    if (!f) return;
+    const done = () => toast(msg || `Copied — send it to ${FEEDBACK.email}.`, "ok");
+    if (navigator.clipboard) navigator.clipboard.writeText(f.report).then(done, done);
+    else done();
+  }
+
   /* ------------------------- constraints modal ------------------------ */
   // (Preference dials removed: the solver runs a fixed policy — MAP-sheet
   // pacing where a sheet exists, otherwise 14-16 credits per Fall/Winter
@@ -1939,6 +2108,10 @@ const App = (() => {
     $("#prioritiesBtn").addEventListener("click", openPriorities);
     $("#navPriorities").addEventListener("click", e => { e.preventDefault(); openPriorities(); });
     $("#navHow").addEventListener("click", e => { e.preventDefault(); $("#howModal").classList.add("open"); });
+    $("#navFeedback").addEventListener("click", e => { e.preventDefault(); openFeedback(); });
+    $("#footFeedback").addEventListener("click", e => { e.preventDefault(); openFeedback(); });
+    $("#fbSend").addEventListener("click", submitFeedback);
+    $("#fbCopy").addEventListener("click", () => copyFeedback());
     $("#refreshBtn").addEventListener("click", () => { solveActive(); toast("Re-optimized.", "ok"); });
 
     // Plan Options dropdown

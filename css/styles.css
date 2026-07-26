@@ -603,6 +603,31 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   flex: 0 0 auto; text-align: center; font-size: .66rem; color: var(--ink-3);
   padding: 6px 14px; background: var(--white); border-top: 1px solid var(--line);
 }
+.foot a { color: var(--royal); font-weight: 700; text-decoration: none; margin-left: 8px; }
+.foot a:hover { text-decoration: underline; }
+
+/* ------------------------------- feedback ----------------------------- */
+.fb-intro { font-size: .8rem; color: var(--ink-2); line-height: 1.5; margin: 0; }
+/* textarea and email inputs miss the shared `select, input[type=text]` rule,
+   so they inherit the UA monospace default — restate the field styling here */
+#feedbackBody input[type="text"], #feedbackBody input[type="email"],
+#feedbackBody textarea, #feedbackBody select { width: 100%; }
+#feedbackBody input[type="email"], #feedbackBody textarea {
+  font: inherit; font-size: .84rem; padding: 8px 10px;
+  border: 1px solid #cfd5db; border-radius: 8px;
+  background: var(--white); color: var(--ink);
+}
+#feedbackBody textarea { resize: vertical; line-height: 1.45; }
+#feedbackBody input[type="email"]:focus, #feedbackBody textarea:focus {
+  outline: none; border-color: var(--royal); box-shadow: 0 0 0 3px var(--royal-soft);
+}
+.fb-snap { margin-top: 14px; align-items: flex-start; }
+.fb-snap .wiz-sub { display: block; margin-top: 2px; }
+.fb-note {
+  font-size: .72rem; color: var(--ink-3); margin: 12px 0 0;
+  background: var(--royal-soft); border-radius: 8px; padding: 8px 11px;
+}
+.fb-note i { color: var(--royal); margin-right: 5px; }
 
 /* ------------------------------ responsive ---------------------------- */
 @media (max-width: 1180px) {
