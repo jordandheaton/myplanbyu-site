@@ -561,7 +561,24 @@ const DATA = (() => {
     // MISM track deliberately does NOT take the sheet: its 5-year shape is
     // hand-designed and the undergrad sheet would fight the MISM year.
     if (catIS && catIS.mapPlan) IS_BS.mapPlan = catIS.mapPlan;
-    if (catIS && catIS.admit) IS_BS.admit = catIS.admit;
+    // Limited-enrollment gate. The junior core is admission-only and starts
+    // year 3; the hand cohort blocks used to carry that as block.fcYear, so it
+    // has to be stated explicitly now that the catalog buckets replace them
+    // (Coursedog doesn't publish an admission anchor for this major).
+    IS_BS.admit = (catIS && catIS.admit) || { y: 3 };
+    // The plain IS (BS) degree takes the CATALOG's requirement structure. The
+    // hand buckets above predate the scraper and had drifted: Requirement 4
+    // (the 16-course IS elective) was missing outright, Requirement 2 was
+    // missing IS 110, Requirement 5 was missing GSCM 201/211 and MSB 390, and
+    // IS 303 was forced when the catalog offers it 1-of-3 with C S 111/142.
+    // The hand cohort blocks go with them — the official MAP sheet now drives
+    // this major's sequencing and keeps the junior core together itself.
+    // IS_BS_MISM captured the hand buckets BY VALUE above and keeps them: its
+    // five-year integrated shape has no catalog equivalent.
+    if (catIS && catIS.buckets) {
+      IS_BS.buckets = catIS.buckets;
+      if (catIS.credits) IS_BS.credits = catIS.credits;
+    }
   }
 
   const majors = HAVE_REAL
@@ -618,9 +635,6 @@ const DATA = (() => {
       doubleCountCap: 15,
       religionPacing: true,
       horizonYears: 6,
-      // Fall/Winter semesters the student wants the plan to fit in. 0 = no
-      // target, which leaves the solver's own 8-10 semester heuristic in charge.
-      targetSemesters: 0,
     },
     weights: { speed: 5, cost: 5, risk: 5, load: 5, life: 5 },
   };

@@ -183,9 +183,7 @@ const App = (() => {
         <div class="sb-sub">${esc(major ? major.name : "No major selected")} · starts ${esc(Solver.SEASON_NAME[prof.startTerm.season])} ${prof.startTerm.year}</div>
       </div>
       <div class="sb-chips">
-        <div class="sb-chip"><span class="sb-lbl">Standing</span><span class="pill green">GOOD</span></div>
         <div class="sb-chip"><span class="sb-lbl">Solver</span><span class="pill green">${result ? result.solveMs + " ms" : "—"}</span></div>
-        <div class="sb-chip"><span class="sb-lbl">Target</span><span class="pill blue">${(+prof.settings.targetSemesters || 0) === 0 ? "None" : (+prof.settings.targetSemesters) + " sem"}</span></div>
         <div class="sb-chip"><span class="sb-lbl">Double-counted</span><span class="pill amber">${result ? result.doubleCounted : 0} cr</span></div>
         <div class="sb-chip"><span class="sb-lbl">Plan score</span><span class="pill navy">${result ? result.score.total.toFixed(1) : "—"}</span></div>
       </div>`;
@@ -1455,33 +1453,6 @@ const App = (() => {
   }
   function closeModal(sel) { $(sel).classList.remove("open"); }
 
-  /* letter grades for the completed-courses checklist (record only) */
-  const GRADES = ["—", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "P"];
-  /* How many Fall/Winter semesters the student wants the plan to take. 0 means
-     "no target" — the solver then picks the classic 8-10 semester shape itself.
-     Labelled with the term each count lands on, since students think in both
-     ("four more semesters" and "done by April 2029" are the same sentence). */
-  const TARGET_SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  function targetTermLabel(startTerm, n) {
-    // Walk the season cycle from the start term, counting Fall/Winter only.
-    const order = ["F", "W", "S", "U"];
-    let { year, season } = startTerm, si = order.indexOf(season), seen = 0;
-    for (let i = 0; i < 48; i++) {
-      const s = order[si];
-      if (s === "F" || s === "W") {
-        seen++;
-        if (seen === n) return `${Solver.SEASON_NAME[s]} ${year}`;
-      }
-      si = (si + 1) % 4;
-      if (s === "F") year++;
-    }
-    return "";
-  }
-  const targetOptions = (startTerm, current) =>
-    `<option value="0" ${!current ? "selected" : ""}>No target — as fast as the requirements allow</option>` +
-    TARGET_SEMESTERS.map(n =>
-      `<option value="${n}" ${+current === n ? "selected" : ""}>${n} semester${n === 1 ? "" : "s"} — finish ${targetTermLabel(startTerm, n)}</option>`).join("");
-
   /* ------------------------- constraints modal ------------------------ */
   // (Preference dials removed: the solver runs a fixed policy — MAP-sheet
   // pacing where a sheet exists, otherwise 14-16 credits per Fall/Winter
@@ -1508,8 +1479,6 @@ const App = (() => {
         <label class="chk"><input type="checkbox" id="pcSummer" ${prof.settings.allowSummer ? "checked" : ""}> Allow Summer terms</label>
         <label class="chk"><input type="checkbox" id="pcSchol" ${prof.settings.scholarshipFullTime ? "checked" : ""}> Scholarship requires full-time</label>
         <label class="chk"><input type="checkbox" id="pcRel" ${prof.settings.religionPacing ? "checked" : ""}> Pace religion credits yearly</label>
-        <label class="wide">When do you want to be done?
-          <select id="pcTarget">${targetOptions(prof.startTerm, prof.settings.targetSemesters)}</select></label>
       </div>`;
     $("#prioModal").classList.add("open");
     $("#prioApply").onclick = () => {
@@ -1520,7 +1489,6 @@ const App = (() => {
         doubleCountCap: parseInt($("#pcDcCap").value, 10) || 15,
         allowSpring: $("#pcSpring").checked, allowSummer: $("#pcSummer").checked,
         scholarshipFullTime: $("#pcSchol").checked, religionPacing: $("#pcRel").checked,
-        targetSemesters: parseInt($("#pcTarget").value, 10) || 0,
       });
       closeModal("#prioModal");
       solveActive();
@@ -1540,7 +1508,6 @@ const App = (() => {
       wiz = JSON.parse(JSON.stringify(DATA.defaultProfile));
       wizEditId = null;
     }
-    wiz.grades = wiz.grades || {};
     wizStep = 0;
     renderWizard();
     $("#wizardModal").classList.add("open");
@@ -1699,10 +1666,10 @@ const App = (() => {
       const c = DATA.courses[e.id];
       const already = wiz.completed.includes(e.id);
       return `<label class="ti-row-item ${disabled || already ? "off" : ""}">
-        <input type="checkbox" data-id="${esc(e.id)}" data-grade="${esc(e.grade || "—")}"
+        <input type="checkbox" data-id="${esc(e.id)}"
           ${already ? "checked disabled" : checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
         <b>${esc(e.id)}</b><span>${esc(c ? c.name : "")}</span>
-        <i>${already ? "already added" : e.grade || (group === "prog" ? "no grade yet" : "")}</i>
+        <i>${already ? "already added" : ""}</i>
       </label>`;
     };
     box.innerHTML = `
@@ -1719,12 +1686,7 @@ const App = (() => {
       let n = 0;
       box.querySelectorAll("input[type=checkbox]:checked:not(:disabled)").forEach(cb => {
         const id = cb.dataset.id;
-        if (!wiz.completed.includes(id)) {
-          wiz.completed.push(id);
-          wiz.grades = wiz.grades || {};
-          wiz.grades[id] = cb.dataset.grade === "P" ? "P" : cb.dataset.grade;
-          n++;
-        }
+        if (!wiz.completed.includes(id)) { wiz.completed.push(id); n++; }
       });
       renderWizard();
       toast(`${n} course${n === 1 ? "" : "s"} imported from your transcript.`, "ok");
@@ -1758,10 +1720,6 @@ const App = (() => {
           <select id="wsSeason">${["F", "W", "S", "U"].map(s => `<option value="${s}" ${wiz.startTerm.season === s ? "selected" : ""}>${Solver.SEASON_NAME[s]}</option>`).join("")}</select>
           <select id="wsYear">${years.map(y => `<option ${wiz.startTerm.year === y ? "selected" : ""}>${y}</option>`).join("")}</select>
         </div>
-        <label class="wiz-lbl">When do you want to be done? <span class="wiz-sub">(the planner aims for this; it will tell you if the requirements don't fit)</span></label>
-        <div class="wiz-row">
-          <select id="wsTarget">${targetOptions(wiz.startTerm, wiz.settings.targetSemesters)}</select>
-        </div>
         <label class="wiz-lbl">Import from your transcript <span class="wiz-sub">(fastest — paste from MyMAP or the transcript preview, or upload the PDF)</span></label>
         <div class="ti-box">
           <textarea id="tiText" rows="4" placeholder="Paste your transcript text or MyMAP academic summary here — every course code is matched against the real BYU catalog."></textarea>
@@ -1780,44 +1738,27 @@ const App = (() => {
         <label class="wiz-lbl">Search the catalog to add more</label>
         <input type="text" id="wsAddCourse" placeholder="Search ${Object.keys(DATA.courses).length.toLocaleString()} BYU courses — e.g. GSCM 201, Human Development…" autocomplete="off">
         <div class="ss-list" id="wsAddList" hidden></div>
-        <label class="wiz-lbl">Completed courses <span class="wiz-sub">(grades are for your record — they don't affect planning)</span></label>
+        <label class="wiz-lbl">Completed courses</label>
         <div class="done-list" id="wsDoneList">${wiz.completed.length ? wiz.completed.map(id => {
           const c = DATA.courses[id];
           return `<div class="done-row" data-c="${esc(id)}">
             <span class="done-code">${esc(id)}</span>
             <span class="done-name">${esc(c ? c.name : "—")}</span>
-            <select class="done-grade" data-c="${esc(id)}">${GRADES.map(g =>
-              `<option ${((wiz.grades||{})[id]||"—") === g ? "selected" : ""}>${g}</option>`).join("")}</select>
             <button class="done-x" data-rm="${esc(id)}" title="Remove">×</button>
           </div>`;
         }).join("") : `<p class="done-empty">No completed courses yet — add them above so the planner skips them.</p>`}</div>`;
-      wiz.grades = wiz.grades || {};
       $$("#wizBody .chip.toggle").forEach(ch => ch.addEventListener("click", () => {
         const id = ch.dataset.c;
         if (wiz.completed.includes(id)) wiz.completed = wiz.completed.filter(x => x !== id);
-        else { wiz.completed.push(id); wiz.grades[id] = wiz.grades[id] || "—"; }
+        else wiz.completed.push(id);
         renderWizard();
       }));
       $$("#wsDoneList .done-x").forEach(x => x.addEventListener("click", () => {
         wiz.completed = wiz.completed.filter(c => c !== x.dataset.rm);
-        delete wiz.grades[x.dataset.rm];
         renderWizard();
       }));
-      $$("#wsDoneList .done-grade").forEach(sel => sel.addEventListener("change", () => {
-        wiz.grades[sel.dataset.c] = sel.value;
-      }));
-      // Re-render on a start-term change: the finish-target labels name concrete
-      // terms ("8 semesters — finish Winter 2030"), so they go stale otherwise.
-      $("#wsSeason").onchange = e => {
-        wiz.startTerm.season = e.target.value;
-        wiz.settings.targetSemesters = parseInt($("#wsTarget").value, 10) || 0;
-        renderWizard();
-      };
-      $("#wsYear").onchange = e => {
-        wiz.startTerm.year = parseInt(e.target.value, 10);
-        wiz.settings.targetSemesters = parseInt($("#wsTarget").value, 10) || 0;
-        renderWizard();
-      };
+      $("#wsSeason").onchange = e => { wiz.startTerm.season = e.target.value; };
+      $("#wsYear").onchange = e => { wiz.startTerm.year = parseInt(e.target.value, 10); };
       // transcript import: paste-and-scan, or PDF -> text -> same scanner
       $("#tiScan").onclick = () => {
         const t = $("#tiText").value;
@@ -1862,7 +1803,6 @@ const App = (() => {
         addList.hidden = false;
         addList.querySelectorAll(".ss-item").forEach(it => it.addEventListener("click", () => {
           wiz.completed.push(it.dataset.code);
-          wiz.grades[it.dataset.code] = "—";
           renderWizard();
         }));
       });
@@ -1895,7 +1835,6 @@ const App = (() => {
     if (wizStep === 1) {
       wiz.startTerm.season = $("#wsSeason").value;
       wiz.startTerm.year = parseInt($("#wsYear").value, 10);
-      wiz.settings.targetSemesters = parseInt($("#wsTarget").value, 10) || 0;
     }
   }
 

@@ -373,7 +373,6 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 .prio-grid label.chk { flex-direction: row; align-items: center; gap: 8px; }
 /* the finish-target row spans both columns: its options name a term
    ("8 semesters — finish Winter 2030") and truncate in a half-width cell */
-.prio-grid label.wide { grid-column: 1 / -1; }
 .prio-grid input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--royal); }
 
 /* course modal */
@@ -816,7 +815,7 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   padding: 5px 10px; display: flex; align-items: center; gap: 6px;
 }
 
-/* ------------------- completed-courses grade checklist --------------- */
+/* ---------------------- completed-courses list ----------------------- */
 .done-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
 .done-row {
   display: flex; align-items: center; gap: 10px;
@@ -824,7 +823,6 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 }
 .done-code { font-weight: 700; font-size: 13px; white-space: nowrap; }
 .done-name { flex: 1; color: var(--ink-2); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.done-grade { border: 1px solid var(--line); border-radius: 7px; padding: 3px 6px; font: inherit; font-size: 12.5px; }
 .done-x {
   background: none; border: none; color: var(--ink-3); font-size: 18px; line-height: 1;
   cursor: pointer; padding: 0 4px; border-radius: 6px;

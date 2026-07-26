@@ -1114,6 +1114,13 @@ const Solver = (() => {
         const satisfied = opts.some(g => state.completed.has(g) ||
           [...state.assign].some(([u, tt]) => baseId(u) === g && tt < t));
         if (satisfied) return false;
+        // Same-term sheet cohort is not an ordering bug: when the sheet pins
+        // both courses to the SAME semester it is running them as a block
+        // (Accounting's ACC 407 with 402/405/409). Reported as a defect, it
+        // put three red alarms on a plan that follows the sheet exactly.
+        if (state.mapCodes && state.mapCodes.has(baseId(uid)) &&
+            opts.some(g => state.mapCodes.has(g) &&
+              [...state.assign].some(([u, tt]) => baseId(u) === g && tt === t))) return false;
         return opts.some(g => [...state.assign].some(([u]) => baseId(u) === g));  // present, just late
       });
       if (orderingBug) {
@@ -1154,7 +1161,7 @@ const Solver = (() => {
       type: "unscheduled",
       // Name the dial the student actually has. "Extend the horizon" is useless
       // advice to someone whose plan is bounded by a finish target they set.
-      text: `${i.course.display || i.uid} couldn't be scheduled${i.course.off.length < 4 ? ` (offered ${[...i.course.off].map(s => SEASON_NAME[s]).join("/")} only)` : ""} — try enabling Spring/Summer, raising the credit cap${(+state.profile.settings.targetSemesters || 0) > 0 ? ", or giving yourself more semesters" : ", or extending the horizon"}.`,
+      text: `${i.course.display || i.uid} couldn't be scheduled${i.course.off.length < 4 ? ` (offered ${[...i.course.off].map(s => SEASON_NAME[s]).join("/")} only)` : ""} — try enabling Spring/Summer, raising the credit cap, or extending the horizon.`,
     }));
     return { problems, unscheduled };
   }
@@ -2193,6 +2200,19 @@ const Solver = (() => {
             // ladders, Dietetics' "Chem 101 or equivalent"). Only a prereq
             // that IS in the plan but sits late is a real ordering problem.
             const anyPresent = opts.some(g => [...assign].some(([u]) => baseId(u) === g));
+            // Same-term sheet cohort: when the sheet pins BOTH this course and
+            // its prerequisite to the SAME semester, that is the advisement
+            // center co-scheduling a junior-core block (Accounting's ACC 407
+            // alongside 402/405/409), not an ordering mistake. Warning on it
+            // buried the real problems under noise.
+            const sheetConcurrent = state.pinnedUids.has(uid) && state.mapCodes &&
+              state.mapCodes.has(baseId(uid)) &&
+              opts.some(g => state.mapCodes.has(g) &&
+                [...assign].some(([u, t2]) => baseId(u) === g && t2 === t && state.pinnedUids.has(u)));
+            if (sheetConcurrent) {
+              addCF(uid, "info", `The official sheet puts this in the same semester as ${opts.map(g => cat[g]?.display || g).join(" or ")} — the department runs them together as a block.`);
+              return;
+            }
             const sheetAssumed = !anyPresent && state.pinnedUids.has(uid) &&
               state.mapCodes && state.mapCodes.has(baseId(uid));
             if (sheetAssumed) {
@@ -2306,34 +2326,26 @@ const Solver = (() => {
       programs.forEach(p => {
         const g = state.admitGate[p.id];
         if (g == null) return;
-        const gateTerm = terms.find(tm => tm.isFW && tm.season === "F" && acadYearIdx(terms, tm.index) === g);
+        // Report the term the plan ACTUALLY starts gated work, not the earliest
+        // year the gate would allow. Those diverge whenever something upstream
+        // (an unfinished IS 303, a late pre-core) pushes the first professional
+        // course back, and quoting the theoretical gate told students to apply
+        // a year before they needed to — the one number on this flag that has
+        // to be right. Fall back to the gate year only if nothing gated landed.
+        let firstT = null;
+        state.instances.forEach(i => {
+          if (admitGateFor(state, i) < 0) return;
+          const t = assign.get(i.uid);
+          if (t !== undefined && (firstT === null || t < firstT)) firstT = t;
+        });
+        const gateTerm = firstT !== null ? terms[firstT]
+          : terms.find(tm => tm.isFW && tm.season === "F" && acadYearIdx(terms, tm.index) === g);
         const dept = (state.admitDept || {})[p.id];
         const what = dept ? `Its ${dept} professional sequence and upper-division courses`
                           : `Its junior core and upper-division courses`;
         flags.push({ level: "info", icon: "lock",
-          text: `${p.name.replace(/\s*\(.*\)$/, "")} is a limited-enrollment (application) major. ${what} are held until admission (${gateTerm ? gateTerm.label : `year ${g + 1}`}); only pre-reqs and GE are scheduled before then. Plan assumes you're admitted — apply on time and have a backup.` });
+          text: `${p.name.replace(/\s*\(.*\)$/, "")} is a limited-enrollment (application) major. ${what} are held until admission, and this plan's first admitted coursework is ${gateTerm ? gateTerm.label : `year ${g + 1}`} — apply the cycle before that. Only pre-reqs and GE are scheduled until then; the plan assumes you're admitted, so have a backup.` });
       });
-    }
-
-    // Finish target: met, or missed and by how much. A student who asked to be
-    // done in N semesters is owed a straight answer either way -- silently
-    // handing back a longer plan is the failure mode this whole control exists
-    // to prevent.
-    if (state.targetSemesters > 0) {
-      const fwEnabled = terms.filter(tm => tm.isFW && tm.enabled);
-      const usedFW = fwEnabled.filter(tm => {
-        for (const [, t] of assign) if (t === tm.index) return true;
-        return false;
-      }).length;
-      const lastIdx = Math.max(...[...assign.values()]);
-      const finishes = terms[lastIdx] ? terms[lastIdx].label : "";
-      if (usedFW > state.targetSemesters) {
-        flags.push({ level: "warn", icon: "calendar-xmark",
-          text: `You asked to finish in ${state.targetSemesters} semester${state.targetSemesters === 1 ? "" : "s"}, but the requirements need ${usedFW} — this plan finishes ${finishes}. Enabling Spring/Summer terms or raising your credit cap are the two ways to pull that in.` });
-      } else {
-        flags.push({ level: "ok", icon: "calendar-check",
-          text: `On target: ${usedFW} of your ${state.targetSemesters} semesters used, finishing ${finishes}.` });
-      }
     }
 
     // MISM application gate
@@ -2613,26 +2625,10 @@ const Solver = (() => {
       instances.forEach(i => { planCr += i.course.credits; });
       const capFW = Math.min(BYU_HARD_CAP, profile.settings.maxCreditsFW || 17);
       const fwEnabled = terms.filter(tm => tm.isFW && tm.enabled);
-      // A student-stated finish target replaces the heuristic outright. It is
-      // taken literally -- no rounding up to a Winter finish, because someone
-      // who asked for 7 semesters means 7, and graduating in December is a
-      // legitimate answer. If it genuinely cannot be met, the budget-extension
-      // loop in phase 4 stretches it and planNotes reports the miss, so a
-      // target that is too tight degrades into an explanation rather than a
-      // pile of unscheduled courses.
-      const want = Math.max(0, +profile.settings.targetSemesters || 0);
-      let autoN = Math.max(8, Math.ceil(planCr / 16));
-      if (autoN > 10) autoN = Math.max(10, Math.ceil(planCr / capFW));
-      while (autoN < fwEnabled.length && fwEnabled[autoN - 1] && fwEnabled[autoN - 1].season !== "W") autoN++;
-      // A target is a CEILING, never a quota. Taking it literally when it is
-      // looser than the natural shape would pad the plan -- asking for 10
-      // semesters would stretch an 8-semester degree to fill them, which is the
-      // opposite of what someone setting a deadline wants.
-      const n = want > 0 ? Math.min(want, autoN) : autoN;
+      let n = Math.max(8, Math.ceil(planCr / 16));
+      if (n > 10) n = Math.max(10, Math.ceil(planCr / capFW));
+      while (n < fwEnabled.length && fwEnabled[n - 1] && fwEnabled[n - 1].season !== "W") n++;
       state.termBudget = fwEnabled[Math.min(n, fwEnabled.length) - 1].index;
-      // Remembered so a later stretch can be detected and explained.
-      state.targetSemesters = want;
-      state.budgetAtStart = state.termBudget;
     }
     // flowchart placement hints: courseId -> {y (1-based year), s (F/W)}. The
     // official department flowchart, where we have one, overrides the generic
