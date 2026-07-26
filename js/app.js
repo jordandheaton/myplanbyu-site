@@ -28,6 +28,14 @@ const App = (() => {
   const $ = sel => document.querySelector(sel);
   const $$ = sel => [...document.querySelectorAll(sel)];
   const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  /* What to call a course on screen. Almost always its code — but a course the
+     catalog links without publishing a number has an internal placeholder key
+     for an id, and printing that verbatim reads as corrupt data. Use anywhere
+     a bare course id would otherwise reach the student (labels, toasts). */
+  const codeLabel = id => {
+    const c = DATA.courses[id];
+    return c && c.unlisted ? (c.display || c.name) : id;
+  };
 
   /* ------------------------------ storage ---------------------------- */
   function load() {
@@ -36,8 +44,23 @@ const App = (() => {
       if (raw && Array.isArray(raw.plans)) { plans = raw.plans; activeId = raw.activeId; }
     } catch (e) { /* fresh start */ }
   }
+  /* Saving must never take the app down with it. Private browsing and a full
+     origin quota both make setItem throw, and save() is called mid-interaction
+     (after a move, a bucket pick, a new plan) — an uncaught throw there strands
+     the student inside the action they just took. The plan still works for the
+     session; only persistence is lost, so say that once and carry on. */
+  let saveWarned = false;
   function save() {
-    localStorage.setItem(LS_KEY, JSON.stringify({ plans, activeId }));
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({ plans, activeId }));
+    } catch (e) {
+      if (!saveWarned) {
+        saveWarned = true;
+        toast("This browser won't let the page save — your plan works now but " +
+              "won't be here next visit. Private browsing? Use Plan Options → " +
+              "Print / PDF to keep a copy.", "err");
+      }
+    }
   }
   const activePlan = () => plans.find(p => p.id === activeId) || null;
 
@@ -320,7 +343,7 @@ const App = (() => {
         }
         box.innerHTML = hits.map(([code, c]) => `
           <button class="csr-item" data-code="${esc(code)}">
-            <b>${esc(code)}</b><span>${esc(c.name)}</span><em>${c.credits} cr</em>
+            <b>${esc(codeLabel(code))}</b><span>${c.unlisted ? "no course number yet" : esc(c.name)}</span><em>${c.credits} cr</em>
           </button>`).join("") ||
           `<div class="csr-empty">No ${Solver.SEASON_NAME[season]} classes match — courses not taught in ${Solver.SEASON_NAME[season]} are hidden.</div>`;
         box.hidden = false;
@@ -334,7 +357,7 @@ const App = (() => {
           };
           plan.updatedAt = Date.now(); save();
           solveActive();
-          toast(`${code} added to ${Solver.SEASON_NAME[season]} ${inp.dataset.year} and pinned.`, "ok");
+          toast(`${codeLabel(code)} added to ${Solver.SEASON_NAME[season]} ${inp.dataset.year} and pinned.`, "ok");
         }));
       });
       inp.addEventListener("blur", () => setTimeout(() => { box.hidden = true; }, 200));
@@ -378,12 +401,18 @@ const App = (() => {
         <div class="card-side"><span class="card-cr">${p.credits.toFixed(1)}</span></div>
       </div>`;
     }
+    // A course the catalog links but doesn't list has no code to show, so its
+    // name takes the code line and a tag stands in for the missing code —
+    // rather than printing the internal placeholder key as if it were one.
+    const unlisted = !!(DATA.courses[p.courseId] || {}).unlisted;
     return `
     <div class="card ${p.isFill ? "card-fillpick" : ""}" draggable="true" data-uid="${esc(p.uid)}">
       <span class="badge ${t.cls}">${t.label}</span>
       <div class="card-main">
         <span class="card-code">${esc(p.display)}${p.uid.includes("#") ? `<span class="card-rep" title="Repeatable course — one enrollment per semester. This is enrollment ${p.uid.split("#")[1]} of the ${p.repTotal || "several"} your requirement needs.">take ${p.uid.split("#")[1]}${p.repTotal ? `/${p.repTotal}` : ""}</span>` : ""}</span>
-        <span class="card-name">${esc(p.sheetName || p.name)}${p.isFill ? ` <span class="fill-change" title="You picked this from a requirement dropdown — swap it any time"><i class="fas fa-list-ul"></i> change ▾</span>` : ""}</span>
+        <span class="card-name">${unlisted
+          ? `<span class="unlisted-tag" title="Your program lists this course, but it has no course number in the catalog yet. Ask your advisor for the current number before you register.">no course number yet</span>`
+          : esc(p.sheetName || p.name)}${p.isFill ? ` <span class="fill-change" title="You picked this from a requirement dropdown — swap it any time"><i class="fas fa-list-ul"></i> change ▾</span>` : ""}</span>
       </div>
       <div class="card-side">
         <span class="card-cr">${p.credits.toFixed(1)}</span>
@@ -496,8 +525,14 @@ const App = (() => {
     const itemHtml = (code, move) => {
       const c = DATA.courses[code];
       const em = move ? [...c.off].map(s => Solver.SEASON_NAME[s]).join("/") : `${c.credits} cr`;
+      // No catalog number for this one: lead with the name and say so, instead
+      // of showing the internal placeholder key in the course-code column.
+      const lead = c.unlisted ? esc(c.display || c.name) : esc(code);
+      const detail = c.unlisted
+        ? `<i class="bp-preq" title="Your program lists this course, but the catalog has no course number for it yet.">no course number yet</i>`
+        : esc(c.name);
       return `<button class="bp-item ${move ? "bp-alt" : ""}" data-code="${esc(code)}" ${move ? 'data-move="1"' : ""}>
-        <b>${esc(code)}</b><span>${esc(c.name)}${preOf[code] ? `<i class="bp-preq" title="Prerequisite not completed or scheduled before this term">needs ${esc(preOf[code])} first</i>` : ""}</span><em>${esc(em)}</em></button>`;
+        <b>${lead}</b><span>${detail}${preOf[code] ? `<i class="bp-preq" title="Prerequisite not completed or scheduled before this term">needs ${esc(preOf[code])} first</i>` : ""}</span><em>${esc(em)}</em></button>`;
     };
     const menu = document.createElement("div");
     menu.className = "ctx-menu bucket-picker";
@@ -514,7 +549,7 @@ const App = (() => {
           ${altsNeedPre.map(code => itemHtml(code, true)).join("")}</details>` : ""}
         ${inPlanPool.length ? `<div class="bp-grouphdr">already in your plan</div>
           ${inPlanPool.map(code => { const c = DATA.courses[code];
-            return `<div class="bp-item bp-inplan" title="Already scheduled elsewhere in your plan — often a prerequisite of another class"><b>${esc(code)}</b><span>${esc(c.name)}</span><em><i class="fas fa-check"></i> in plan</em></div>`; }).join("")}` : ""}
+            return `<div class="bp-item bp-inplan" title="Already scheduled elsewhere in your plan — often a prerequisite of another class"><b>${esc(codeLabel(code))}</b><span>${c.unlisted ? "no course number yet" : esc(c.name)}</span><em><i class="fas fa-check"></i> in plan</em></div>`; }).join("")}` : ""}
         ${opts.length || alts.length || inPlanPool.length ? "" : `<div class="bp-empty">No catalog options resolve for this requirement — check the progress report, or use the semester search bar.</div>`}
         ${isSwap ? `<button class="bp-item bp-unfill"><b><i class="fas fa-rotate-left"></i></b><span>Back to an open "choose a class" slot</span></button>` : ""}
       </div>
@@ -551,9 +586,9 @@ const App = (() => {
           byDist.find(tm => tm.index <= lastActive && state.load[tm.index] + c.credits <= ceilOf(tm)) ||
           byDist.find(tm => tm.index <= lastActive && state.load[tm.index] + c.credits <= tm.cap) ||
           byDist.find(tm => state.load[tm.index] + c.credits <= tm.cap) || byDist[0];
-        if (!target) { toast(`${code} has no available term in your plan window.`); return; }
+        if (!target) { toast(`${codeLabel(code)} has no available term in your plan window.`); return; }
         year = target.year; ssn = target.season;
-        if (target.index > lastActive) toast(`Heads up: ${code} only fits in a NEW semester (${Solver.SEASON_NAME[ssn]} ${year}) — every existing term is full.`, "err");
+        if (target.index > lastActive) toast(`Heads up: ${codeLabel(code)} only fits in a NEW semester (${Solver.SEASON_NAME[ssn]} ${year}) — every existing term is full.`, "err");
       }
       prof.fills = prof.fills || {};
       const arr = (prof.fills[fillKey] = prof.fills[fillKey] || []);
@@ -568,7 +603,7 @@ const App = (() => {
       prof.pins[code] = { year, season: ssn, manual: true };
       activePlan().updatedAt = Date.now(); save();
       solveActive();
-      toast(`${code} ${isSwap ? `swapped in for ${p.display}` : `chosen for ${p.display} — stays in ${Solver.SEASON_NAME[ssn]} ${year}`}${btn.dataset.move ? ` (moved: not taught ${Solver.SEASON_NAME[season]})` : ""}.`, "ok");
+      toast(`${codeLabel(code)} ${isSwap ? `swapped in for ${p.display}` : `chosen for ${p.display} — stays in ${Solver.SEASON_NAME[ssn]} ${year}`}${btn.dataset.move ? ` (moved: not taught ${Solver.SEASON_NAME[season]})` : ""}.`, "ok");
     }));
     const unfillBtn = menu.querySelector(".bp-unfill");
     if (unfillBtn) unfillBtn.addEventListener("click", () => {
@@ -1353,7 +1388,9 @@ const App = (() => {
         <span class="badge lg ${t.cls}">${t.label}</span>
         <div>
           <h3>${esc(p.display)} <span class="cm-cr">${p.credits.toFixed(1)} cr</span></h3>
-          <p class="cm-name">${esc(p.name)}</p>
+          <p class="cm-name">${c.unlisted
+            ? `<span class="unlisted-tag">no course number yet</span> Your program lists this course, but the catalog hasn't published a course number for it. Ask your advisor for the number before you register.`
+            : esc(p.name)}</p>
         </div>
       </div>
       <div class="cm-grid">
@@ -1911,7 +1948,7 @@ const App = (() => {
         <div class="done-list" id="wsDoneList">${wiz.completed.length ? wiz.completed.map(id => {
           const c = DATA.courses[id];
           return `<div class="done-row" data-c="${esc(id)}">
-            <span class="done-code">${esc(id)}</span>
+            <span class="done-code">${esc(codeLabel(id))}</span>
             <span class="done-name">${esc(c ? c.name : "—")}</span>
             <button class="done-x" data-rm="${esc(id)}" title="Remove">×</button>
           </div>`;
@@ -1967,7 +2004,7 @@ const App = (() => {
           if (code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q)) hits.push([code, c]);
         }
         addList.innerHTML = hits.map(([code, c]) => `
-          <button class="ss-item" data-code="${esc(code)}"><b>${esc(code)}</b><span>${esc(c.name)} · ${c.credits} cr</span></button>`).join("")
+          <button class="ss-item" data-code="${esc(code)}"><b>${esc(codeLabel(code))}</b><span>${esc(c.name)} · ${c.credits} cr</span></button>`).join("")
           || `<div class="ss-empty">No catalog match — only real BYU courses can be marked completed.</div>`;
         addList.hidden = false;
         addList.querySelectorAll(".ss-item").forEach(it => it.addEventListener("click", () => {
@@ -2058,7 +2095,8 @@ const App = (() => {
       btn.addEventListener("click", () => {
         uiPrefs[key] = !panel.classList.contains("collapsed");
         panel.classList.toggle("collapsed", uiPrefs[key]);
-        localStorage.setItem("myplanbyu.ui", JSON.stringify(uiPrefs));
+        // a collapsed panel that can't be remembered is not worth an error
+        try { localStorage.setItem("myplanbyu.ui", JSON.stringify(uiPrefs)); } catch (e) { /* ignore */ }
       });
     };
     wireCollapse("#collapseLeft", "#panelLeft", "leftCollapsed");
@@ -2110,6 +2148,29 @@ const App = (() => {
     $("#navHow").addEventListener("click", e => { e.preventDefault(); $("#howModal").classList.add("open"); });
     $("#navFeedback").addEventListener("click", e => { e.preventDefault(); openFeedback(); });
     $("#footFeedback").addEventListener("click", e => { e.preventDefault(); openFeedback(); });
+
+    /* CATALOG AGE. The scraper refreshes this data on a schedule; if it ever
+       stops, the site would keep serving last year's requirements with total
+       confidence and no one would know. Printing the date makes a silent
+       failure visible, and says plainly when it's stale enough to double-check
+       against the live catalog. It lives in the notice bar rather than the
+       footer because phones hide the footer — and phones are most of the
+       audience. */
+    (() => {
+      const el = $("#dataStamp");
+      const stamp = typeof CATALOG_DATA !== "undefined" && CATALOG_DATA.generated;
+      if (!el || !stamp) return;
+      const when = new Date(stamp + "T00:00:00");
+      if (isNaN(when)) return;
+      const days = Math.floor((Date.now() - when) / 86400000);
+      const nice = when.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      el.textContent = `Catalog data from ${nice}.`;
+      if (days > 120) {
+        el.textContent += " Requirements may have changed since — check catalog.byu.edu.";
+        el.className = "data-stale";
+      }
+      el.title = `Generated from catalog.byu.edu on ${nice} (${days} day${days === 1 ? "" : "s"} ago).`;
+    })();
     $("#fbSend").addEventListener("click", submitFeedback);
     $("#fbCopy").addEventListener("click", () => copyFeedback());
     $("#refreshBtn").addEventListener("click", () => { solveActive(); toast("Re-optimized.", "ok"); });

@@ -604,6 +604,9 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   padding: 6px 14px; background: var(--white); border-top: 1px solid var(--line);
 }
 .foot a { color: var(--royal); font-weight: 700; text-decoration: none; margin-left: 8px; }
+/* catalog age, in the notice bar so phones see it too */
+#dataStamp { margin-left: 5px; opacity: .85; }
+#dataStamp.data-stale { color: var(--red-ink); font-weight: 700; opacity: 1; }
 .foot a:hover { text-decoration: underline; }
 
 /* ------------------------------- feedback ----------------------------- */
@@ -843,6 +846,13 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 }
 .done-x:hover { color: var(--red-ink); background: var(--red); }
 .done-empty { color: var(--ink-3); font-size: 12.5px; padding: 4px 2px; }
+
+/* a course the catalog links but hasn't numbered yet */
+.unlisted-tag {
+  display: inline-block; font-size: .62rem; font-weight: 700;
+  color: var(--amber-ink); background: var(--amber);
+  border-radius: 4px; padding: 1px 6px; vertical-align: 1px;
+}
 
 /* advisor question quota — quiet until it matters */
 .chat-quota {

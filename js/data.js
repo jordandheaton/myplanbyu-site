@@ -490,11 +490,26 @@ const DATA = (() => {
     return Math.max(1, Math.min(10, Math.round(d)));
   }
   if (HAVE_REAL) {
+    /* UNRESOLVED COURSES. When a catalog requirement links a course the course
+       index doesn't contain (usually a brand-new course), generate_data.py
+       synthesizes an id from the course NAME, truncated to 24 chars and marked
+       with a trailing "*" (see seg_courses in generate_data.py). That marker is
+       an internal key, not a course code — printed in the slot where "ACC 200"
+       goes it reads as corrupt data ("Bioengergetics and Metab*"), and some
+       carry the catalog's own typos. So give these a display label of their
+       real NAME and flag them, and every render site follows: `display` is what
+       the UI shows, falling back to the id only when it isn't set. */
+    const isSynthetic = code => /\*$/.test(code);
+
     const merged = {};
     for (const [code, e] of Object.entries(CATALOG_DATA.courses)) {
       const hand = C[code];
       merged[code] = {
         id: code, name: e.n || code, credits: e.c ?? 3,
+        ...(isSynthetic(code) ? {
+          display: e.n || code.replace(/\*$/, ""),
+          unlisted: true,       // "not in the course catalog yet" — UI says so
+        } : {}),
         tags: hand?.tags || [],
         // The SCRAPED catalog is authoritative for prereqs — including their
         // ABSENCE. A course whose official requisites are empty ("Recommended:
