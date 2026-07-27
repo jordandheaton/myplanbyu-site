@@ -5,6 +5,10 @@
 advisor_usage.json
 advisor_usage.tmp
 
+# Eval transcripts are run output, not source -- each one costs money to make,
+# so they're kept locally for reading but not committed.
+eval/transcript_*.md
+
 # Python
 .venv/
 __pycache__/

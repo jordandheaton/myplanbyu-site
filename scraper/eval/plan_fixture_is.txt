@@ -1,0 +1,57 @@
+Plan "IS plan" -- programs: University Core (GE + Religion); Information Systems (BS)
+Already completed BEFORE this plan: 6 courses / ~17 credits (WRTG 150, A HTG 100, MATH 110, IS 201, ACC 200, REL A 275). These are DONE — never suggest scheduling them; prerequisites they satisfy are satisfied.
+HOW TO READ THIS PLAN:
+- 'choose a class' slots are single placeholder cards (credits shown) ALREADY counted in the term totals — a label like 'Complete 15 hours' names the whole catalog requirement, NOT extra load that term.
+- Repeatable courses ('take 2/6') enroll once per semester by rule.
+- Religion is deliberately spread ~2 cr per semester (BYU norm) — do not suggest clustering it.
+- The planner has already verified every prerequisite chain and season offering against the live BYU catalog; the sequencing shown is valid unless a warning below says otherwise. Do not ask the student to re-verify prerequisites you cannot see.
+WHY THE PLAN LOOKS THIS WAY (solver's own reasoning — cite these when asked why):
+- 8 Fall/Winter semesters carry 109 credits (avg 13.6/term; policy band 14–16, 17 tolerated). Raw credit math would fit ~7 — the extra term(s) are forced by prerequisite chains, single-season offerings, and MAP-sheet term caps, not unused space.
+- Skeleton: the official Information Systems MAP sheet. Sheet-coded courses are locked to their printed semesters, each sheet term stops near its printed total, and everything else (GE, religion, minors, certificates) backfills the room the sheet left.
+- Information Systems is limited-enrollment: upper-division work is scheduled only after the assumed admission (professional phase starts Year 3; apply during Year 2).
+- Hard rules enforced everywhere: prerequisites strictly earlier, catalog season offerings, ≤18 cr registration cap, ≥12 cr full-time floor, admission gates, cohort envelopes. Preferences (difficulty spread, religion pacing, compactness) are optimized but not guaranteed.
+Placement notes for specific courses:
+- IS 303 (Winter 2028): Only taught Winter semester — moving it means waiting a full year for the next offering.
+- IS 404 (Fall 2028): Professional-phase course — held until assumed admission to Information Systems (limited enrollment; the professional phase starts Year 3, so apply during Year 2).
+- IS 402 (Fall 2028): Only taught Fall semester — moving it means waiting a full year for the next offering.
+- IS 402 (Fall 2028): Professional-phase course — held until assumed admission to Information Systems (limited enrollment; the professional phase starts Year 3, so apply during Year 2).
+- IS 403 (Fall 2028): Must come before IS 413 — it's the prerequisite that unlocks it.
+- IS 403 (Fall 2028): Only taught Fall semester — moving it means waiting a full year for the next offering.
+- IS 403 (Fall 2028): Professional-phase course — held until assumed admission to Information Systems (limited enrollment; the professional phase starts Year 3, so apply during Year 2).
+- IS 415 (Fall 2028): Must come before IS 455 — it's the prerequisite that unlocks it.
+- IS 415 (Fall 2028): Only taught Fall semester — moving it means waiting a full year for the next offering.
+- IS 415 (Fall 2028): Professional-phase course — held until assumed admission to Information Systems (limited enrollment; the professional phase starts Year 3, so apply during Year 2).
+- IS 401 (Winter 2029): Professional-phase course — held until assumed admission to Information Systems (limited enrollment; the professional phase starts Year 3, so apply during Year 2).
+- IS 413 (Winter 2029): Only taught Winter semester — moving it means waiting a full year for the next offering.
+- IS 413 (Winter 2029): Professional-phase course — held until assumed admission to Information Systems (limited enrollment; the professional phase starts Year 3, so apply during Year 2).
+- IS 414 (Winter 2029): Only taught Winter semester — moving it means waiting a full year for the next offering.
+Fall 2026 [16 cr]: UNIV 101 (2cr), Religion Cornerstones (2cr slot), Global & Cultural Awareness (3cr slot), Languages of Learning (3cr slot), Arts (3cr slot), ELECTIVE (3cr)
+Winter 2027 [16 cr]: MKTG 201 (3cr), IS 110 (1cr), Religion Cornerstones (2cr slot), Biological Science (3cr slot), Physical Science (3cr slot), MSB 180 (1cr), Advanced Written & Oral Communication (3cr slot)
+Fall 2027 [14 cr]: ECON 110 (3cr), FIN 201 (3cr), Religion Cornerstones (2cr slot), Civilization 2 (3cr slot), Letters (3cr slot)
+Winter 2028 [15 cr]: STAT 121 (3cr), IS 303 (3cr), M COM 320 (3cr), Civilization 1 (3cr slot), ELECTIVE (3cr)
+Fall 2028 [14 cr]: IS 404 (3cr), IS 402 (3cr), IS 403 (3cr), IS 415 (3cr), Religion Electives (2cr slot)
+Winter 2029 [14 cr]: IS 401 (3cr), IS 413 (3cr), IS 414 (3cr), IS 455 (3cr), Religion Electives (2cr slot)
+Fall 2029 [14 cr]: GSCM 201 (1.5cr), GSCM 211 (1.5cr), MSB 390 (3cr), HRM 391 (3cr), Religion Electives (2cr slot), Information Systems: Complete 1 of 16 Courses (3cr slot)
+Winter 2030 [6 cr]: STRAT 392 (3cr), IS 456 (3cr)
+Requirements — Information Systems (BS): Requirement 1.1 — Complete 2 Courses [needs 2 courses; covered by this plan] | Requirement 1.2 — Complete 1 of 3 Courses [needs 1 course] | Requirement 2 — Complete 6 Courses [needs 6 courses; covered by this plan] | Requirement 3 — Complete 8 Courses [needs 8 courses; covered by this plan] | Requirement 4 — Complete 1 of 16 Courses [needs 1 course; covered by this plan] | Requirement 5 — Complete 5 Courses [needs 5 courses; covered by this plan]
+KEY DEADLINES (from BYU calendars + limited-enrollment admission notes — cite these):
+- [Winter 2028] Information Systems application: Competitive, limited-enrollment major (Junior Core); prerequisites must be done before the deadline.
+- [Fall 2026] Add/drop Sep 10, 2026 · withdraw Nov 24, 2026: Term runs Sep 02 – Dec 10, 2026.
+ADMISSION REQUIREMENTS — Information Systems (from https://marriott.byu.edu/infosys/admissions/bsis/admission-criteria/):
+- prerequisite: ACC 200 — Principles of Accounting
+- prerequisite: IS 201 — Intro to Management Information Systems
+- prerequisite: IS 303 or C S 111 — Intro to Programming
+- Minimum 3.0 GPA across the prerequisite courses.
+- A grade below B in IS 201 and/or IS 303 is not accepted.
+- Transferred or repeated prerequisites are discounted by 0.3 (e.g., A → A-).
+- Deadline: last business day of June, 4:30 p.m. — all prereq grades must be posted.
+PLANNER RECOMMENDATIONS shown to the student (agree with or refine these, don't contradict them blindly):
+- ~6 credits of open electives — that's room for a minor or certificate with no extra semesters. Compare one side-by-side before committing; your current plan stays untouched.
+RELEVANT SCHOLARSHIPS for this student (deadlines recur annually):
+- Continuing Student Academic Scholarship [due Feb 1; 3.7+ GPA]
+- Private Donor Scholarships (administered by BYU) [due Feb 1; 3+ GPA]
+- Phi Kappa Phi BYU Chapter Scholarships (Brasher & Ellsworth) [due Feb 15; 3.8+ GPA]
+- Spring / Summer Scholarships [due Mar 1; 3+ GPA]
+- BYU Honors Program Scholarships [due Jul 31; 3.5+ GPA]
+- Wheatley Scholars (Jack & Lois Wheatley Endowed Leadership Scholarship) [due Nov 1; 3.7+ GPA]
+Planner warnings: Winter 2030 is below 14 credits — scholarship / full-time status risk.
