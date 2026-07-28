@@ -51,6 +51,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
@@ -337,6 +339,81 @@ def health():
     """Also reports the guardrail state so the chat panel can say 'the advisor
     is paused for the month' instead of just failing on the next question."""
     return jsonify({"ok": True, "model": MODEL, "limits": guard.status()})
+
+
+@app.route("/api/feedback", methods=["POST", "OPTIONS"])
+def feedback():
+    """Catch bug reports from the planner's feedback form.
+
+    The form previously had only a `mailto:` fallback, which does nothing at all
+    on a phone or any machine without a mail client configured -- and a plan
+    report is long enough that mail clients truncate the URL anyway. Since the
+    advisor is already a backend the site talks to, feedback rides the same
+    origin and the same tunnel: one thing to deploy, no third-party form
+    service, and the reports land on the same machine as the data they describe.
+
+    Costs nothing (no model call), so it is deliberately NOT metered against the
+    advisor's spend cap -- a student who used up their questions must still be
+    able to report a bug. It is rate-limited only to keep the file from being
+    used as free storage.
+
+    Appends one JSON object per line to data/feedback.jsonl. Line-delimited so a
+    partial write can never corrupt earlier reports.
+    """
+    if request.method == "OPTIONS":   # CORS preflight
+        return ("", 204)
+
+    body = request.get_json(silent=True) or {}
+    report = (body.get("report") or "").strip()
+    if not report:
+        return jsonify({"error": "report is required"}), 400
+
+    ip = client_ip(request.remote_addr, request.headers.get("X-Forwarded-For"))
+    if not _feedback_rate_ok(ip):
+        return jsonify({"error": "too many reports from this address; try again later"}), 429
+
+    entry = {
+        "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "kind": str(body.get("kind") or "")[:60],
+        "where": str(body.get("where") or "")[:200],
+        "what": str(body.get("what") or "")[:4000],
+        "expected": str(body.get("expected") or "")[:4000],
+        # Contact is optional and volunteered; keep it, but never echo it back.
+        "email": str(body.get("email") or "")[:200],
+        "subject": str(body.get("subject") or "")[:300],
+        "report": report[:20000],
+        "snapshot": body.get("snapshot"),
+    }
+    path = _DATA_DIR / "feedback.jsonl"
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except OSError as exc:
+        # Tell the truth: the client falls back to the clipboard + email path,
+        # which is worth far more than a cheerful lie.
+        return jsonify({"error": f"could not store feedback: {exc}"}), 500
+
+    print(f"[feedback] {entry['kind'] or 'general'} | {entry['where'] or 'no location'} "
+          f"-> data/feedback.jsonl")
+    return jsonify({"ok": True})
+
+
+# Simple in-memory throttle: a handful of reports per address per hour. Not
+# persisted, because a restart losing the counter is harmless here.
+_FEEDBACK_HITS: dict[str, list[float]] = {}
+_FEEDBACK_PER_HOUR = 12
+
+
+def _feedback_rate_ok(ip: str) -> bool:
+    now = time.time()
+    hits = [t for t in _FEEDBACK_HITS.get(ip, []) if now - t < 3600]
+    if len(hits) >= _FEEDBACK_PER_HOUR:
+        _FEEDBACK_HITS[ip] = hits
+        return False
+    hits.append(now)
+    _FEEDBACK_HITS[ip] = hits
+    return True
 
 
 @app.route("/api/ask", methods=["POST", "OPTIONS"])

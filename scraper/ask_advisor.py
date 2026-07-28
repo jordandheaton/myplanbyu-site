@@ -118,6 +118,18 @@ SYSTEM_PROMPT = (
     "- If the Context truly does not contain enough information, say so plainly "
     "and point the student to catalog.byu.edu. Do NOT invent courses, credit "
     "hours, requirements, costs, or dates.\n"
+    "- The student's DRAFT PLAN block, when present, is the authority on THEIR "
+    "situation: graduation term, credits remaining, current major, and each "
+    "semester's load. Students routinely misstate these. If the question asserts "
+    "something the plan contradicts ('graduate by Spring 2028', 'my remaining 45 "
+    "credits', 'switch from Pre-CS'), SAY SO FIRST, give the plan's real figure, "
+    "and answer from that figure. Never adopt a number from the question that the "
+    "plan disagrees with, and never state a graduation term you have not read off "
+    "the plan.\n"
+    "- Match recommendations to the student's STANDING. A first- or second-year "
+    "undergraduate cannot enrol in graduate work, so do not answer 'what electives "
+    "should I take' with MBA/500-/600-level courses unless they asked for graduate "
+    "options; recommend undergraduate courses they can actually register for.\n"
     "- Cite specific course codes (e.g. IS 303) and program names when relevant.\n"
     "- For questions about how a major should be SEQUENCED or laid out across "
     "semesters, prefer Context items of type 'flowchart' (official departmental "
@@ -157,6 +169,45 @@ def _get_index():
     return _INDEX
 
 
+# --- graduate-content filter -----------------------------------------------
+# myplanBYU is an UNDERGRADUATE planner: all 175 majors it schedules are BS/BA/
+# BFA. The index, though, also carries BYU Marriott's MBA emphases -- their URLs
+# sit under /mba/ -- and every 500-/600-level course those track sheets list.
+# Asked "what electives suit a consulting or product-management career", balanced
+# retrieval returned MBA 673, MBA 684B/C, MBA 631 and IS 562 to a FIRST-YEAR
+# student: courses they cannot register for.
+#
+# A SYSTEM_PROMPT rule ("match recommendations to standing") did not fix this and
+# could not. The model was obeying its stronger instruction to answer only from
+# Context, and Context held nothing else. The repair belongs where Context is
+# built, which is here.
+_GRAD_DEPTS = {"MBA", "MPA", "MACC", "EMBA", "LAW"}
+_CODE_RE = re.compile(r"^([A-Z][A-Z& ]*?)\s*(\d{3})")
+# Asking ABOUT graduate work is legitimate and must still work: BYU's 3+2 MISM
+# track lives in this very planner (solver.js carries `is-bs-mism`, +24 credits),
+# so the filter lifts the moment the student raises it themselves.
+_GRAD_INTENT_RE = re.compile(
+    r"\b(mba|m\.?b\.?a\.?|macc|mism|mpa|master'?s|master of|grad(uate)? school"
+    r"|ph\.?d|doctorate|3\s*\+\s*2)\b", re.I)
+
+
+def _is_graduate(meta: dict) -> bool:
+    """True for content an undergraduate cannot act on."""
+    if "/mba/" in (meta.get("url") or "").lower():
+        return True
+    name = (meta.get("name") or "").strip().upper()
+    if name.startswith("MBA "):          # e.g. "MBA Product Management Association"
+        return True
+    if meta.get("type") == "course":
+        m = _CODE_RE.match((meta.get("id") or "").upper())
+        if m:
+            dept, num = m.group(1).strip(), int(m.group(2))
+            # BYU numbers graduate work 500+; a few departments are grad-only.
+            if dept in _GRAD_DEPTS or num >= 500:
+                return True
+    return False
+
+
 def retrieve(query: str, top_k: int, type_filter: str | None = None):
     """Return the most relevant Pinecone matches for the query.
 
@@ -194,10 +245,17 @@ def retrieve(query: str, top_k: int, type_filter: str | None = None):
     # the others out. The "everything else" bucket is `type != course`.
     courses_k = max(1, top_k - top_k // 2)   # courses get the slightly larger share
     other_k = max(1, top_k // 2)
+    # Over-fetch when the graduate filter is active so dropping MBA/500-level
+    # hits leaves a FULL context rather than a thin one — the whole failure was
+    # the model having nothing undergraduate to offer.
+    allow_grad = bool(_GRAD_INTENT_RE.search(query))
+    mult = 1 if allow_grad else 3
     base = (
-        query_filter(courses_k, {"type": "course"})
-        + query_filter(other_k, {"type": {"$ne": "course"}})
+        query_filter(courses_k * mult, {"type": "course"})
+        + query_filter(other_k * mult, {"type": {"$ne": "course"}})
     )
+    if not allow_grad:
+        base = [m for m in base if not _is_graduate(m.get("metadata", {}))]
     base.sort(key=lambda m: m.get("score", 0.0), reverse=True)
 
     # Entity-guaranteed: a question like "major in IS + Spanish cert + GBC" is

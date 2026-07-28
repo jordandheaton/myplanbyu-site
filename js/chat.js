@@ -50,14 +50,31 @@ const Chat = (() => {
     return el;
   }
 
-  /* Friendly, non-technical offline notice. The advisor needs a running
-     backend; in the static demo deployment there isn't one. */
+  /* Offline notice, written for whoever is actually looking at it.
+     On the deployed site that is a student, who needs to know the rest of the
+     page still works and nothing they did caused this. On localhost it is
+     whoever is developing, who needs the command — "see the scraper README"
+     costs a dig through two files to recover one line. */
   function offlineHtml() {
+    const local = typeof location !== "undefined" && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    if (local) {
+      return "<b>The AI Advisor backend isn't running.</b><br>" +
+        "Start it and reload:<br>" +
+        "<code>myplanBYU/scraper/run_advisor.ps1</code><br>" +
+        "It serves <code>" + esc(API) + "</code>. Everything else works without it.";
+    }
+    if (MIXED_CONTENT_BLOCKED) {
+      return "<b>The AI Advisor is offline right now.</b><br>" +
+        "This page is served over HTTPS but the advisor is configured at a plain " +
+        "<code>http://</code> address, which browsers block. Point " +
+        "<code>window.MYPLAN_ADVISOR_API</code> at an HTTPS origin " +
+        "(see <code>scraper/README_ADVISOR_DEPLOY.md</code>). Everything else on " +
+        "the page works without it.";
+    }
     return "<b>The AI Advisor is offline right now.</b><br>" +
-      "It runs on a small backend server that isn't part of this static demo. " +
-      "To try it live, run the advisor locally (see the repo's " +
-      "<code>scraper/</code> README) and reload — everything else on the page " +
-      "works without it.";
+      "It runs on a small backend server that isn't reachable at the moment — " +
+      "nothing you did caused this, and every other part of the planner " +
+      "(your schedule, requirements, warnings, printing) works normally.";
   }
 
   let offlineShown = false;

@@ -24,6 +24,7 @@ const Solver = (() => {
   const HARD_DIFF = 7;          // "historically hard" threshold
   const UG_TARGET_CREDITS = 120;
   const BYU_HARD_CAP = 18;      // BYU registration cap (above needs approval)
+  const FULL_TIME_CREDITS = 12; // BYU full-time line (scholarships, aid, housing)
 
   /* ------------------------------ utils ------------------------------ */
   function mulberry32(a) {
@@ -481,11 +482,46 @@ const Solver = (() => {
         // only live in years 3-4 (4 terms of an 8-term plan), a 100/200-level
         // one has all 8 — so raise per-term enrollment (within the course's
         // real max) until the ladder fits its window.
+        // ONE ENROLLMENT when the course's own per-term maximum already covers
+        // the whole requirement. IAS 399R "Academic Internship" is 0.5-9 cr
+        // against American Studies' 3-hour internship line: a student does ONE
+        // internship for 3 credits, not six half-credit semesters of one. The
+        // ladder below only ever shortened these, never collapsed them, and its
+        // `inst > maxLadder` threshold missed this case by exactly one step
+        // (6 instances against a maxLadder of 6). Laddering internships and
+        // practica was the largest single source of repeated-course findings.
+        // Bounded at 9 credits — roughly three-quarters of a full-time load,
+        // so the semester still has room for two more classes. Collapsing a
+        // BIGGER requirement swallows the whole term: SPED's CPSE 487R is a
+        // 1-12 cr practicum, and taking all 12 at once left no room for
+        // CPSE 463 and CPSE 470, which then fit nowhere in the plan at all.
+        // Above the bound the ladder below still shortens it, just not to one.
+        if (c.vmax >= b.pick.n && b.pick.n > per && b.pick.n <= 9) {
+          per = b.pick.n;
+          inst = 1;
+          c = cat[pool[0]] = { ...c, credits: per };
+        }
         const maxLadder = Math.max(2, 8 - minYearForLevel(courseLevel(c)) * 2);
         if (inst > maxLadder && c.vmax > per) {
           per = Math.min(c.vmax, Math.ceil((b.pick.n / maxLadder) * 2) / 2);
           inst = Math.max(1, Math.ceil(b.pick.n / per));
           c = cat[pool[0]] = { ...c, credits: per };
+        }
+        // A course that is NOT repeatable — no "R" suffix, no variable credit —
+        // cannot honestly be taken more than once. Needing 15 enrollments of
+        // the 1-credit PORT 493 capstone to satisfy "Complete 15 hours" means
+        // the REQUIREMENT was mis-scraped: Portuguese Studies' own structured
+        // data shows 9 hours drawn from 28 courses, not 15 from a single
+        // capstone. Laddering it built a 12-semester plan carrying six copies
+        // that could never be placed. Take it once and say so — an honest
+        // under-fill the student can take to an advisor beats a fabricated
+        // extra two years.
+        if (inst > 1 && !/R$/.test(pool[0].trim()) && !(c.vmax > 0)) {
+          warnings.push({ text: `${cat[pool[0]].display || pool[0]} is listed as the only way to fill `
+            + `"${b.name}" (${b.pick.n} hours), but it is a ${per}-credit course that cannot be repeated. `
+            + `The catalog requirement looks mis-scraped, so the plan schedules it once — verify this `
+            + `requirement with your advisor.` });
+          inst = 1;
         }
         // clone (cat shares objects with DATA.courses) before bumping repeatMax
         if (inst > (c.repeatMax || 1)) cat[pool[0]] = { ...cat[pool[0]], repeatMax: inst };
@@ -580,6 +616,15 @@ const Solver = (() => {
       if (it.c && !it.alts) mapCoded.add(it.c);
     })); });
 
+    // Courses whose unmet prerequisite this pass DELIBERATELY declined to pull,
+    // on the grounds that the sheet vouches for it (see below). prereqSatisfied()
+    // has to be told, or the two halves of the solver contradict each other: the
+    // expander says "assume it's satisfied", the scheduler says "it isn't in the
+    // plan, so this course can never be placed", and the course silently falls
+    // out of the degree. That is exactly what happened to Dance Education K-12's
+    // DANCE 384R, whose prerequisite DANCE 382R is not on the sheet.
+    const sheetPreSat = new Set();
+
     // Pass 3: prerequisite closure (pull in unmet prereqs as additions)
     let changed = true;
     while (changed) {
@@ -590,7 +635,7 @@ const Solver = (() => {
           const ok = optsG.some(g => completed.has(g) || chosen.has(g));
           if (!ok) {
             // sheet-coded course whose prereq the sheet omits -> pre-satisfied
-            if (mapCoded.has(id) && !optsG.some(g => mapCoded.has(g))) continue;
+            if (mapCoded.has(id) && !optsG.some(g => mapCoded.has(g))) { sheetPreSat.add(id); continue; }
             // don't try to auto-pull an excluded course (would loop forever)
             const pick = optsG.filter(g => cat[g] && !excluded.has(g)).sort((a, b2) => cat[a].diff - cat[b2].diff)[0];
             if (pick && take(pick, "prereq::closure", 1)) changed = true;
@@ -661,16 +706,19 @@ const Solver = (() => {
     chosen.forEach((rec, id) => { if (!completed.has(id)) planned += cat[id].credits * rec.instances; });
     let compCredits = 0;
     completed.forEach(id => { if (cat[id]) compCredits += cat[id].credits; });
-    let target = UG_TARGET_CREDITS + gradCredits;
-    // MAP-first: the sheet's printed Total Hours ARE the plan's capacity —
-    // don't pad past them (an extra filler elective has no legal sheet term
-    // and just overstuffs the freshman fall)
-    const mapMajor = programs.find(p => p.id === profile.majorId && p.mapPlan);
-    if (mapMajor) {
-      const sheet = mapMajor.mapPlan.reduce((s, t) =>
-        s + (t.total ?? (t.items || []).reduce((a, i) => a + (i.cr || 0), 0)), 0);
-      if (sheet >= 100) target = Math.min(target, Math.ceil(sheet));
-    }
+    // 120 credits is BYU's graduation requirement, so it is a FLOOR on the
+    // plan, never something a MAP sheet can lower. This used to clamp the
+    // target down to the sheet's printed Total Hours
+    // (`target = Math.min(target, ceil(sheet))`) to stop filler electives
+    // overstuffing sheet terms that have printed caps. But 47 of the 161
+    // sheets print less than 120 — Geography: Global Studies sums to 103,
+    // Cell Biology to 113.5 — so the clamp only ever fired in the direction
+    // that produced un-graduatable plans: Cell Biology came out at exactly
+    // 114 credits, and the app then had to warn the student its own plan was
+    // 6 credits short. The overstuffing it guarded against is handled
+    // properly elsewhere: mapCap keeps each sheet term to its printed total,
+    // and enforceMapCap evicts anything that overflows one.
+    const target = UG_TARGET_CREDITS + gradCredits;
     let gap = target - (planned + compCredits);
     let en = 1;
     while (gap > 0) {
@@ -680,7 +728,7 @@ const Solver = (() => {
       gap -= 3; en++;
     }
 
-    return { chosen, warnings, doubleCounted, completed, groupSel, dcIds, fillMeta: _fillMeta };
+    return { chosen, warnings, doubleCounted, completed, groupSel, dcIds, sheetPreSat, fillMeta: _fillMeta };
   }
 
   /* Build schedulable instances from chosen courses */
@@ -725,8 +773,24 @@ const Solver = (() => {
       if (pt === undefined || pt >= t) return false;
     }
     if (inst.k > 1) return true;         // base prereqs only bind the first instance
+    // The sheet vouched for this course's missing prerequisites (expand() Pass 3
+    // declined to pull them in because the sheet schedules the course without
+    // them — AP, transfer, placement). Honour that here too: a group with NO
+    // option anywhere in the plan is treated as satisfied, exactly like preCo's
+    // "an absent course doesn't block". A group whose option IS in the plan
+    // still binds in the normal order.
+    const vouched = state.sheetPreSat && state.sheetPreSat.has(baseId(inst.uid));
     for (const group of inst.course.pre) {
       const opts = Array.isArray(group) ? group : [group];
+      if (vouched) {
+        let present = opts.some(g => completed.has(g));
+        if (!present) {
+          for (const [uid] of state.assign) {
+            if (opts.includes(baseId(uid))) { present = true; break; }
+          }
+        }
+        if (!present) continue;         // sheet vouched for it; nothing to order against
+      }
       const ok = opts.some(g => {
         if (completed.has(g)) return true;
         // co-requisites: block-mates in the same cohort count as satisfied
@@ -865,6 +929,84 @@ const Solver = (() => {
     return out;
   }
 
+  /* THE SHEET AND THE FLOWCHART WIN ON SEASON.
+
+     When the official MAP sheet or a program's flowchart envelope places a
+     course in a term, that placement is the authority for THIS plan. BYU's
+     advisement documents are maintained separately from the course record's
+     `courseTypicallyOffered`, and the course record goes stale: IS 404 reads
+     "Winter." while both the 2025-26 IS sheet and the flowchart put it in the
+     FALL junior core, and IS 401 carries the mirror-image conflict. The
+     documents the advisement centre hands students are the ones to trust.
+
+     Widening the course's offered seasons for this plan keeps canPlace(), the
+     season warnings, and the drag-drop validator all agreeing with the sheet
+     instead of contradicting it — previously the plan placed IS 404 in Fall
+     and then had no way to say why that was legal. */
+  function widenSeason(state, baseCode, season) {
+    if (!season) return;
+    const c = state.cat[baseCode];
+    if (!c || (c.off || "").includes(season)) return;
+    const widened = { ...c, off: (c.off || "") + season, seasonFromPlan: true };
+    state.cat[baseCode] = widened;
+    state.instances.forEach(i => { if (baseId(i.uid) === baseCode) i.course = widened; });
+  }
+
+  /* GRADUATION TOP-UP — re-assert the 120-credit floor after every pass that
+     can SHRINK a plan.
+
+     expand() sizes the plan to 120, but later passes remove credits: GE
+     right-sizing drops categories a sheet already enumerates, and the
+     "Recommended Courses are not required to complete the program" fix stopped
+     scheduling BYU's optional blocks. Elementary Education finished at 115 and
+     the app had to tell the student its own plan was 5 credits short of the
+     requirement — a plan that does not graduate anyone.
+
+     These are REAL open electives the student chooses, not disposable floor
+     padding: they carry ELECTIVE ids, count toward the degree, and survive the
+     padding strip. Slots go to the term with the most headroom (respecting the
+     sheet's printed cap and the credit ceiling) so nothing overstuffs, and
+     never past the graduating term — the plan gets fuller, not longer. */
+  function topUpCredits(state) {
+    let owed = creditsOwed(state);
+    if (owed <= 0.01) return;
+    const gradTerm = lastActiveTerm(state);
+    const cap = Math.min(BYU_HARD_CAP, state.profile.settings.maxCreditsFW || 17);
+    let n = 0;
+    state.instances.forEach(i => {
+      const m = /^ELECTIVE (\d+)$/.exec(i.uid);
+      if (m) n = Math.max(n, +m[1]);
+    });
+    let guard = 0;
+    while (owed > 0.01 && guard++ < 8) {
+      // most headroom first, so the extra work spreads instead of stacking
+      let best = -1, bestRoom = 0;
+      state.terms.forEach(tm => {
+        if (!tm.isFW || !tm.enabled || tm.index > gradTerm) return;
+        const mc = state.mapCap && state.mapCap.get(tm.index);
+        const room = (mc != null ? mc : cap) - (state.load[tm.index] || 0);
+        if (room > bestRoom + 1e-9) { bestRoom = room; best = tm.index; }
+      });
+      // Size the card to what is still OWED, capped at 3 — a fixed 3 gave up
+      // whenever the last gap was smaller than the room available. Elementary
+      // Education finished 2 credits short with 3 credits of headroom sitting
+      // in its final term, and told the student its own plan did not graduate
+      // them. Minimum 1: "Open Elective, 0.5 cr" is not a class.
+      const cr = Math.max(1, Math.min(3, Math.ceil(owed * 2) / 2));
+      if (best < 0 || bestRoom < cr) break;     // genuinely nowhere legal to put it
+      const id = `ELECTIVE ${++n}`;
+      state.cat[id] = { id, display: "ELECTIVE", name: "Open Elective / Exploration",
+        credits: cr, pre: [], off: "FWSU", diff: 3, load: 1, demand: "low", rare: false,
+        tags: [], testOut: "Consider AP/CLEP credit, an internship (academic credit), or test-out exams to clear elective hours.",
+        repeatMax: 1, placeholder: true, elective: true, note: null };
+      const inst = { uid: id, course: state.cat[id], k: 1, total: 1, buckets: ["electives::fill"] };
+      state.byUid.set(id, inst);
+      state.instances.push(inst);
+      place(state, inst, best);
+      owed -= cr;
+    }
+  }
+
   function seed(state, programs) {
     const { profile, terms, cat } = state;
     const problems = [];
@@ -879,7 +1021,10 @@ const Solver = (() => {
         !(state.mapCodes && state.mapCodes.has(id)));
       if (!uids.length) return;
       state.blocks.set(b.block.id, { ...b.block, uids });
-      uids.forEach(u => state.blockOf.set(u, b.block.id));
+      uids.forEach(u => {
+        state.blockOf.set(u, b.block.id);
+        widenSeason(state, baseId(u), b.block.season);   // the envelope's season wins
+      });
     }));
 
     /* 1b — flowchart cohorts: the RIGID junior-core envelopes. These lock their
@@ -897,7 +1042,10 @@ const Solver = (() => {
       if (uids.length < 2) return;
       const id = `fc:${p.id}:${i}`;
       state.blocks.set(id, { id, season: co.s, label: co.label, uids, fcYear: co.y });
-      uids.forEach(u => state.blockOf.set(u, id));
+      uids.forEach(u => {
+        state.blockOf.set(u, id);
+        widenSeason(state, baseId(u), co.s);             // the flowchart's season wins
+      });
     }));
 
     /* 1c — CO-REQUISITE cohorts: concurrent-enrollment courses (a lab + its
@@ -1170,7 +1318,7 @@ const Solver = (() => {
 
     const unscheduled = state.instances.filter(i => !state.assign.has(i.uid));
     unscheduled.forEach(i => problems.push({
-      type: "unscheduled",
+      type: "unscheduled", uid: i.uid,   // so solve() can drop the ones it rescues
       // Name the dial the student actually has. "Extend the horizon" is useless
       // advice to someone whose plan is bounded by a finish target they set.
       text: `${i.course.display || i.uid} couldn't be scheduled${i.course.off.length < 4 ? ` (offered ${[...i.course.off].map(s => SEASON_NAME[s]).join("/")} only)` : ""} — try enabling Spring/Summer, raising the credit cap, or extending the horizon.`,
@@ -1828,17 +1976,127 @@ const Solver = (() => {
     }
   }
 
+  /* The graduating term — the one term floor padding must never touch.
+
+     The full-time floor protects scholarships and aid, but it must not invent
+     coursework. A student in their final semester takes the credits they still
+     need and graduates; they do not enrol in nine credits of "Open Elective"
+     to reach 14. Accounting's requirements land on exactly 120.0 credits and
+     floor padding pushed the plan to 129. Across the catalogue three quarters
+     of ALL filler sat in the last two terms of plans that were already
+     complete, and padded plans averaged 130 credits against a 120 requirement.
+
+     A first attempt capped TOTAL padding at the degree target instead. That
+     also starved genuinely short MID-degree terms — below-full-time findings
+     tripled and uneven-load findings quintupled — because a light semester in
+     year two is a real problem the floor is right to fix. The final term is
+     the only one where padding invents work rather than protecting the
+     student, so it is the only one exempted OUTRIGHT.
+
+     Mid-degree terms are handled by degree, not by exemption: once the plan
+     already meets 120, padFloor() holds them to the full-time line (12) rather
+     than the comfort floor (14). That keeps the protection the first attempt
+     destroyed — no term ever drops below full time — while ending the
+     invention. See padFloor() for the measurement behind it. */
+  function lastActiveTerm(state) {
+    let last = -1;
+    state.assign.forEach(t => { if (t > last) last = t; });
+    return last;
+  }
+
+  /* Credits the plan still owes the 120-hour graduation requirement. The
+     graduating term is padded to THIS, not to the full-time floor: Accounting
+     already lands on 120.0 and needs nothing, while Elementary Education
+     lands on 118 and genuinely needs one more class. Padding to the floor
+     instead gave Accounting nine credits it did not need. */
+  function creditsOwed(state) {
+    let planned = 0;
+    state.terms.forEach(tm => { planned += state.load[tm.index] || 0; });
+    const earned = state.terms.earnedCredits || 0;
+    const target = UG_TARGET_CREDITS + (state.profile.majorId === "is-bs-mism" ? 24 : 0);
+    return target - (planned + earned);
+  }
+
+  /* Drop every disposable floor-filler. Both floor passes call this first so
+     repeated enforceFloor()/improve() cycles don't accumulate phantom
+     electives, and solve() calls it before the last compact() so compact's
+     term-count target reflects REAL content. */
+  function stripFloorPadding(state) {
+    state.instances.filter(i => /^ELECTIVE\+/.test(i.uid)).forEach(i => {
+      unplace(state, i); state.byUid.delete(i.uid); delete state.cat[i.uid];
+    });
+    state.instances = state.instances.filter(i => !/^ELECTIVE\+/.test(i.uid));
+  }
+
+  /* FLOOR PADDING — the ONE place disposable `ELECTIVE+` filler is created,
+     shared by enforceFloor (mid-solve) and topUpFloor (final).
+
+     Filler is not wrong in itself. A term that lands at 10 credits really does
+     cost the student full-time status, and one open elective is the honest fix
+     for that. What it must not do is INVENT work, and it was: measured across
+     the 700-plan taxonomy, **78 of 78 padded plans already reached the
+     120-credit graduation requirement before a single filler slot was added.**
+     Three rules keep it honest:
+
+       1. Once the degree requirement is met, padding stops protecting the
+          student and starts adding classes they will never need — so the bar
+          drops from the profile's COMFORT floor (`minCreditsFW`, default 14)
+          to BYU's actual full-time line, 12. The 14-credit preference still
+          shapes the plan through scorePlan and the redistribution pass above;
+          it just no longer fabricates credits to reach itself.
+       2. At most TWO filler cards in one semester. Three or four "ELECTIVE"
+          cards side by side read as the solver giving up, because they are.
+          This cap yields to the full-time floor — see the loop.
+       3. The card is sized to the GAP, not a flat 3 credits. Flat 3s overshot:
+          158 of 364 padded terms used to end ABOVE their own MAP sheet's
+          printed total.
+
+     The graduating term keeps the stricter rule from the credits-owed fix:
+     padded only as far as the credits still owed, never up to a floor. A
+     student in their last semester takes what they still need and graduates. */
+  function padFloor(state) {
+    const minFW = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    const active = new Set(state.assign.values());
+    const gradTerm = lastActiveTerm(state);
+    state.terms.forEach(tm => {
+      if (!tm.isFW || !tm.enabled || !active.has(tm.index)) return;
+      // MAP-sheet terms follow their own printed total — a 13-credit sheet
+      // semester is the advisement center's pacing, never "short"
+      const mc = state.mapCap && state.mapCap.get(tm.index);
+      for (let g = 1; g <= 5; g++) {
+        // the two-card cap is COSMETIC, so it yields to the one thing that is
+        // a guarantee rather than a preference: a term below BYU's full-time
+        // line keeps filling. In practice this never fires past g=2.
+        if (g > 2 && state.load[tm.index] >= FULL_TIME_CREDITS) break;
+        const owed = creditsOwed(state);
+        if (tm.index === gradTerm && owed <= 0.01) break;
+        const want = owed > 0.01 ? minFW : Math.min(minFW, FULL_TIME_CREDITS);
+        const floorTarget = mc != null ? Math.min(want, mc) : want;
+        let gap = floorTarget - state.load[tm.index];
+        if (tm.index === gradTerm) gap = Math.min(gap, owed);
+        if (gap <= 0.01) break;
+        // 0.5-credit granularity, but never a card smaller than 1 credit —
+        // "Open Elective, 0.5 cr" is not a class anyone registers for
+        const cr = Math.max(1, Math.min(3, Math.ceil(gap * 2) / 2));
+        const id = `ELECTIVE+ ${tm.index}.${g}`;
+        state.cat[id] = { id, display: "ELECTIVE", name: "Open Elective / Exploration",
+          credits: cr, pre: [], off: "FWSU", diff: 3, load: 1, demand: "low", rare: false,
+          tags: [], testOut: "Fills full-time status — swap in a real elective, minor course, or internship credit.",
+          repeatMax: 1, placeholder: true, elective: true, note: null };
+        const inst = { uid: id, course: state.cat[id], k: 1, total: 1, buckets: ["electives::floor"] };
+        state.byUid.set(id, inst); state.instances.push(inst); place(state, inst, tm.index);
+      }
+    });
+  }
+
   /* FINAL floor top-up — runs AFTER the last improve(). Unlike enforceFloor it
      ONLY relocates LOW-VALUE courses (electives, GE/religion slots, un-hinted)
      into a below-min term, so it can never (a) re-strand a flowchart-hinted
      major course or (b) re-activate a surplus term the optimizer just emptied.
-     Any term still short is padded with an open elective. */
+     Any term still short goes to padFloor(). */
   function topUpFloor(state) {
-    const minFW = state.profile.settings.minCreditsFW || 12;
-    state.instances.filter(i => /^ELECTIVE\+/.test(i.uid)).forEach(i => {   // idempotent
-      unplace(state, i); state.byUid.delete(i.uid); delete state.cat[i.uid];
-    });
-    state.instances = state.instances.filter(i => !/^ELECTIVE\+/.test(i.uid));
+    const minFW = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    stripFloorPadding(state);                                               // idempotent
     const moveCost = uid => {
       const c = state.byUid.get(uid).course;
       if (c.elective) return 0;
@@ -1871,41 +2129,18 @@ const Solver = (() => {
       }
       if (!moved) break;
     }
-    // pad any still-short term with open electives (guaranteed full-time);
-    // MAP-sheet terms stop at their own printed total (see enforceFloor)
-    const active = new Set(state.assign.values());
-    state.terms.forEach(tm => {
-      if (!tm.isFW || !tm.enabled || !active.has(tm.index)) return;
-      const mc = state.mapCap && state.mapCap.get(tm.index);
-      const floorTarget = mc != null ? Math.min(minFW, mc) : minFW;
-      let g = 0;
-      while (state.load[tm.index] < floorTarget && g++ < 5) {
-        const id = `ELECTIVE+ ${tm.index}.${g}`;
-        state.cat[id] = { id, display: "ELECTIVE", name: "Open Elective / Exploration",
-          credits: 3, pre: [], off: "FWSU", diff: 3, load: 1, demand: "low", rare: false,
-          tags: [], testOut: "Fills full-time status — swap in a real elective, minor course, or internship credit.",
-          repeatMax: 1, placeholder: true, elective: true, note: null };
-        const inst = { uid: id, course: state.cat[id], k: 1, total: 1, buckets: ["electives::floor"] };
-        state.byUid.set(id, inst); state.instances.push(inst); place(state, inst, tm.index);
-      }
-    });
+    padFloor(state);   // anything still short gets bounded, gap-sized filler
   }
 
   /* HARD FLOOR — the score nudges terms toward full time, but the user wants a
      GUARANTEE: no active Fall/Winter term below 12 credits (part-time risks
      scholarships/housing). Runs LAST: first redistribute a movable course from
-     a term that can spare it, then, if a term still can't reach 12, pad it with
-     an open elective (accepting a few credits over the 120 target — a real
-     full-time semester beats a part-time one). */
+     a term that can spare it, then, if a term still can't reach 12, hand it to
+     padFloor() — a real full-time semester beats a part-time one, and that is
+     the one thing padding is still allowed to buy past the 120-credit target. */
   function enforceFloor(state) {
-    const minFW = state.profile.settings.minCreditsFW || 12;
-    // idempotent: drop any floor-fillers from a previous call so repeated
-    // enforceFloor()/improve() cycles don't accumulate phantom electives
-    state.instances.filter(i => /^ELECTIVE\+/.test(i.uid)).forEach(i => {
-      unplace(state, i);
-      state.byUid.delete(i.uid); delete state.cat[i.uid];
-    });
-    state.instances = state.instances.filter(i => !/^ELECTIVE\+/.test(i.uid));
+    const minFW = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    stripFloorPadding(state);
     // pass 1: redistribution — donor keeps ≥ min, prereqs/dependents stay valid
     for (let round = 0; round < 40; round++) {
       const active = new Set(state.assign.values());
@@ -1947,27 +2182,177 @@ const Solver = (() => {
       }
       if (!moved) break;
     }
-    // pass 2: any term still short gets open electives (guaranteed full-time)
-    const active = new Set(state.assign.values());
-    state.terms.forEach(tm => {
-      if (!tm.isFW || !tm.enabled || !active.has(tm.index)) return;
-      // MAP-sheet terms follow their own printed total — a 13-credit sheet
-      // semester is the advisement center's pacing, never "short"
-      const mc = state.mapCap && state.mapCap.get(tm.index);
-      const floorTarget = mc != null ? Math.min(minFW, mc) : minFW;
-      let guard = 0;
-      while (state.load[tm.index] < floorTarget && guard++ < 5) {
-        const id = `ELECTIVE+ ${tm.index}.${guard}`;
-        state.cat[id] = { id, display: "ELECTIVE", name: "Open Elective / Exploration",
-          credits: 3, pre: [], off: "FWSU", diff: 3, load: 1, demand: "low", rare: false,
-          tags: [], testOut: "Fills full-time status — swap in a real elective, minor course, or internship credit.",
-          repeatMax: 1, placeholder: true, elective: true, note: null };
-        const inst = { uid: id, course: state.cat[id], k: 1, total: 1, buckets: ["electives::floor"] };
-        state.byUid.set(id, inst);
-        state.instances.push(inst);
-        place(state, inst, tm.index);
+    // pass 2: any term still short gets bounded, gap-sized filler
+    padFloor(state);
+  }
+
+  /* LAST-CHANCE PLACEMENT — seed() computes `unscheduled` before the optimizer
+     has run, and nothing revisits it. A course that had nowhere to go in the
+     first pass therefore stays unplaced for good, even after compaction and
+     tail-weaving free exactly the room it needed.
+
+     The commonest reason it had nowhere to go is a PREREQUISITE that landed too
+     late. Acting's TMA 291 is pulled in by prereq closure for TMA 497, gets no
+     early seat because the MAP sheet fills every term, and ends up in the plan's
+     final Fall — after which TMA 497, taught Fall only, has no term left in the
+     horizon. depLimitOf() cannot prevent this: it only looks at dependents that
+     are already SCHEDULED, and TMA 497 never was.
+
+     Two attempts per stranded course, cheapest first:
+       1. place it as-is in any legal term (the room may simply exist now);
+       2. otherwise find the prerequisite blocking it, move that prerequisite to
+          an earlier legal term, and retry. The prerequisite moves only if it
+          lands somewhere canPlace() accepts and stays before its own dependents
+          (depLimitOf), and every move is REVERTED if the rescue still fails —
+          a stranded course is bad, but shuffling a healthy plan to fail anyway
+          is worse. */
+  function rescueUnscheduled(state) {
+    const pending = state.instances.filter(i => !state.assign.has(i.uid));
+    if (!pending.length) return;
+    // NEVER past the plan's existing span. The first cut of this pass let the
+    // horizon grow and "rescued" Acting's TMA 497 into a Fall 2031 holding that
+    // one 3-credit class — a whole extra academic year, which is worse than the
+    // honest error flag it replaced. If a course does not fit in the terms the
+    // plan already uses, leaving it unscheduled is the truthful answer: app.js
+    // names it and offers the dials (Spring term, credit cap, horizon), and
+    // solver.js's standing rule is that the student decides those.
+    const span = lastActiveTerm(state);
+    const legalTerms = inst => state.terms
+      .filter(tm => tm.enabled && tm.index <= span
+                 && (state.termBudget == null || tm.index <= state.termBudget)
+                 && (inst.course.off || "FW").includes(tm.season))
+      .map(tm => tm.index);
+
+    // Pull the prerequisites blocking `inst` at term t earlier. Returns the
+    // list of [instance, originalTerm] it moved, or null if it could not.
+    const pullPrereqsBefore = (inst, t) => {
+      const moved = [];
+      const revert = () => moved.forEach(([m, f]) => { unplace(state, m); place(state, m, f); });
+      for (const group of inst.course.pre) {
+        const opts = Array.isArray(group) ? group : [group];
+        if (opts.some(g => state.completed.has(g))) continue;
+        let satisfied = false, blocker = null;
+        for (const [uid, tt] of state.assign) {
+          if (!opts.includes(baseId(uid))) continue;
+          if (tt < t) { satisfied = true; break; }
+          if (blocker == null) blocker = uid;
+        }
+        if (satisfied) continue;
+        // nothing of this group is in the plan, or it is immovable
+        if (blocker == null || state.pinnedUids.has(blocker) || state.blockOf.has(blocker)) {
+          revert(); return null;
+        }
+        const bi = state.byUid.get(blocker);
+        const from = state.assign.get(blocker);
+        unplace(state, bi);
+        let ok = false;
+        for (let t2 = 0; t2 < t; t2++) {
+          if (t2 >= depLimitOf(state, blocker)) continue;
+          if (canPlace(state, bi, t2)) { place(state, bi, t2); moved.push([bi, from]); ok = true; break; }
+        }
+        if (!ok) { place(state, bi, from); revert(); return null; }
+      }
+      return moved;
+    };
+
+    pending.forEach(inst => {
+      const legal = legalTerms(inst);
+      for (const t of legal) {
+        if (canPlace(state, inst, t)) { place(state, inst, t); return; }
+      }
+      for (const t of legal) {
+        const moved = pullPrereqsBefore(inst, t);
+        if (!moved) continue;
+        if (canPlace(state, inst, t)) { place(state, inst, t); return; }
+        moved.forEach(([m, f]) => { unplace(state, m); place(state, m, f); });
       }
     });
+  }
+
+  /* BACKLOADING — trade a major course out of the last two terms for a flexible
+     GE/elective slot sitting earlier.
+
+     The plans that trip this are credit-balanced but content-backloaded: Korean
+     runs 14/15/15/17/15/15/17/14 credits, which looks fine, while nine of its
+     eighteen named courses sit in the final two semesters. The cause is not the
+     prerequisite ladder, which was the obvious suspect and the wrong one —
+     measured against the plan's own placements, only 3 of Korean's 11 late
+     courses, 2 of Latin American Studies' 13 and 1 of English's 10 are actually
+     pinned there by a prerequisite. The rest could legally sit at t0.
+
+     What puts them late is that GE placeholders are front-loaded by design
+     (scorePlan pushes low levels early), so they occupy the early capacity, the
+     sheet fills the rest, and the major's own courses take the only seats left —
+     the tail. Both kinds of card are interchangeable in the sense that matters:
+     a "GE - Arts" slot can be satisfied any semester, a 400-level major course
+     cannot. So swap them.
+
+     Rules: the major course must clear level pacing at its new year (never drag
+     a 400-level into freshman fall — that just trades one complaint for a worse
+     one), both halves must pass canPlace, neither may cross a dependent
+     (depLimitOf), and pinned/cohort/sheet-labelled cards are untouchable. Every
+     swap is all-or-nothing and reverts cleanly. */
+  function spreadMajorWork(state) {
+    const used = [...new Set(state.assign.values())].sort((a, b) => a - b);
+    if (used.length < 4) return;
+    const lateFrom = used[used.length - 2];
+    const movable = uid => !state.pinnedUids.has(uid) && !state.blockOf.has(uid)
+      && !(state.mapLabels && state.mapLabels.has(uid));
+    const isMajorCourse = uid => {
+      const c = state.byUid.get(uid).course;
+      return !c.placeholder && !c.elective && !c.bucket;
+    };
+    // a slot that stands for "some course of this kind", not a named class.
+    // Religion is excluded: BYU paces it one per semester, and weaveTail
+    // already documents why those must not be shuffled.
+    const isFlexibleSlot = uid => {
+      const c = state.byUid.get(uid).course;
+      return (c.placeholder || c.elective) && !c.isReligion;
+    };
+    const majorsIn = t => [...state.assign]
+      .filter(([u, tt]) => tt === t && isMajorCourse(u)).length;
+
+    // Only touch plans that are ACTUALLY backloaded. A healthy board must come
+    // out of this pass byte-identical, or a fix for 6 majors becomes churn
+    // across 175. Thresholds mirror the taxonomy detector: ≥12 named courses,
+    // ≥40% of them in the last two terms.
+    const allMajors = [...state.assign].filter(([u]) => isMajorCourse(u));
+    if (allMajors.length < 12) return;
+    const lateShare = () => allMajors.filter(([u]) => state.assign.get(u) >= lateFrom).length
+      / allMajors.length;
+    if (lateShare() < 0.4) return;
+
+    for (let round = 0; round < 20; round++) {
+      const lateMajors = [...state.assign]
+        .filter(([u, t]) => t >= lateFrom && isMajorCourse(u) && movable(u))
+        .map(([u]) => u);
+      if (!lateMajors.length) break;
+      let swapped = false;
+      for (const uid of lateMajors) {
+        const mi = state.byUid.get(uid);
+        const mt = state.assign.get(uid);
+        const minY = minYearForLevel(courseLevel(mi.course));
+        // earliest, emptiest-of-major-work donor terms first, so the major's
+        // courses end up spread rather than piled into one rescued semester
+        const donors = [...state.assign]
+          .filter(([u, t]) => t < lateFrom && isFlexibleSlot(u) && movable(u)
+                           && acadYearIdx(state.terms, t) >= minY)
+          .sort((a, b) => (majorsIn(a[1]) - majorsIn(b[1])) || (a[1] - b[1]));
+        for (const [duid, dt] of donors) {
+          const di = state.byUid.get(duid);
+          unplace(state, mi); unplace(state, di);
+          if (dt < depLimitOf(state, uid) && mt < depLimitOf(state, duid)
+              && canPlace(state, di, mt)) {
+            place(state, di, mt);
+            if (canPlace(state, mi, dt)) { place(state, mi, dt); swapped = true; break; }
+            unplace(state, di);
+          }
+          place(state, mi, mt); place(state, di, dt);      // revert
+        }
+        if (swapped) break;
+      }
+      if (!swapped) break;
+    }
   }
 
   /* MAP-CAP GUARANTEE — several passes (swaps with freed capacity, floor
@@ -2641,6 +3026,9 @@ const Solver = (() => {
     const expandRes = expand(profile, programs, cat);
     const instances = buildInstances(expandRes.chosen, expandRes.completed, cat);
     const state = makeState(profile, terms, instances, cat, expandRes.completed);
+    // see expand() Pass 3 — courses whose missing prerequisite the SHEET vouches
+    // for, so prereqSatisfied() doesn't strand them
+    state.sheetPreSat = expandRes.sheetPreSat || new Set();
     state.mapWantsSpring = mapNeedsSpring && !profile.settings.allowSpring;
     // STABILITY: previous uid -> termIndex from the plan being re-solved
     // (small edits keep everything else put; see seed + scorePlan)
@@ -2832,6 +3220,66 @@ const Solver = (() => {
           cursor = t + 1;
         });
       }
+      // ---- the printed Total Hours is the sheet's own ceiling -------------
+      // A MAP row carries both a list of items and a printed total, and 37 of
+      // the 1,306 rows across the 161 sheets list items summing ABOVE that
+      // total — four of them by 10+ credits. Elementary Education's year-2
+      // Fall row carries a 12-credit "Education EL ED 400R or 496R" line that
+      // also appears, correctly, in the year-4 Fall row: student teaching,
+      // duplicated two years early. Pinning the whole row put 25 credits in a
+      // term the sheet prints at 15, seven credits above BYU's registration
+      // cap, and nothing downstream could undo it — sheet placement calls
+      // place() directly, bypassing canPlace, and enforceMapCaps skips
+      // anything in pinnedUids.
+      //
+      // So the two numbers disagree and one of them has to win. The printed
+      // total wins: it is the figure the advisement center publishes, a
+      // student reads, and mapCap already enforces on everything else. Items
+      // that do not fit are simply NOT PINNED — they stay ordinary instances
+      // and the optimizer places them under the normal rules, which is how
+      // Elementary Education's student teaching finds its way back to the
+      // year-4 term the sheet itself puts it in.
+      //
+      // BUT the printed total only wins when it could plausibly describe the
+      // term it labels, because the corruption runs both ways. Dietetics'
+      // year-2 Winter prints 6.0 against six perfectly ordinary items
+      // (Civilization 1, NDFS 250, NDFS 251, CELL 305, religion, a
+      // physical-science GE) summing to a normal 16 — there the TOTAL is the
+      // mis-read number. A Fall/Winter row printed below the full-time line is
+      // not a light semester; it is a bad scrape, and enforcing it as a ceiling
+      // stranded CELL 305 with nowhere to go. Only 3 of the 37 overflowing
+      // rows are that shape; in the other 34 the total sits in the normal
+      // 13-16 band and the items are the corrupt half.
+      //
+      // The 0.5 tolerance absorbs sheet rounding, not a duplicated line.
+      // Only rows that CONTRADICT THEMSELVES are constrained. A well-formed row
+      // is left exactly as it was: slot filling routinely lands a 3-credit
+      // course in a 2-credit slot (takeSlot allows budget + 0.6), and clamping
+      // that would re-shape 1,269 sheets that were never broken to fix 37 that
+      // were. An earlier cut applied the ceiling everywhere and pushed
+      // Classical Studies: Classics from 10 semesters to 11.
+      const rowOverflows = new Map();     // plan term -> row exceeds its own total
+      mapProg.mapPlan.forEach((mt, si) => {
+        const t = bindOf.get(si);
+        if (t == null || mt.total == null) return;
+        const items = (mt.items || []).reduce((s, it) => s + (+it.cr || 0), 0);
+        if (items > mt.total + 0.6) rowOverflows.set(t, true);
+      });
+      const sheetPinned = new Map();      // plan term -> credits pinned so far
+      const sheetCeil = t => {
+        if (!rowOverflows.get(t)) return null;                  // row agrees with itself
+        const total = state.mapCap.get(t);
+        if (total == null) return null;                         // row prints no total
+        const tm = state.terms[t];
+        if (tm && tm.isFW && total < FULL_TIME_CREDITS) return null;   // total is the bad number
+        return total;
+      };
+      const sheetRoom = (t, cr) => {
+        const ceil = sheetCeil(t);
+        if (ceil == null) return true;    // nothing trustworthy to enforce
+        return (sheetPinned.get(t) || 0) + cr <= ceil + 0.5;
+      };
+      const notePinned = (t, cr) => sheetPinned.set(t, (sheetPinned.get(t) || 0) + cr);
       const occ = new Map();          // code -> occurrence # seen so far
       mapProg.mapPlan.forEach((mt, si) => {
         const t = bindOf.get(si);
@@ -2846,8 +3294,13 @@ const Solver = (() => {
           if (!inst || state.assign.has(inst.uid)) return;
           // student pin (profile.pins) outranks the sheet for that course
           if ((profile.pins || {})[baseId(inst.uid)]) return;
+          if (!sheetRoom(t, inst.course.credits)) return;   // row overflows its own total
+          // the sheet's own term is authoritative for this course's season —
+          // see widenSeason()
+          widenSeason(state, baseId(inst.uid), state.terms[t] && state.terms[t].season);
           place(state, inst, t);
           state.pinnedUids.add(inst.uid);
+          notePinned(t, inst.course.credits);
         });
       });
       // ---- labeled sheet slots -> catalog-bucket placeholders -----------
@@ -2994,21 +3447,47 @@ const Solver = (() => {
         // the plan shipped a class the student cannot register for. Sheet
         // authority covers courses the sheet NAMES, not our choice of filler.
         const taughtNow = i => (i.course.off || "FW").includes(state.terms[t].season);
+        // ONE ENROLLMENT PER SEMESTER. A slot's credit budget used to be spent
+        // by taking instance after instance of the SAME repeatable course:
+        // IAS 399R is 0.5 cr against a 3 cr "internship" line, so all six of
+        // American Studies' enrollments landed in Winter 2029, and Portuguese
+        // Studies stacked PORT 493 ten deep. The student cannot register for
+        // the same class six times in one semester.
+        // The exemption mirrors prereqSatisfied() exactly: two DIFFERENT
+        // electives drawn from one bucket may share a term, but a real
+        // repeatable course may not, and neither may religion slots (BYU
+        // pacing keeps those to one per semester).
+        const oneEnrollmentPerTerm = i => !i.course.bucket || i.course.isReligion;
+        const baseAlreadyInTerm = i => {
+          if (!oneEnrollmentPerTerm(i)) return false;
+          const b = baseId(i.uid);
+          for (const [uid, tt] of state.assign) {
+            if (tt === t && baseId(uid) === b) return true;
+          }
+          return false;
+        };
         while (budget > 0.4 && guard++ < 6) {
           let cand = null;
           for (const key of keys) {
             if (key === "__elective__") {
-              cand = state.instances.find(i => !state.assign.has(i.uid) && i.course.elective && taughtNow(i));
+              cand = state.instances.find(i => !state.assign.has(i.uid) && i.course.elective &&
+                taughtNow(i) && !baseAlreadyInTerm(i));
             } else {
               cand = state.instances.find(i => !state.assign.has(i.uid) && taughtNow(i) &&
-                (i.buckets || []).includes(key) && i.course.credits <= budget + 0.6);
+                (i.buckets || []).includes(key) && i.course.credits <= budget + 0.6 &&
+                !baseAlreadyInTerm(i));
             }
             if (cand) break;
           }
           if (!cand || cand.course.credits > budget + 0.6) break;
+          // the row's printed Total Hours caps the whole row, slots included —
+          // see sheetRoom(). Elementary Education's duplicated 12-credit
+          // student-teaching line arrives here, not in the coded loop.
+          if (!sheetRoom(t, cand.course.credits)) break;
           place(state, cand, t);
           state.pinnedUids.add(cand.uid);
           if (label) state.mapLabels.set(cand.uid, label);
+          notePinned(t, cand.course.credits);
           budget -= cand.course.credits;
         }
       };
@@ -3028,6 +3507,35 @@ const Solver = (() => {
       });
       jobs.sort((a, b) => (b.specific ? 1 : 0) - (a.specific ? 1 : 0));
       jobs.forEach(j => takeSlot(j.keys, j.t, j.cr, j.label));
+      // REPEAT ORDER — the sort above fills specific slots before generic ones,
+      // so slots are NOT filled in term order and instance #2 of a repeatable
+      // could be bound to an earlier term than #1 (PORT 493 came out #2 in
+      // term 5, #1 in term 9). prereqSatisfied() enforces #k strictly after
+      // #k-1, so leaving them crossed makes this skeleton contradict the
+      // optimizer that runs next. Instances of one course are interchangeable,
+      // so the repair is to hand the same set of terms back out in ascending
+      // order of instance number — no course moves semester, they just stop
+      // being numbered backwards.
+      {
+        const byBase = new Map();
+        state.assign.forEach((t, uid) => {
+          const inst = state.byUid.get(uid);
+          if (!inst || inst.k == null) return;
+          if (inst.course.bucket && !inst.course.isReligion) return;  // see takeSlot
+          if (state.blockOf.has(uid)) return;      // cohort blocks move as a unit
+          const b = baseId(uid);
+          if (!byBase.has(b)) byBase.set(b, []);
+          byBase.get(b).push(inst);
+        });
+        byBase.forEach(insts => {
+          if (insts.length < 2) return;
+          const terms = insts.map(i => state.assign.get(i.uid)).sort((a, b) => a - b);
+          const ordered = insts.slice().sort((a, b) => a.k - b.k);
+          if (ordered.every((i, idx) => state.assign.get(i.uid) === terms[idx])) return;
+          ordered.forEach(i => unplace(state, i));
+          ordered.forEach((i, idx) => place(state, i, terms[idx]));
+        });
+      }
       // first-term cap yields to the sheet (a 17-credit MAP freshman fall
       // is the advisement center's own pacing)
       if (state.mapCap.has(0)) state.firstTermCap = null;
@@ -3051,7 +3559,8 @@ const Solver = (() => {
         .map(a => a.sort((x, y) => x.num - y.num));
     })();
 
-    const { problems, unscheduled } = seed(state, programs);
+    let { problems } = seed(state, programs);   // `unscheduled` is recomputed after
+                                                // rescueUnscheduled() — see below
 
     // GE RIGHT-SIZING — trust the sheet's OWN General Education, not the
     // universal 12-category University Core. A MAP sheet that ENUMERATES GE (no
@@ -3127,10 +3636,7 @@ const Solver = (() => {
     // target (round(totalFW/15.5)) reflects REAL content, not filler that
     // self-justifies extra terms; compact/closeGaps then collapse the freed
     // terms, and the final topUpFloor re-guarantees the ≥12 floor.
-    state.instances.filter(i => /^ELECTIVE\+/.test(i.uid)).forEach(i => {
-      unplace(state, i); state.byUid.delete(i.uid); delete state.cat[i.uid];
-    });
-    state.instances = state.instances.filter(i => !/^ELECTIVE\+/.test(i.uid));
+    stripFloorPadding(state);
     compact(state); closeGaps(state);
     enforceMapCaps(state);                     // sheet terms end at their printed totals
     // weave BEFORE the floor top-up: padding the receiving terms to ≥12 first
@@ -3139,7 +3645,18 @@ const Solver = (() => {
     // The single topUpFloor afterwards guarantees ≥12 everywhere that's left.
     weaveTail(state);                          // fold leftover tail terms into sheet headroom
     closeGaps(state);                          // a dissolved tail can leave an interior hole
+    rescueUnscheduled(state);                  // retry courses seed() had to give up on
+    spreadMajorWork(state);                    // trade late major work for early GE slots
+    topUpCredits(state);                       // re-assert the 120-credit graduation floor
     topUpFloor(state);                         // guarantee ≥12 on every surviving term
+
+    // seed()'s `unscheduled` is a snapshot taken before any optimizer pass ran,
+    // so anything rescueUnscheduled() has since placed must stop being reported
+    // as unplaceable — and its problem text with it, or the app shows an error
+    // flag naming a course that is sitting on the board.
+    const stranded = state.instances.filter(i => !state.assign.has(i.uid));
+    const strandedUids = new Set(stranded.map(i => i.uid));
+    problems = problems.filter(p => p.type !== "unscheduled" || strandedUids.has(p.uid));
 
     const score = scorePlan(state);
     const { flags, courseFlags } = analyze(state, expandRes, programs, problems);
@@ -3192,7 +3709,7 @@ const Solver = (() => {
       terms, placements, programs: programs.map(p => p.id),
       progress, flags, planNotes, groupSel: expandRes.groupSel,
       score, doubleCounted: expandRes.doubleCounted,
-      unscheduled: unscheduled.map(i => ({ uid: i.uid, name: i.course.name })),
+      unscheduled: stranded.map(i => ({ uid: i.uid, name: i.course.name })),
       solveMs: Math.round(performance.now() - t0),
       state, // kept live for drag-drop validation
       _ctx: { expandRes, programsFull: programs, problems }, // for reanalyze()

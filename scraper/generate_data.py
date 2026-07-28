@@ -402,6 +402,23 @@ def parse_freeform(p: Dict[str, Any], id2code, by_code, name2code, ptype: str,
     for header, body in segments:
         courses = seg_courses(body, id2code, by_code, name2code, synth)
         body_txt = strip_tags(body)
+        # OPTIONAL-BY-ITS-OWN-ADMISSION blocks. BYU publishes suggested course
+        # lists inside the requirement HTML under the header "Recommended
+        # Courses are not required to complete the program". Parsed as a
+        # requirement they became pick:{type:"all"} — every suggestion
+        # MANDATORY. Biological Science Education came out at 153 program
+        # credits and a 12-semester, 166-credit plan; 29 programs carried 68
+        # such buckets. The header states plainly that they are optional, so
+        # keep the list as a program NOTE (students may still want to see it)
+        # and never schedule it.
+        if NOT_REQUIRED_RE.search(header):
+            label = re.sub(r"\s+", " ", strip_tags(header)).strip()
+            if courses:
+                names = ", ".join(c for c, _ in courses[:12])
+                notes.append(f"{label}: {names}"[:400])
+            elif body_txt:
+                notes.append(f"{label} {body_txt}".strip()[:400])
+            continue
         # long em/plain sentences -> program notes
         for em in EM_RE.findall(body):
             t = strip_tags(em)
@@ -470,6 +487,25 @@ def parse_freeform(p: Dict[str, Any], id2code, by_code, name2code, ptype: str,
         if unit == "course" and k is not None and k > len(opts):
             HEALTH.append(f"{name}: '{node['header']}' wants {int(k)} courses "
                           f"but only {len(opts)} options resolved")
+        # Same check for HOUR requirements, which had none. A "Complete 15
+        # hours" line whose resolved options cannot supply 15 credits means
+        # the scrape lost the pool, and the planner is left repeating one
+        # course to make up the difference (Portuguese Studies laddered the
+        # 1-credit PORT 493 capstone fifteen times). Only flag non-repeatable,
+        # fixed-credit pools: a 0.5-credit R-course legitimately covers a
+        # 3-hour line over several semesters.
+        if unit == "hour" and k is not None and opts:
+            supply = 0.0
+            elastic = False
+            for c in opts:
+                cr = creds.get(c) or (course_credits(by_code[c]) if c in by_code else 3.0)
+                supply += cr
+                if c.rstrip().endswith("R") or (c in by_code and variable_credit_max(by_code[c])):
+                    elastic = True
+            if not elastic and supply < k:
+                HEALTH.append(f"{name}: '{node['header']}' wants {k} credit hours but its "
+                              f"{len(opts)} option(s) supply only {supply:g} and none are "
+                              f"repeatable — requirement pool looks under-scraped")
         if unit == "hour":
             pick = {"type": "credits", "n": (3.0 if k is None else k)}
         elif k is None or k >= len(opts):
@@ -1401,6 +1437,15 @@ STANDING_YEAR = [
 ]
 # purely-advisory prereq text we should NOT turn into hard constraints
 NEP_ADVISORY_RE = re.compile(r"^\s*(recommended|suggested|helpful|prefer)", re.I)
+# A requirement header that declares its own contents optional. Matched on the
+# explicit phrase, not on the word "recommended" alone — plenty of genuine
+# requirements mention a recommendation in passing.
+NOT_REQUIRED_RE = re.compile(
+    r"not\s+required\s+to\s+(?:complete|graduate)|^\s*recommended\s+courses?\b", re.I)
+# "enrollment in an IS Core envelope" — BYU's word for a block of courses
+# REGISTERED TOGETHER in one semester ("Add an envelope of classes"), not a
+# sequence. Codes on such a line are co-members, not prerequisites.
+NEP_ENVELOPE_RE = re.compile(r"\benvelopes?\b", re.I)
 # consent-only lines with no real course ("Instructor's consent.")
 NEP_CONSENT_ONLY_RE = re.compile(r"consent|permission|approval|application|interview|audition|department", re.I)
 CAPSTONE_NAME_RE = re.compile(r"\bcapstone\b|\bsenior\s+(?:thesis|project|seminar)\b", re.I)
@@ -1429,6 +1474,15 @@ def parse_nep_prereqs(nep: str, self_code: str, codes_in) -> Tuple[List[List[str
     if "concurrent" in low:
         # "X or concurrent enrollment" / "concurrent enrollment in X" -> X may
         # be taken before or the same term (never AFTER the dependent course)
+        return [], [[c] for c in codes]
+    if NEP_ENVELOPE_RE.search(low):
+        # Envelope co-membership, not a sequence. IS 404's line reads
+        # "IS 414; Acceptance into the Information Systems major; enrollment
+        # in an IS Core envelope" — IS 414 is taken ALONGSIDE it, in the same
+        # registration block. Promoting it to a strict prerequisite forced two
+        # Winter-only courses a full year apart and put IS 404 ahead of the
+        # course it supposedly required. Concurrent is the honest reading:
+        # same term is fine, strictly later is not.
         return [], [[c] for c in codes]
     # ANY "or" -> ONE OR-group of all alternatives. Mixed and/or grammar
     # ("ENGL 291, 292, and 293; or ENGL 291 and 294") can't be structured
@@ -1659,6 +1713,44 @@ def main() -> int:
         if len(real) < 3:
             HEALTH.append(f"{prog['name']}: near-empty requirement data "
                           f"({len(real)} real courses) — plan would be all placeholders")
+
+    # A MAP row carries a list of items AND a printed Total Hours. When the
+    # items sum ABOVE that total the row contradicts itself, and exactly one of
+    # the two numbers is the bad scrape. Which one is decidable:
+    #   * printed total in the normal 13-16 band -> the ITEMS are wrong, and the
+    #     overflow is usually a line duplicated from another year (Elementary
+    #     Education's y2 Fall carries the 12.0-credit "Education EL ED 400R or
+    #     496R" slot that also appears, correctly, in y4 Fall).
+    #   * a Fall/Winter row printed BELOW the full-time line -> the TOTAL is
+    #     wrong (Dietetics y2W prints 6.0 against six ordinary items summing to
+    #     16). Only 3 of the 37 findings are this shape.
+    # solver.js reads it the same way, so neither case is fatal — but the sheet
+    # is wrong either way and a re-scrape should be checked against this list
+    # rather than silently inheriting it.
+    # Tolerance 0.6 absorbs rounding; the real offenders run 1-12 credits over.
+    FULL_TIME = 12.0
+    for prog in out_programs:
+        for row in (prog.get("mapPlan") or []):
+            total = row.get("total")
+            if total is None:
+                continue
+            items = sum(float(it.get("cr") or 0) for it in (row.get("items") or []))
+            if items <= total + 0.6:
+                continue
+            where = f"MAP row y{row.get('y')}{row.get('s')}"
+            if row.get("s") in ("F", "W") and total < FULL_TIME:
+                HEALTH.append(
+                    f"{prog['name']}: {where} prints a total of {total:g} for a "
+                    f"Fall/Winter term whose {len(row.get('items') or [])} items sum to "
+                    f"{items:g} — the PRINTED TOTAL looks mis-scraped (below full time); "
+                    f"solver.js ignores it as a ceiling")
+            else:
+                HEALTH.append(
+                    f"{prog['name']}: {where} lists {items:g} credits of items against a "
+                    f"printed total of {total:g} (+{items - total:g}) — the ITEMS look "
+                    f"wrong, likely a line duplicated from another year; solver.js pins "
+                    f"only up to the printed total")
+
     if HEALTH:
         hp = DATA_PATH.parent / "_health_report.txt"
         hp.write_text("\n".join(sorted(HEALTH)) + "\n", encoding="utf-8")

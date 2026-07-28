@@ -1510,8 +1510,33 @@ const App = (() => {
      completed-course list, if the student leaves the snapshot ticked — passes
      through that company. That is a call for you to make, not me, which is
      why the no-third-party path is the default. */
+  /* Where a bug report goes.
+     `mailto:` alone was not good enough to launch on: on a phone, or any
+     machine with no mail client configured, the button silently does nothing,
+     and a plan report is long enough that clients truncate the URL anyway
+     (submitFeedback below already guards that at 1900 chars). So POST it.
+
+     The endpoint rides the SAME origin as the AI advisor — that server is
+     already deployed alongside the site, so this needs no second service and no
+     third-party form host. One `window.MYPLAN_ADVISOR_API` line configures
+     both. Reports land in scraper/data/feedback.jsonl.
+
+     Every failure path still falls back to clipboard + email, so a report is
+     never lost when the backend is down. Set `endpoint` to a fixed URL here to
+     override (Formspree and friends accept exactly this JSON POST). */
   const FEEDBACK = {
-    endpoint: "",
+    endpoint: (() => {
+      const url = (typeof window !== "undefined" && window.MYPLAN_FEEDBACK_API)
+        || ((typeof window !== "undefined" && window.MYPLAN_ADVISOR_API)
+            || "http://127.0.0.1:5000/api") + "/feedback";
+      // An https: page cannot call http://127.0.0.1 — the browser blocks it as
+      // mixed content. Report it as unset rather than burning a doomed fetch
+      // and a confusing error on the way to the mail fallback (same check as
+      // chat.js MIXED_CONTENT_BLOCKED).
+      if (typeof location !== "undefined" && location.protocol === "https:"
+          && /^http:\/\//i.test(url)) return "";
+      return url;
+    })(),
     email: "jordandheaton@gmail.com",
   };
   const FEEDBACK_KINDS = [
@@ -2285,6 +2310,26 @@ const App = (() => {
     });
     if (blockLines.length) lines.push(...blockLines);
 
+    // Co-requisites among the planned courses. "Do any of my classes have a lab
+    // I have to register for at the same time?" is a routine registration
+    // question, and the advisor used to burn its web searches and then tell the
+    // student to look up 21 course pages by hand — while DATA.coreqs held the
+    // answer (ME EN 330 + ME EN 335) the whole time. The solver already keeps
+    // these together; say so, so the advisor can just answer.
+    {
+      const planned = new Set(result.placements.map(p => p.courseId));
+      const pairs = [];
+      Object.entries(DATA.coreqs || {}).forEach(([code, mates]) => {
+        if (!planned.has(code)) return;
+        const inPlan = (mates || []).filter(m => planned.has(m));
+        if (inPlan.length) pairs.push(`${code} + ${inPlan.join(" + ")}`);
+      });
+      if (pairs.length) {
+        lines.push("MUST REGISTER TOGETHER (co-requisites — same semester, and the "
+          + "planner has already placed them together): " + pairs.join("; "));
+      }
+    }
+
     const byTerm = new Map();
     result.placements.forEach(p => {
       if (!byTerm.has(p.termIndex)) byTerm.set(p.termIndex, []);
@@ -2306,7 +2351,18 @@ const App = (() => {
     });
 
     if (result.unscheduled?.length) {
-      lines.push("Unscheduled: " + result.unscheduled.map(u => u.name).join(", "));
+      // Spell out what this list MEANS. As a bare "Unscheduled: <name>" the AI
+      // advisor read it as a list of optional extras and told a nursing student
+      // they could "skip" NURS 404 and stay Fall/Winter — it is a required
+      // clinical, and skipping it means not graduating. Give the course CODE
+      // too: the advisor quoted "Cl Prac Glob & Pop Hlth Nurs", which a student
+      // cannot look up or register for.
+      lines.push("REQUIRED BUT NOT YET SCHEDULED — degree requirements the planner "
+        + "could NOT place. These are NOT optional and NOT droppable; the student "
+        + "cannot graduate without them, so never suggest skipping one. The usual "
+        + "fix is enabling a Spring/Summer term (the app offers a one-click action) "
+        + "or raising the credit cap: "
+        + result.unscheduled.map(u => `${u.uid} (${u.name})`).join(", "));
     }
 
     // deadlines & opportunities (timeline layer) — so the advisor can answer

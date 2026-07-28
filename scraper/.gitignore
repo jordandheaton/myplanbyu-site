@@ -5,6 +5,11 @@
 advisor_usage.json
 advisor_usage.tmp
 
+# Bug reports submitted through the app's feedback form. Contains whatever
+# students typed plus any email address they volunteered -- personal data, and
+# never source. Read it locally; do not commit it.
+data/feedback.jsonl
+
 # Eval transcripts are run output, not source -- each one costs money to make,
 # so they're kept locally for reading but not committed.
 eval/transcript_*.md
