@@ -1000,6 +1000,9 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   /* 16px keeps iOS from zooming the page on input focus */
   select, textarea, input[type="text"], input[type="number"], input[type="email"],
   .col-search input, .chat-inrow textarea { font-size: 16px; }
+  /* ...but the box was still sized for the 13.5px desktop text, so at 16px the
+     placeholder wrapped to a second line and got cut off. Two lines' worth. */
+  .chat-inrow textarea { min-height: 58px; }
   .card { padding: 10px; }
   .cm-move select { flex: 1 1 100%; }   /* the term picker gets its own row */
   .cm-move .btn { flex: 1 1 auto; justify-content: center; }
