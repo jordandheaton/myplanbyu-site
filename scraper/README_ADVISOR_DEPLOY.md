@@ -50,7 +50,82 @@ python advisor_server.py
 Nothing else changes; `chat.js` reads that global and falls back to localhost.
 
 > A free `trycloudflare.com` URL changes every restart. For a stable one, use a
-> named tunnel on a domain you own.
+> named tunnel on a domain you own — Path A2.
+
+---
+
+## Path A2 — named tunnel (the URL stops changing)
+
+A quick tunnel hands you a new random hostname every restart, and that hostname
+is baked into `index.html`, so every tunnel restart means an edit + commit +
+push or the live site points at a dead address. A **named** tunnel fixes that
+permanently: `advisor.yourdomain.com`, stable across reboots.
+
+The catch: named tunnels need DNS, so they need **a domain you control**. There
+is no permanent free `trycloudflare` hostname.
+
+### Your part (three steps — account, purchase, sign-in)
+
+These need an account holder; nobody can do them for you.
+
+**1. Free Cloudflare account** — <https://dash.cloudflare.com/sign-up>. Email +
+password, verify the email. No card required for this step.
+
+**2. Buy the domain, at Cloudflare** — Dashboard → **Domain Registration** →
+**Register Domain** → search (e.g. `jordanheaton.com`) → buy. Roughly $10-12/yr
+for `.com`, sold at wholesale with no first-year-discount trap.
+
+Buy it *here* rather than elsewhere: a domain registered at Cloudflare is
+already on Cloudflare DNS, so the tunnel works immediately. Bought elsewhere,
+you must add the site and re-point nameservers at the other registrar first, and
+wait for propagation.
+
+**3. Authorise cloudflared** — in a terminal:
+
+```powershell
+& "C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel login
+```
+
+A browser opens; pick the domain and click **Authorize**. That writes
+`%USERPROFILE%\.cloudflared\cert.pem`, which every later command reads. This is
+a sign-in as you, which is why it is not automatable.
+
+### The rest (mechanical — hand it back to Claude, or run it yourself)
+
+```powershell
+$cf = "C:\Program Files (x86)\cloudflared\cloudflared.exe"
+
+# 1. create the tunnel (writes a credentials JSON keyed by tunnel UUID)
+& $cf tunnel create myplan-advisor
+
+# 2. point a hostname at it (creates the DNS record for you)
+& $cf tunnel route dns myplan-advisor advisor.YOURDOMAIN.com
+
+# 3. run it
+& $cf tunnel run --url http://127.0.0.1:5000 myplan-advisor
+```
+
+Then one final edit to `index.html`, never to be repeated:
+
+```html
+<script>window.MYPLAN_ADVISOR_API = "https://advisor.YOURDOMAIN.com/api";</script>
+```
+
+…and restart the advisor so CORS allows the live site:
+
+```powershell
+.\run_advisor.ps1 -Restart -Origin https://jordandheaton.github.io -Proxies 1
+```
+
+Keep `-Origin` pointing at wherever the SITE is served from — that is the page
+making the request. It only changes if you also move the portfolio onto the new
+domain, in which case use `https://yourdomain.com`.
+
+### Optional: run it as a service
+
+`cloudflared service install` registers the tunnel as a Windows service so it
+survives reboots without a terminal window. The advisor itself still needs to be
+running for the tunnel to have anything to reach.
 
 ---
 
