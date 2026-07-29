@@ -1407,6 +1407,8 @@ const App = (() => {
         <span class="badge lg ${t.cls}">${t.label}</span>
         <div>
           <h3>${esc(p.display)} <span class="cm-cr">${p.credits.toFixed(1)} cr</span></h3>
+          ${!p.placeholder && !c.unlisted ? `<a class="cm-rmp" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(p.courseId)}" target="_blank" rel="noopener" title="Student reviews of professors who have taught this course — Rate My Professors, BYU page. The planner has no section/instructor data, so check who actually teaches it next semester.">
+            <i class="fas fa-star-half-stroke"></i> Professor ratings (RMP)</a>` : ""}
           <p class="cm-name">${c.unlisted
             ? `<span class="unlisted-tag">no course number yet</span> Your program lists this course, but the catalog hasn't published a course number for it. Ask your advisor for the number before you register.`
             : esc(p.name)}</p>

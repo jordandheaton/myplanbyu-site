@@ -1023,3 +1023,9 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* RMP link-out on the class modal — a LINK to the source, deliberately not an
+   integration: RMP has no official API, and the planner has no section or
+   instructor data, so ranking professors here would be confident fiction. */
+.cm-rmp { display: inline-block; font-size: .74rem; margin: 2px 0 4px; color: var(--royal); }
+.cm-rmp:hover { text-decoration: underline; }
