@@ -1307,6 +1307,30 @@ def parse_structured(p: Dict[str, Any], id2code, by_code, ptype: str) -> Optiona
     }
 
 
+# Branches the LIVE catalog pages show but the scraped University Core record
+# does not carry. Discovered via a tester: their MyMAP counts STAT 121 toward
+# Languages of Learning, but the scraped record's LoL area holds ONLY the
+# foreign-language pool — the quantitative option (catalog.byu.edu "Option 7.1",
+# 13 math/stat/logic courses) is absent from the JSON entirely, so no parser
+# change can recover it. Curated from the Winter-2024+ requirement page
+#   https://catalog.byu.edu/pages/jWiurZPNH19WdU8A7h4o        (checked 2026-07-28)
+# and deliberately ONLY that variant: the pre-2024 page lists extra legacy
+# courses (MATH 110/111, PL SC 328) whose eligibility for CURRENT students we
+# cannot confirm, and over-crediting a GE is worse than under-crediting it.
+# Codes are membership-filtered against the catalog at build time, so a
+# discontinued or mistranscribed code drops out with a health note instead of
+# shipping.
+GE_SUPPLEMENTS: Dict[str, Dict[str, Any]] = {
+    "ge-languages-of-learning": {
+        "codes": ["MATH 105", "MATH 108", "MATH 112", "MATH 113", "MATH 114",
+                  "PHIL 250", "PSYCH 301", "STAT 121", "STAT 201", "STAT 221"],
+        "note": ("Also satisfiable with one approved math/statistics/logic "
+                 "course (e.g. STAT 121, MATH 112) — the 'language of "
+                 "quantitative reasoning' option."),
+    },
+}
+
+
 def parse_ge(core: Dict[str, Any], id2code, by_code) -> Optional[Dict[str, Any]]:
     """University Core -> one 'choose 1' bucket per GE category.
 
@@ -1358,6 +1382,22 @@ def parse_ge(core: Dict[str, Any], id2code, by_code) -> Optional[Dict[str, Any]]
             "note": ("Some alternatives are two-course combinations — see the "
                      "catalog for exact pairings." if combo_note else None),
         })
+    # branches the scrape lacks — see GE_SUPPLEMENTS above
+    for b in buckets:
+        supp = GE_SUPPLEMENTS.get(b["id"])
+        if not supp:
+            continue
+        added, dropped = [], []
+        for code in supp["codes"]:
+            (dropped if code not in by_code else added).append(code)
+        b["options"].extend(c for c in added if c not in b["options"])
+        if supp.get("note"):
+            b["note"] = (b["note"] + " " if b.get("note") else "") + supp["note"]
+        print(f"  GE supplement {b['id']}: +{len(added)} courses"
+              + (f" ({', '.join(dropped)} not in catalog — dropped)" if dropped else ""))
+        if dropped:
+            HEALTH.append(f"GE supplement {b['id']}: {', '.join(dropped)} listed on "
+                          f"the live catalog page but absent from the course scrape")
     if not buckets:
         return None
     return {"name": "University Core (GE)", "buckets": buckets, "notes": notes[:6]}

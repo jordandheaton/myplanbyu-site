@@ -233,6 +233,14 @@ def parse_program_colleges(catalog):
         keep = ptype == "major" and desig.upper() not in ("", "NONE", "PRE")
         display = f"{p.get('name')} ({desig})" if keep else p.get("name")
         out.setdefault(f"{ptype}-{slugify(display)}", col)
+    # Hand-curated programs in js/data.js use their own ids, so they never
+    # matched a college here — an IS student saw NO study abroad, no
+    # college-matched scholarships, and (now) no clubs, silently. Alias them.
+    for hand, canonical in (("is-bs", "major-information-systems-bs"),
+                            ("is-bs-mism", "major-information-systems-bs"),
+                            ("gbc-cert", "major-information-systems-bs")):
+        if canonical in out:
+            out[hand] = out[canonical]
     return out
 
 
@@ -336,6 +344,24 @@ def parse_scholarships():
 
 
 # ------------------------- emit ----------------------------------------------
+def parse_clubs(catalog):
+    """Clubs, college-tagged the same way study abroad is, so the app can show
+    'clubs relevant to YOUR programs' beside scholarships — tester request.
+    Name + url + colleges only: 373 club descriptions would bloat the payload
+    the whole site downloads, and the AI advisor already has the full text."""
+    docs = json.loads((DATA / "clubs.json").read_text(encoding="utf-8"))
+    subj2col = optags.build_subject_college_map(catalog["courses"])
+    out = []
+    for d in docs:
+        name = (d.get("name") or "").strip()
+        if not name:
+            continue
+        cols = optags.college_tags(name, d.get("text") or "", "club", subj2col)
+        out.append({"name": name, "url": d.get("url") or "https://clubs.byu.edu",
+                    "colleges": [c for c in cols if c != optags.KENN]})
+    return out
+
+
 def main():
     catalog = json.loads((DATA / "catalog.json").read_text(encoding="utf-8"))
     timeline = {
@@ -345,6 +371,7 @@ def main():
         "programColleges": parse_program_colleges(catalog),
         "studyAbroad": parse_study_abroad(catalog),
         "scholarships": parse_scholarships(),
+        "clubs": parse_clubs(catalog),
     }
     body = json.dumps(timeline, ensure_ascii=False, separators=(",", ": "))
     OUT.write_text(

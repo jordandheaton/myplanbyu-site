@@ -657,9 +657,9 @@ const App = (() => {
   }
 
   function buildTimeline() {
-    const empty = { byTerm: new Map(), deadlines: [], recs: [], schols: [], abroad: [] };
+    const empty = { byTerm: new Map(), deadlines: [], recs: [], schols: [], abroad: [], clubs: [] };
     if (typeof TIMELINE === "undefined" || !result) return empty;
-    const { byTerm, deadlines, recs, schols, abroad } = empty;
+    const { byTerm, deadlines, recs, schols, abroad, clubs } = empty;
     const chip = (t, c) => { if (t == null) return; if (!byTerm.has(t)) byTerm.set(t, []); byTerm.get(t).push(c); };
     const activeT = [...new Set(result.placements.map(p => p.termIndex))].sort((a, b) => a - b);
     if (!activeT.length) return empty;
@@ -751,6 +751,13 @@ const App = (() => {
       .forEach(p => abroad.push({ name: p.name, url: p.url, term: p.term,
         colleges: p.colleges.filter(c => cols.includes(c)) }));
 
+    // 4b) RELEVANT CLUBS — tester request: surface them beside scholarships
+    //     and study abroad. Same college matching as study abroad; capped so
+    //     the panel stays a panel (clubs.byu.edu has the full directory).
+    (TIMELINE.clubs || []).filter(c => c.colleges && c.colleges.some(c2 => cols.includes(c2)))
+      .slice(0, 14)
+      .forEach(c => clubs.push({ name: c.name, url: c.url }));
+
     // 5) RECOMMENDATIONS — rule-based, from THIS plan's actual shape. Each can
     //    carry an `act` the student applies with ONE CLICK — the solver never
     //    silently changes a constraint (e.g. adding Spring) on its own.
@@ -816,7 +823,7 @@ const App = (() => {
         act: { kind: "fulltime", label: "Guarantee full-time status" } });
     }
 
-    return { byTerm, deadlines, recs, schols, abroad };
+    return { byTerm, deadlines, recs, schols, abroad, clubs };
   }
 
   /* Apply a one-click Recommended action. The student initiated it — settings
@@ -886,6 +893,18 @@ const App = (() => {
               <b>${esc(p.name)}</b>
               ${p.term ? `<p>${esc(p.term)}</p>` : ""}
               ${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">Details <i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}
+            </div>
+          </div>`).join("")}
+      </details>` : ""}
+      ${tl.clubs.length ? `<details class="tl-acc">
+        <summary><i class="fas fa-people-group"></i> Clubs for your college <span class="tl-count">${tl.clubs.length}</span></summary>
+        <p class="tl-acc-hint">Matched to your programs' college. Free to join, great for networking — full directory at clubs.byu.edu.</p>
+        ${tl.clubs.map(c => `
+          <div class="tl-item ev-club">
+            <span class="tl-when"><i class="fas fa-user-group"></i></span>
+            <div class="tl-body">
+              <b>${esc(c.name)}</b>
+              ${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">Details <i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}
             </div>
           </div>`).join("")}
       </details>` : ""}`;
@@ -1708,11 +1727,34 @@ const App = (() => {
           <input type="number" id="pcDcCap" min="0" max="30" value="${prof.settings.doubleCountCap}"></label>
         <label class="chk"><input type="checkbox" id="pcSpring" ${prof.settings.allowSpring ? "checked" : ""}> Allow Spring terms</label>
         <label class="chk"><input type="checkbox" id="pcSummer" ${prof.settings.allowSummer ? "checked" : ""}> Allow Summer terms</label>
+        <label>Graduate by (target)
+          <select id="pcTarget">
+            <option value="">No target — best pace (recommended)</option>
+            ${(() => {
+              // F/W terms across the horizon, "Winter 2028 (April)" style —
+              // April/December are what students actually say out loud
+              const out = [];
+              const st = prof.startTerm || { year: new Date().getFullYear(), season: "F" };
+              const cur = prof.settings.targetGrad || {};
+              for (let y = st.year; y < st.year + (prof.settings.horizonYears || 6); y++) {
+                for (const [se, mon] of [["F", "December"], ["W", "April"]]) {
+                  const yy = se === "W" ? y + 1 : y;
+                  if (yy === st.year && st.season === "W" && se === "F") continue;
+                  const sel = cur.year === yy && cur.season === se ? " selected" : "";
+                  out.push(`<option value="${yy}-${se}"${sel}>${se === "W" ? "Winter" : "Fall"} ${yy} (${mon} ${se === "W" ? yy : yy})</option>`);
+                }
+              }
+              return out.join("");
+            })()}
+          </select></label>
         <label class="chk"><input type="checkbox" id="pcSchol" ${prof.settings.scholarshipFullTime ? "checked" : ""}> Scholarship requires full-time</label>
         <label class="chk"><input type="checkbox" id="pcRel" ${prof.settings.religionPacing ? "checked" : ""}> Pace religion credits yearly</label>
       </div>`;
     $("#prioModal").classList.add("open");
     $("#prioApply").onclick = () => {
+      const tgv = $("#pcTarget").value;
+      prof.settings.targetGrad = tgv
+        ? { year: parseInt(tgv, 10), season: tgv.split("-")[1] } : null;
       Object.assign(prof.settings, {
         maxCreditsFW: parseInt($("#pcMaxFW").value, 10) || 17,
         minCreditsFW: parseInt($("#pcMinFW").value, 10) || 14,
@@ -2079,25 +2121,48 @@ const App = (() => {
           const p = DATA.programIndex[id];
           return `<span class="chip on">${esc(p ? p.name : id)}<button class="ss-x" data-id="${esc(id)}">×</button></span>`;
         }).join("") || `<span class="ss-none">None selected</span>`}</div>
-        <input type="text" class="ss-input" placeholder="Search ${items.length} programs…">
+        <div class="ss-inrow">
+          <input type="text" class="ss-input" placeholder="Search ${items.length} programs…">
+          <button type="button" class="btn ghost sm ss-browse"><i class="fas fa-list"></i> Browse all</button>
+        </div>
         <div class="ss-list" hidden></div>`;
       const input = root.querySelector(".ss-input");
       const list = root.querySelector(".ss-list");
+      const itemHtml = p => `
+          <button class="ss-item" data-id="${esc(p.id)}">
+            <b>${esc(p.name)}</b>
+            <span>${esc(p.college || "")}${p.detailed ? "" : " · placeholder"}</span>
+          </button>`;
+      const wireItems = () => list.querySelectorAll(".ss-item").forEach(it => it.addEventListener("click", () => {
+        if (chosen.length >= max) chosen = max === 1 ? [] : chosen.slice(0, max - 1);
+        chosen.push(it.dataset.id);
+        onChange(chosen); draw();
+      }));
       input.addEventListener("input", () => {
         const q = input.value.trim().toLowerCase();
         if (!q) { list.hidden = true; return; }
         const hits = items.filter(p => p.name.toLowerCase().includes(q) && !chosen.includes(p.id)).slice(0, 12);
-        list.innerHTML = hits.map(p => `
-          <button class="ss-item" data-id="${esc(p.id)}">
-            <b>${esc(p.name)}</b>
-            <span>${esc(p.college || "")}${p.detailed ? "" : " · placeholder"}</span>
-          </button>`).join("") || `<div class="ss-empty">No matches</div>`;
+        list.innerHTML = hits.map(itemHtml).join("") || `<div class="ss-empty">No matches</div>`;
         list.hidden = false;
-        list.querySelectorAll(".ss-item").forEach(it => it.addEventListener("click", () => {
-          if (chosen.length >= max) chosen = max === 1 ? [] : chosen.slice(0, max - 1);
-          chosen.push(it.dataset.id);
-          onChange(chosen); draw();
-        }));
+        wireItems();
+      });
+      // Tester request: "a list of majors/minors/certificates people can look
+      // through before they begin searching." Grouped by college, scrollable,
+      // same click-to-select as search hits.
+      root.querySelector(".ss-browse").addEventListener("click", () => {
+        if (!list.hidden && list.dataset.mode === "browse") { list.hidden = true; return; }
+        const byCol = new Map();
+        items.filter(p => !chosen.includes(p.id)).forEach(p => {
+          const k = p.college || "Other";
+          if (!byCol.has(k)) byCol.set(k, []);
+          byCol.get(k).push(p);
+        });
+        list.innerHTML = [...byCol.keys()].sort().map(col => `
+          <div class="ss-group">${esc(col)}</div>
+          ${byCol.get(col).sort((a, b) => a.name.localeCompare(b.name)).map(itemHtml).join("")}`).join("");
+        list.dataset.mode = "browse";
+        list.hidden = false;
+        wireItems();
       });
       root.querySelectorAll(".ss-x").forEach(x => x.addEventListener("click", () => {
         chosen = chosen.filter(c => c !== x.dataset.id);
@@ -2350,6 +2415,10 @@ const App = (() => {
       lines.push(`Requirements — ${pr.name}: ${reqs.join(" | ")}`);
     });
 
+    const tg = plan.profile.settings && plan.profile.settings.targetGrad;
+    if (tg && tg.year) {
+      lines.push(`STUDENT'S GRADUATION TARGET: ${tg.season === "W" ? "Winter" : "Fall"} ${tg.year} — the plan is paced to end by then; courses that can't fit are listed as unscheduled below.`);
+    }
     if (result.unscheduled?.length) {
       // Spell out what this list MEANS. As a bare "Unscheduled: <name>" the AI
       // advisor read it as a list of optional extras and told a nursing student

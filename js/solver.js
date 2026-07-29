@@ -73,6 +73,22 @@ const Solver = (() => {
       if (si >= 4) { si = 0; }
       if (s === "F") year++;           // Fall 2026 -> Winter 2027
     }
+    // TARGET GRADUATION (tester request: "put my desired graduation date and
+    // pace that way"). The target simply ENDS THE CANVAS: terms after it are
+    // disabled, and every downstream system already respects that — MAP-sheet
+    // binding skips disabled terms, canPlace refuses them, backfill never
+    // reaches them. So an impossible target degrades through the EXISTING
+    // honesty machinery (unscheduled list, error flags, one-click Spring/
+    // Summer recommendation) instead of a parallel code path that would need
+    // its own guarantees. analyze() adds one summary flag naming the target.
+    if (settings.targetGrad && settings.targetGrad.year) {
+      const tg = terms.find(t => t.year === settings.targetGrad.year
+                              && t.season === settings.targetGrad.season);
+      if (tg) {
+        terms.forEach(t => { if (t.index > tg.index) t.enabled = false; });
+        terms.targetIdx = tg.index;
+      }
+    }
     return terms;
   }
   function termIndexFor(terms, year, season) {
@@ -780,8 +796,23 @@ const Solver = (() => {
     // "an absent course doesn't block". A group whose option IS in the plan
     // still binds in the normal order.
     const vouched = state.sheetPreSat && state.sheetPreSat.has(baseId(inst.uid));
+    // Sheet-sanctioned concurrency: when the sheet pins BOTH a course and its
+    // prerequisite into the SAME semester, that is the advisement centre
+    // scheduling them together — Accounting's junior core takes ACC 402/405/409
+    // alongside ACC 407 in one Winter, exactly like a cohort envelope. Under
+    // sheet-wins (§4h) that is the sheet's call, so treat it like coSet rather
+    // than flagging the sheet's own layout as a prerequisite error.
+    const tHere = t;
+    const pinnedTogether = g => {
+      if (!state.pinnedUids.has(inst.uid)) return false;
+      for (const [uid, tt] of assign) {
+        if (tt === tHere && baseId(uid) === g && state.pinnedUids.has(uid)) return true;
+      }
+      return false;
+    };
     for (const group of inst.course.pre) {
       const opts = Array.isArray(group) ? group : [group];
+      if (opts.some(pinnedTogether)) continue;
       if (vouched) {
         let present = opts.some(g => completed.has(g));
         if (!present) {
@@ -2206,6 +2237,80 @@ const Solver = (() => {
           (depLimitOf), and every move is REVERTED if the rescue still fails —
           a stranded course is bad, but shuffling a healthy plan to fail anyway
           is worse. */
+  /* PINNED-COURSE PREREQUISITE ORDER — a sheet pin bypasses canPlace, so a
+     pinned course can sit BEFORE a prerequisite the plan schedules later, and
+     nothing downstream repairs it: the pinned course never moves, and the
+     optimizer has no move that pays it to relocate the prerequisite.
+
+     The first tester to try Accounting found the canonical case in minutes:
+     the sheet pins ACC 310 into freshman Winter and omits ACC 200 entirely
+     (BYU assumes it is done beforehand), but the requirement bucket pulls
+     ACC 200 into the plan wherever it fits — sometimes after 310. This class
+     is 48 `prereq-order (MAP-locked)` warnings across 32 majors.
+
+     For each pinned course P: for each unsatisfied prerequisite group, if an
+     in-plan option sits at/after P's term and is movable, relocate it to the
+     EARLIEST legal term before P (earliest = most slack, and a prerequisite
+     belongs where it unlocks things). Three rounds so two-link chains settle.
+     A group with no legal repair keeps its warning — honest beats silent. */
+  function fixPinnedPrereqOrder(state) {
+    for (let round = 0; round < 3; round++) {
+      let moved = false;
+      state.pinnedUids.forEach(puid => {
+        const pinst = state.byUid.get(puid);
+        const tp = state.assign.get(puid);
+        if (!pinst || tp === undefined || pinst.k > 1) return;
+        for (const group of pinst.course.pre) {
+          const opts = Array.isArray(group) ? group : [group];
+          if (opts.some(g => state.completed.has(g))) continue;
+          let ok = false, candidate = null;
+          for (const [uid, tt] of state.assign) {
+            if (!opts.includes(baseId(uid))) continue;
+            if (tt < tp) { ok = true; break; }
+            if (candidate == null) candidate = uid;
+          }
+          if (ok || candidate == null) continue;
+          if (state.pinnedUids.has(candidate) || state.blockOf.has(candidate)) continue;
+          const ci = state.byUid.get(candidate);
+          const from = state.assign.get(candidate);
+          unplace(state, ci);
+          let placed = false;
+          for (let t = 0; t < tp; t++) {
+            if (canPlace(state, ci, t)) { place(state, ci, t); placed = true; moved = true; break; }
+          }
+          // Every earlier term full (sheet terms sit at their printed totals —
+          // Statistics pins MATH 113 into Winter of year ONE, so the only
+          // earlier term is a Fall the sheet already filled). Trade places
+          // with a flexible occupant: a GE/elective card can live anywhere,
+          // a prerequisite cannot. All-or-nothing with revert, like weaveTail.
+          if (!placed) {
+            for (let t = 0; t < tp && !placed; t++) {
+              const occ = [...state.assign].filter(([u, tt]) => tt === t).map(([u]) => u)
+                .filter(u => !state.pinnedUids.has(u) && !state.blockOf.has(u))
+                .map(u => state.byUid.get(u))
+                .filter(oi => oi && (oi.course.elective || oi.course.placeholder) && !oi.course.isReligion);
+              for (const oi of occ) {
+                unplace(state, oi);
+                if (canPlace(state, ci, t)) {
+                  place(state, ci, t);
+                  let home = -1;
+                  for (let t2 = 0; t2 < state.terms.length; t2++) {
+                    if (t2 !== t && canPlace(state, oi, t2)) { home = t2; break; }
+                  }
+                  if (home >= 0) { place(state, oi, home); placed = true; moved = true; break; }
+                  unplace(state, ci);                    // no home for the displaced card
+                }
+                place(state, oi, t);                     // revert this attempt
+              }
+            }
+          }
+          if (!placed) place(state, ci, from);
+        }
+      });
+      if (!moved) break;
+    }
+  }
+
   function rescueUnscheduled(state) {
     const pending = state.instances.filter(i => !state.assign.has(i.uid));
     if (!pending.length) return;
@@ -2738,6 +2843,22 @@ const Solver = (() => {
     // decides (Recommended offers the one-click opt-in); we never auto-enable
     if (state.mapWantsSpring) {
       flags.push({ level: "warn", icon: "sun", text: "The official MAP sheet schedules some courses in a Spring term, but Spring terms are OFF in your constraints. Courses also taught Fall/Winter were re-sequenced; a Spring-only course will show as unscheduled. See Recommended (left panel) to add a Spring term." });
+    }
+
+    // Target graduation: one summary flag that names the target, so a too-
+    // tight date reads as "your target doesn't fit" rather than a pile of
+    // per-course errors with no visible cause. The per-course entries stay —
+    // they say WHICH courses; this says WHY.
+    if (state.terms.targetIdx != null) {
+      const tgLabel = state.terms[state.terms.targetIdx].label;
+      const nUnsched = problems.filter(p => p.type === "unscheduled").length;
+      if (nUnsched > 0) {
+        flags.push({ level: "error", icon: "flag-checkered",
+          text: `Your target of graduating by ${tgLabel} doesn't fit: ${nUnsched} required course${nUnsched > 1 ? "s" : ""} can't be scheduled in time. Push the target later, raise the credit cap, or add Spring/Summer terms — nothing has been dropped from your requirements.` });
+      } else {
+        flags.push({ level: "info", icon: "flag-checkered",
+          text: `On track for your ${tgLabel} graduation target — every requirement fits.` });
+      }
     }
 
     // lease utilization hint
@@ -3466,16 +3587,26 @@ const Solver = (() => {
           }
           return false;
         };
+        // DEPENDENCY-SAFE slot filling. A slot binding is a PIN, and a GE pool
+        // can contain concrete courses that carry prerequisite chains — adding
+        // MATH 112/113 to Languages of Learning made a Statistics sheet's late
+        // GE slot grab the MATH 112 instance (in the plan as Calc 2's prereq)
+        // and pin it into Winter 2030, AFTER the three courses that need it.
+        // A candidate must be legal where the slot sits: its own prereqs
+        // satisfiable at t, and no dependent of it already scheduled at/before
+        // t. Placeholder cards pass both trivially, so a generic slot always
+        // has a safe fallback.
+        const depSafe = i => prereqSatisfied(state, i, t) && t < depLimitOf(state, i.uid);
         while (budget > 0.4 && guard++ < 6) {
           let cand = null;
           for (const key of keys) {
             if (key === "__elective__") {
               cand = state.instances.find(i => !state.assign.has(i.uid) && i.course.elective &&
-                taughtNow(i) && !baseAlreadyInTerm(i));
+                taughtNow(i) && !baseAlreadyInTerm(i) && depSafe(i));
             } else {
               cand = state.instances.find(i => !state.assign.has(i.uid) && taughtNow(i) &&
                 (i.buckets || []).includes(key) && i.course.credits <= budget + 0.6 &&
-                !baseAlreadyInTerm(i));
+                !baseAlreadyInTerm(i) && depSafe(i));
             }
             if (cand) break;
           }
@@ -3500,6 +3631,34 @@ const Solver = (() => {
         if (t == null) return;
         (mt.items || []).forEach(it => {
           if (!it.slot && !it.alts) return;       // coded singles handled above
+          // A slot whose label IS a course code is the sheet scheduling that
+          // exact course — the scraper just couldn't read the cell as a coded
+          // item. Bind it directly, exactly like the coded loop above. Routing
+          // it through the bucket search instead put STAT 121 in the cell
+          // Accounting's sheet marks "ACC 200": bucketByCodes skips pick-all
+          // buckets, so the only bucket containing ACC 200 was univ-core's
+          // Quantitative Reasoning pool (BYU lists it there, restricted-use),
+          // and takeSlot handed that bucket its first fitting instance. The
+          // real ACC 200 then floated to Fall 2027 — a year AFTER the pinned
+          // ACC 310 that requires it, which is what the tester reported.
+          if (it.slot && !it.alts) {
+            const codes = labelCodes(it.label || "");
+            if (codes.length === 1 && !expandRes.completed.has(codes[0])
+                && !(profile.pins || {})[codes[0]]) {
+              let bound = false;
+              for (let k = 0; k <= 3 && !bound; k++) {
+                const inst = state.byUid.get(k === 0 ? codes[0] : `${codes[0]}#${k}`);
+                if (!inst || state.assign.has(inst.uid)) continue;
+                if (!sheetRoom(t, inst.course.credits)) break;
+                widenSeason(state, codes[0], state.terms[t] && state.terms[t].season);
+                place(state, inst, t);
+                state.pinnedUids.add(inst.uid);
+                notePinned(t, inst.course.credits);
+                bound = true;
+              }
+              if (bound) return;                  // no job — the cell is filled
+            }
+          }
           const keys = slotKeys(it);
           if (keys.length) jobs.push({ keys, t, cr: it.cr || 3,
             label: it.label || (it.c ? `${it.c} or …` : null), specific: keys.length === 1 && keys[0] !== "__elective__" });
@@ -3560,6 +3719,7 @@ const Solver = (() => {
     })();
 
     let { problems } = seed(state, programs);   // `unscheduled` is recomputed after
+    fixPinnedPrereqOrder(state);               // sheet pins bypass canPlace — repair order early
                                                 // rescueUnscheduled() — see below
 
     // GE RIGHT-SIZING — trust the sheet's OWN General Education, not the
@@ -3647,6 +3807,7 @@ const Solver = (() => {
     closeGaps(state);                          // a dissolved tail can leave an interior hole
     rescueUnscheduled(state);                  // retry courses seed() had to give up on
     spreadMajorWork(state);                    // trade late major work for early GE slots
+    fixPinnedPrereqOrder(state);               // late passes can re-shuffle a repaired prereq
     topUpCredits(state);                       // re-assert the 120-credit graduation floor
     topUpFloor(state);                         // guarantee ≥12 on every surviving term
 

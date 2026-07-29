@@ -357,6 +357,16 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 .ss-item b { display: block; font-size: .8rem; }
 .ss-item span { font-size: .68rem; color: var(--ink-3); }
 .ss-empty { padding: 10px 12px; font-size: .76rem; color: var(--ink-3); }
+/* browse-all directory (tester request): search input + browse button share a
+   row; college group headers break up the full list */
+.ss-inrow { display: flex; gap: 6px; align-items: center; }
+.ss-inrow .ss-input { flex: 1; }
+.ss-browse { white-space: nowrap; flex: 0 0 auto; }
+.ss-group {
+  position: sticky; top: 0; padding: 5px 12px; background: var(--bg, #f4f6fa);
+  font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); border-bottom: 1px solid var(--line);
+}
 
 /* dials + priorities */
 .dial { margin-bottom: 14px; }
