@@ -1272,7 +1272,11 @@ const Solver = (() => {
     // 1) place NON-block courses first so cohort prerequisites (IS 303,
     //    pre-core) land in early terms; 2) then lock the rigid cohort blocks
     //    at their target term; 3) then fill whatever remains.
-    state.softCapFW = Math.min(16, profile.settings.maxCreditsFW || 16);
+    // 16 is the default policy band; a graduation target replaces it with the
+    // pace that target implies (lower to stretch, higher to compact) so the
+    // FIRST pass already lays courses down at the student's chosen density
+    // instead of packing to 16 and leaving later passes to unpick it.
+    state.softCapFW = Math.min(state.paceFill || 16, profile.settings.maxCreditsFW || 16);
     tryFill(true, true);
     for (let pass = 0; pass < 4; pass++) blockOrder.forEach(placeBlock);
     tryFill(true, false);
@@ -1321,7 +1325,7 @@ const Solver = (() => {
 
     /* 5 — pad below-minimum Fall/Winter terms with electives, then spread leftovers */
     const electives = state.instances.filter(i => i.course.elective && !state.assign.has(i.uid));
-    const minFW = profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
     let ei = 0;
     const lastUsed = () => Math.max(0, ...[...state.assign.values()]);
     const firstUsed = Math.min(...[...state.assign.values(), Infinity]);
@@ -1335,16 +1339,28 @@ const Solver = (() => {
         place(state, electives[ei++], t);
       }
     }
-    while (ei < electives.length) {
-      // remaining electives: earliest F/W term with headroom (inside budget)
-      let placed = false;
-      for (let t = 0; t < state.terms.length; t++) {
-        if (state.termBudget != null && t > state.termBudget) break;
-        const term = state.terms[t];
-        if (!term.enabled || !term.isFW) continue;
-        if (state.load[t] + 3 <= term.cap) { place(state, electives[ei++], t); placed = true; break; }
+    // Remaining electives: earliest F/W term with headroom (inside budget).
+    // A graduation target caps the FIRST sweep at its pace, so leftovers
+    // spread into the later semesters the student asked for instead of
+    // stacking the earliest term to 17 and leaving the tail empty — moving
+    // them out afterwards is a bulk move no single-course optimizer step can
+    // make (each first course into an empty term looks like a 25-point loss).
+    // The second sweep runs at the real cap and seats anything the pace
+    // couldn't, so pace can never strand an elective.
+    for (const paced of [true, false]) {
+      const ceilOf = term => (paced && state.paceFill != null)
+        ? Math.min(term.cap, state.paceFill) : term.cap;
+      while (ei < electives.length) {
+        let placed = false;
+        for (let t = 0; t < state.terms.length; t++) {
+          if (state.termBudget != null && t > state.termBudget) break;
+          const term = state.terms[t];
+          if (!term.enabled || !term.isFW) continue;
+          if (state.load[t] + 3 <= ceilOf(term)) { place(state, electives[ei++], t); placed = true; break; }
+        }
+        if (!placed) break;
       }
-      if (!placed) break;
+      if (state.paceFill == null) break;
     }
 
     const unscheduled = state.instances.filter(i => !state.assign.has(i.uid));
@@ -1362,7 +1378,7 @@ const Solver = (() => {
     const { profile, terms, assign, load } = state;
     const w = profile.weights;
     const lease12 = profile.settings.housing === "off-campus-12mo";
-    const minFW = profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
 
     const activeIdx = new Set(assign.values());
     let lastIdx = 0, firstIdx = Infinity;
@@ -1377,7 +1393,7 @@ const Solver = (() => {
         fwTermCount++;
         // a MAP-sheet term filled to its own declared total is never
         // "part-time" — some official sheets pace a 13-credit semester
-        const mc = state.mapCap && state.mapCap.get(tm.index);
+        const mc = sheetTotal(state, tm.index);
         if (load[tm.index] < minFW && !(mc != null && load[tm.index] >= mc - 0.5)) partTimeFW++;
       } else { spsuTerms++; spsuCredits += load[tm.index]; }
     });
@@ -1398,8 +1414,15 @@ const Solver = (() => {
     // terms" (life penalty ~0.8 each) against "a whole extra semester" — and
     // is what makes compact()'s term-emptying moves actually score as wins.
     // The 8-10 term shape emerges from this trade, not from force-filling.
+    // With a graduation target set, the NUMBER of semesters stops being
+    // something to minimize — the student already decided it. Charging 6 a
+    // term on top of that is the optimizer arguing with them, and it is what
+    // kept a 5-year target packing into 8 terms. Semesters up to the target's
+    // own ideal are free; only overshoot still costs.
+    const billableTerms = state.idealTerms != null
+      ? Math.max(0, fwTermCount - state.idealTerms) : fwTermCount;
     const cost = partTimeFW * 4 + spsuCredits * (lease12 ? 0.25 : 0.9) + spsuTerms * (lease12 ? 0.2 : 1)
-      + fwTermCount * 6 + lastIdx * 0.35;
+      + billableTerms * 6 + lastIdx * 0.35;
 
     // RISK — hard-course stacking
     let risk = 0;
@@ -1527,20 +1550,47 @@ const Solver = (() => {
     // indifferent between "8 terms at 16" and "10 at 13" and the fill passes
     // spread everything to the minimum, stranding low-priority courses late.
     const totalFW = fwActive.reduce((s, t) => s + load[t], 0);
-    const idealTerms = Math.max(8, Math.round(totalFW / 15.5));
+    // A graduation target overrides the 15.5 house pace with its own — see the
+    // TARGET PACE block in solve(). state.idealTerms is already clamped to what
+    // the full-time floor can actually support, so a wildly distant target
+    // still can't smear 120 credits across 12 half-empty semesters.
+    const idealTerms = state.idealTerms != null
+      ? state.idealTerms : Math.max(8, Math.round(totalFW / 15.5));
     if (fwActive.length > idealTerms) structure += (fwActive.length - idealTerms) * 16;
+    // OVER-PACE — the force that actually spreads a stretched plan. Without it
+    // nothing pulls work out of a naturally-16-credit term into the empty
+    // semesters the student asked for; the ideal-term count alone only stops
+    // punishing them. Weight 4/credit beats the "no generals in the last two
+    // semesters" rule below (softened to 3 under a stretch), which is the only
+    // thing standing between a tail term and the GE slots that would fill it.
+    if (state.paceCap != null) {
+      fwActive.forEach(t => { structure += Math.max(0, load[t] - state.paceCap) * 4; });
+    }
+    // The senior taper is a comfort rule: finish light. A student who set an
+    // EARLIER graduation date has explicitly traded that comfort away, and
+    // holding it at full strength left Chemistry's last semester at 12 credits
+    // with a required course sitting unscheduled beside it. Softened under a
+    // rush, never dropped — the taper still breaks ties toward a lighter end.
+    const taperW = state.rush ? 0.7 : 2.2;
     const lastTwo = new Set(fwActive.slice(-2));
     lastTwo.forEach(t => {
-      structure += Math.max(0, load[t] - 14) * 2.2      // over the senior taper
-                 + Math.max(0, load[t] - 10) * 0.25;    // gently: lighter is better
+      structure += Math.max(0, load[t] - 14) * taperW   // over the senior taper
+                 + Math.max(0, load[t] - 10) * (state.rush ? 0 : 0.25);
     });
     // strong but not compression-blocking: emptying a straggler term shifts
     // the "last two" boundary onto GE-bearing terms — the compressed plan must
     // still win, then improve() relocates those GEs earlier. And a final term
     // STARVING below full-time takes GEs gladly (better than part-time).
-    gePerTerm.forEach((n, t) => { if (lastTwo.has(t) && load[t] >= minFW) structure += n * 8; });
+    // Under a deliberate stretch this rule has to give ground. The tail terms
+    // exist BECAUSE the student asked for them, and generals/electives are the
+    // only work loose enough to move into them — every major course is held by
+    // its sheet row or its prerequisites. Held at 8 it kept those terms empty
+    // and the stretch never happened. Softened, not dropped: real major work
+    // still wins the tail whenever any is free to go there.
+    const geLateW = state.stretch ? 3 : 8;
+    gePerTerm.forEach((n, t) => { if (lastTwo.has(t) && load[t] >= minFW) structure += n * geLateW; });
     fwActive.forEach(t => {
-      const mc = state.mapCap && state.mapCap.get(t);
+      const mc = sheetTotal(state, t);
       if (mc != null && load[t] >= mc - 0.5) return;   // at the sheet's own total
       if (load[t] < minFW) structure += (minFW - load[t]) * 2.0;
     });
@@ -1657,7 +1707,7 @@ const Solver = (() => {
   /* --------------------------- improvement --------------------------- */
   function improve(state, iterations, seedNum, floorSafe = false) {
     const rnd = mulberry32(seedNum);
-    const minFW = state.profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
     // floor-safe: a move that pulls a course OUT of an active term must not
     // leave that term part-time (in (0, min)); emptying it fully is fine. Lets
     // the FINAL improve() de-strand courses without breaking the ≥12 guarantee.
@@ -1822,8 +1872,23 @@ const Solver = (() => {
       // NO hard 8-term floor: a transfer/mid-degree student with 60 credits
       // left deserves a 4-term plan. A fresh 120-cr degree still computes to
       // ~8 on its own (120/15.5 ≈ 7.7 → 8); caps + prereqs bound the rest.
-      const ideal = Math.max(1, Math.round(totalFW / 15.5));
-      if (fw.length <= ideal) return;
+      const ideal = state.idealTerms != null
+        ? state.idealTerms : Math.max(1, Math.round(totalFW / 15.5));
+      // A term below the full-time line is ALWAYS worth trying to dissolve,
+      // however few semesters the plan is using. The count alone said yes to
+      // Chemistry's eleven terms — the eleventh holding a single 2-credit
+      // religion class — because eleven was a legal number of semesters for
+      // its credit total. Term count is a budget, not a certificate of health.
+      // The score gate below still vetoes any move that makes things worse.
+      const starved = fw.some(t => state.load[t] < floorFW(state) - 0.01);
+      // Under a stretch this pass changes job. The semester COUNT is the thing
+      // the student picked, so compacting is no longer an improvement — it is
+      // the optimizer overruling them. Accounting paced cleanly to ten
+      // 12-credit semesters and this pulled it back to nine, finishing a term
+      // early of the date the student typed. It still runs as a REPAIR: a term
+      // below the full-time line is worth dissolving whatever the target.
+      if (state.stretch && !starved) return;
+      if (fw.length <= ideal && !starved) return;
       const cands = fw.filter(t => {
         const uids = [...state.assign].filter(([, tt]) => tt === t).map(([u]) => u);
         return uids.length && !uids.some(u => state.blockOf.has(u) || state.pinnedUids.has(u));
@@ -1861,7 +1926,7 @@ const Solver = (() => {
      the gap and lightens/empties a later term. (Only interior gaps — empty
      terms AFTER the last active one are just unused budget.) */
   function closeGaps(state) {
-    const minFW = state.profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
     const cap = Math.min(BYU_HARD_CAP, state.profile.settings.maxCreditsFW || BYU_HARD_CAP);
     for (let round = 0; round < 8; round++) {
       const active = [...new Set(state.assign.values())].sort((a, b) => a - b);
@@ -1887,7 +1952,7 @@ const Solver = (() => {
   }
 
   function consolidate(state) {
-    const minFW = state.profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
     for (let round = 0; round < 3; round++) {
       const activeIdx = new Set(state.assign.values());
       const lows = state.terms
@@ -1929,7 +1994,7 @@ const Solver = (() => {
      (below-minimum) ones. Random hill-climbing rarely samples exactly this
      donor→starved pair, so extended plans kept 2-5 credit tail terms. */
   function fillLight(state) {
-    const minFW = state.profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
     for (let round = 0; round < 40; round++) {
       const activeIdx = new Set(state.assign.values());
       // rebalance among ACTIVE terms only — pulling courses into empty budget
@@ -2029,6 +2094,44 @@ const Solver = (() => {
      than the comfort floor (14). That keeps the protection the first attempt
      destroyed — no term ever drops below full time — while ending the
      invention. See padFloor() for the measurement behind it. */
+  /* The Fall/Winter credit floor a plan is PACED and PADDED to. 14 is the
+     comfort target the load policy aims at; BYU's actual full-time line is 12.
+     A student who sets a LATER graduation target is asking, in the only words
+     the UI gives them, for lighter semesters — so the comfort floor yields to
+     the pace that target implies. It can never fall below the real full-time
+     line, and with no target set nothing changes. Without this the two floors
+     fought: paceCap said 13, minCreditsFW said 14, and the 14 won every time,
+     which is why the first cut of the stretch moved nothing. */
+  /* The MAP row's printed Total Hours for a plan term — but only when the
+     number is believable. A Fall/Winter row printed BELOW BYU's full-time line
+     is not the advisement center pacing a light semester; it is a bad scrape.
+     The Anthropology cultural/linguistic double major prints rows of 3.0 and
+     3.5 against five real courses apiece.
+
+     That matters because everything downstream reads the printed total as a
+     floor EXEMPTION — "this term is allowed to be short" — so a bogus 3.0 told
+     padFloor not to pad and told scorePlan not to penalize, and the plan came
+     out with a 6-credit Fall between two full semesters. The natural plan hid
+     it: elective backfill happened to fill those terms anyway. Pacing the plan
+     to a target moved the backfill earlier and exposed it.
+
+     Same plausibility test the sheet-binding block already applies to the
+     CEILING side (see sheetCeil) — this is the floor side of the same coin. */
+  function sheetTotal(state, t) {
+    if (!state.mapCap) return null;
+    const total = state.mapCap.get(t);
+    if (total == null) return null;
+    const tm = state.terms[t];
+    if (tm && tm.isFW && total < FULL_TIME_CREDITS) return null;
+    return total;
+  }
+
+  function floorFW(state) {
+    const pref = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    if (state.paceFill == null) return pref;
+    return Math.max(FULL_TIME_CREDITS, Math.min(pref, state.paceFill));
+  }
+
   function lastActiveTerm(state) {
     let last = -1;
     state.assign.forEach(t => { if (t > last) last = t; });
@@ -2086,14 +2189,14 @@ const Solver = (() => {
      padded only as far as the credits still owed, never up to a floor. A
      student in their last semester takes what they still need and graduates. */
   function padFloor(state) {
-    const minFW = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    const minFW = floorFW(state);
     const active = new Set(state.assign.values());
     const gradTerm = lastActiveTerm(state);
     state.terms.forEach(tm => {
       if (!tm.isFW || !tm.enabled || !active.has(tm.index)) return;
       // MAP-sheet terms follow their own printed total — a 13-credit sheet
       // semester is the advisement center's pacing, never "short"
-      const mc = state.mapCap && state.mapCap.get(tm.index);
+      const mc = sheetTotal(state, tm.index);
       for (let g = 1; g <= 5; g++) {
         // the two-card cap is COSMETIC, so it yields to the one thing that is
         // a guarantee rather than a preference: a term below BYU's full-time
@@ -2126,7 +2229,7 @@ const Solver = (() => {
      major course or (b) re-activate a surplus term the optimizer just emptied.
      Any term still short goes to padFloor(). */
   function topUpFloor(state) {
-    const minFW = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    const minFW = floorFW(state);
     stripFloorPadding(state);                                               // idempotent
     const moveCost = uid => {
       const c = state.byUid.get(uid).course;
@@ -2170,7 +2273,7 @@ const Solver = (() => {
      padFloor() — a real full-time semester beats a part-time one, and that is
      the one thing padding is still allowed to buy past the 120-credit target. */
   function enforceFloor(state) {
-    const minFW = state.profile.settings.minCreditsFW || FULL_TIME_CREDITS;
+    const minFW = floorFW(state);
     stripFloorPadding(state);
     // pass 1: redistribution — donor keeps ≥ min, prereqs/dependents stay valid
     for (let round = 0; round < 40; round++) {
@@ -2312,6 +2415,14 @@ const Solver = (() => {
   }
 
   function rescueUnscheduled(state) {
+    if (!state.instances.some(i => !state.assign.has(i.uid))) return;
+    // Floor padding must never be what stands between a REQUIRED course and a
+    // seat. enforceFloor has already run by now, so a term can look full while
+    // most of its credits are disposable "Open Elective" cards — Chemistry's
+    // Winter 2031 was 7.5 credits of filler, and a religion cornerstone that
+    // would have fitted underneath it got pushed into a brand-new Fall holding
+    // that one 2-credit class. Strip first; topUpFloor re-pads at the end.
+    stripFloorPadding(state);
     const pending = state.instances.filter(i => !state.assign.has(i.uid));
     if (!pending.length) return;
     // NEVER past the plan's existing span. The first cut of this pass let the
@@ -2321,18 +2432,55 @@ const Solver = (() => {
     // plan already uses, leaving it unscheduled is the truthful answer: app.js
     // names it and offers the dials (Spring term, credit cap, horizon), and
     // solver.js's standing rule is that the student decides those.
-    const span = lastActiveTerm(state);
+    // ...UNLESS the student named a graduation date. Then the semesters
+    // between the plan's end and that date are not "the horizon growing" —
+    // they are semesters the student has already said they intend to enrol in,
+    // and refusing to use them is how Chemistry's fourth religion cornerstone
+    // ended up unscheduled with an empty Winter sitting right there. The
+    // target still bounds it: nothing is ever rescued past the date.
+    const span = state.terms.targetIdx != null
+      ? Math.min(state.terms.targetIdx, state.termBudget == null ? state.terms.targetIdx : state.termBudget)
+      : lastActiveTerm(state);
+    // Semesters the plan ALREADY uses come first. Opening a new one for a
+    // single course is the outcome this pass exists to avoid, so it stays the
+    // last resort rather than whichever term happens to sort first.
+    const inUse = new Set(state.assign.values());
     const legalTerms = inst => state.terms
       .filter(tm => tm.enabled && tm.index <= span
                  && (state.termBudget == null || tm.index <= state.termBudget)
                  && (inst.course.off || "FW").includes(tm.season))
-      .map(tm => tm.index);
+      .map(tm => tm.index)
+      .sort((a, b) => (inUse.has(b) ? 1 : 0) - (inUse.has(a) ? 1 : 0) || a - b);
 
     // Pull the prerequisites blocking `inst` at term t earlier. Returns the
     // list of [instance, originalTerm] it moved, or null if it could not.
     const pullPrereqsBefore = (inst, t) => {
       const moved = [];
       const revert = () => moved.forEach(([m, f]) => { unplace(state, m); place(state, m, f); });
+      // A repeatable's OWN previous instance blocks it just as hard as a
+      // prerequisite does — prereqSatisfied requires #k strictly after #k-1 —
+      // but it isn't in course.pre, so this pass could never see it. That is
+      // the whole of the religion-cornerstone stranding: #3 drifts into the
+      // last term and #4, needing a term after it, has nowhere to go while the
+      // plan sits at 12 credits with room to spare. Pull #3 back one term and
+      // both fit. Recursive by construction: pulling #3 pulls #2 if it must.
+      if (inst.k > 1 && (!inst.course.bucket || inst.course.isReligion)) {
+        const prevUid = `${baseId(inst.uid)}#${inst.k - 1}`;
+        const prev = state.byUid.get(prevUid);
+        const pt = prev && state.assign.get(prevUid);
+        if (prev && pt !== undefined && pt >= t) {
+          const from = pt;
+          unplace(state, prev);
+          let ok = false;
+          for (let t2 = 0; t2 < t; t2++) {
+            if (t2 >= depLimitOf(state, prevUid)) continue;
+            if (canPlace(state, prev, t2) || pullPrereqsBefore(prev, t2)) {
+              if (canPlace(state, prev, t2)) { place(state, prev, t2); moved.push([prev, from]); ok = true; break; }
+            }
+          }
+          if (!ok) { place(state, prev, from); return null; }
+        }
+      }
       for (const group of inst.course.pre) {
         const opts = Array.isArray(group) ? group : [group];
         if (opts.some(g => state.completed.has(g))) continue;
@@ -2476,7 +2624,12 @@ const Solver = (() => {
       return 4;
     };
     state.mapCap.forEach((total, t) => {
-      const ceil = state.terms[t].isFW ? Math.max(total, 16) : total;
+      // The printed total is the sheet's own DENSITY, and a graduation target
+      // is a request to change exactly that — the same reasoning that lets a
+      // stretch thin these rows lets a rush thicken them. Order and season,
+      // which are what the sheet is really authoritative about, do not move.
+      const ceil = state.terms[t].isFW
+        ? Math.max(total, 16, state.paceFill || 0) : total;
       let guard = 0;
       while (state.load[t] > ceil + 0.6 && guard++ < 12) {
         const uids = [...state.assign].filter(([, tt]) => tt === t).map(([u]) => u)
@@ -2537,7 +2690,7 @@ const Solver = (() => {
   function weaveTail(state) {
     if (!state.mapCap || !state.mapCap.size) return;      // MAP-first plans only
     const lastSheet = Math.max(...state.mapCap.keys());
-    const FLOOR = state.profile.settings.minCreditsFW || 12;
+    const FLOOR = floorFW(state);
     const depths = computeDepth(state.instances, state.cat);
     const room = (t, cr, ceil) => state.load[t] + cr <= ceil + 0.01;
 
@@ -2595,9 +2748,14 @@ const Solver = (() => {
       for (const inst of movable) {
         unplace(state, inst);
         // 16 is the policy band; 17 is the tolerated stretch ("sometimes 17
-        // is fine") tried only when nothing fits at 16
+        // is fine") tried only when nothing fits at 16. A graduation target
+        // replaces both with its own pace — otherwise this pass, which is not
+        // score-gated, would quietly re-pack a deliberately stretched tail
+        // back into the sheet terms at 16 credits and undo the whole thing.
+        const band = state.paceCap != null
+          ? [Math.min(16, state.paceCap), Math.min(17, state.paceCap + 1)] : [16, 17];
         let home = null;
-        for (const ceil of [16, 17]) {
+        for (const ceil of band) {
           home = state.terms.find(tm => tm.enabled && tm.isFW && tm.index < t &&
             room(tm.index, inst.course.credits, ceil) && canPlace(state, inst, tm.index));
           if (home) break;
@@ -2607,7 +2765,7 @@ const Solver = (() => {
           reverts.push(() => { unplace(state, inst); place(state, inst, t); });
           continue;
         }
-        const undoSwap = trySwap(inst, t, 16) || trySwap(inst, t, 17);
+        const undoSwap = trySwap(inst, t, band[0]) || trySwap(inst, t, band[1]);
         if (undoSwap) {
           reverts.push(() => { undoSwap(); place(state, inst, t); });
           continue;
@@ -2792,7 +2950,7 @@ const Solver = (() => {
     }
 
     // part-time Fall/Winter warning
-    const minFW = profile.settings.minCreditsFW || 12;
+    const minFW = floorFW(state);
     terms.forEach(tm => {
       const active = [...assign.values()].includes(tm.index);
       if (active && tm.isFW && state.load[tm.index] < minFW) {
@@ -2852,12 +3010,66 @@ const Solver = (() => {
     if (state.terms.targetIdx != null) {
       const tgLabel = state.terms[state.terms.targetIdx].label;
       const nUnsched = problems.filter(p => p.type === "unscheduled").length;
+      const lastT = lastActiveTerm(state);
+      const activeT = new Set(assign.values());
+      const fwT = terms.filter(tm => tm.isFW && activeT.has(tm.index));
+      const perTerm = fwT.length
+        ? fwT.reduce((s, tm) => s + (state.load[tm.index] || 0), 0) / fwT.length : 0;
+      const pace = perTerm
+        ? ` It paces about ${perTerm.toFixed(1)} credits per Fall/Winter semester across ${fwT.length}.` : "";
       if (nUnsched > 0) {
+        // WHY it doesn't fit decides what to tell them, and the two causes take
+        // opposite advice. If the degree needs more credits than the Fall/Winter
+        // semesters before the target can physically hold, no amount of solver
+        // work helps and "raise the credit cap" is close to useless — at a
+        // three-year target the average major needs 124 credits against 102 of
+        // capacity. That is a Spring/Summer conversation. If the capacity is
+        // there and courses still won't fit, the binding constraint is
+        // sequence — prerequisite chains, or a course taught one season a year
+        // — and adding credits per term changes nothing. Saying both every
+        // time taught students to ignore the flag.
+        const fwToTarget = terms.filter(tm => tm.isFW && tm.enabled
+          && tm.index <= state.terms.targetIdx).length;
+        const capFW = Math.min(BYU_HARD_CAP, profile.settings.maxCreditsFW || 17);
+        const room = fwToTarget * capFW;
+        let placedCr = 0;
+        state.load.forEach((cr, t) => { if (terms[t] && terms[t].isFW) placedCr += cr || 0; });
+        const stuckCr = problems.filter(p => p.type === "unscheduled")
+          .reduce((s, p) => s + ((state.byUid.get(p.uid) || { course: {} }).course.credits || 0), 0);
+        const need = placedCr + stuckCr;
+        const spOff = !profile.settings.allowSpring || !profile.settings.allowSummer;
         flags.push({ level: "error", icon: "flag-checkered",
-          text: `Your target of graduating by ${tgLabel} doesn't fit: ${nUnsched} required course${nUnsched > 1 ? "s" : ""} can't be scheduled in time. Push the target later, raise the credit cap, or add Spring/Summer terms — nothing has been dropped from your requirements.` });
+          text: need > room + 0.5
+            ? `Graduating by ${tgLabel} doesn't fit, and it isn't close: that leaves ${fwToTarget} Fall/Winter semesters, which hold ${Math.round(room)} credits even at your ${capFW}-credit cap, against the ${Math.round(need)} this degree still needs. ${spOff ? "Spring and Summer terms are the only way to close a gap this size — turn them on in Constraints" : "Even with Spring and Summer on, a gap this size needs a later date"}, or push the target back. ${nUnsched} course${nUnsched > 1 ? "s are" : " is"} parked unscheduled; nothing has been dropped.`
+            : `Graduating by ${tgLabel} doesn't fit: ${nUnsched} required course${nUnsched > 1 ? "s" : ""} can't be scheduled in time. The semesters have the room — what blocks ${nUnsched > 1 ? "them" : "it"} is sequence: a prerequisite chain that has to run in order, or a class taught only one season a year. More credits per term won't help; a later target${spOff ? ", or Spring/Summer terms to run the chain sooner," : ""} will. Nothing has been dropped from your requirements.` });
+      } else if (lastT >= 0 && lastT < state.terms.targetIdx && terms[lastT].isFW &&
+                 terms.slice(lastT + 1, state.terms.targetIdx + 1)
+                   .some(tm => tm.isFW && tm.enabled)) {
+        // Finishing EARLY of the target is not a failure and it is not silent
+        // padding either. Past a point a stretch stops being possible, and
+        // inventing filler to reach the date would be charging the student for
+        // classes to hit a number.
+        //
+        // But there are TWO reasons it stops, and they need different answers.
+        // Usually it is the full-time floor: you cannot spread 120 credits
+        // across twelve semesters and still be full time. On a MAP-bound major
+        // it is more often the sheet — pace thins a sheet's generals but never
+        // its coded courses, so Accounting's first five semesters stay at the
+        // 14-16 the advisement centre printed and the plan lands at nine
+        // regardless of the date. Blaming the floor there is simply false: nine
+        // terms of 121 credits would sit at 12.1, comfortably full time.
+        const heldBySheet = terms.filter(tm => tm.isFW && activeT.has(tm.index)
+          && state.load[tm.index] > (state.paceCap || 99) + 0.5
+          && [...assign].filter(([u, t2]) => t2 === tm.index && state.pinnedUids.has(u))
+               .reduce((s, [u]) => s + ((state.byUid.get(u) || { course: {} }).course.credits || 0), 0)
+             >= state.load[tm.index] / 2).length;
+        flags.push({ level: "info", icon: "flag-checkered",
+          text: heldBySheet
+            ? `You finish in ${terms[lastT].label}, ahead of your ${tgLabel} target.${pace} ${heldBySheet} of those semesters are set by your ${state.mapName || "MAP"} sheet, which paces them heavier than your date asks for — the planner lightens the generals and religion around a sheet, never the major sequence itself. To use the extra time, add a minor, a certificate, or an internship.`
+            : `You finish in ${terms[lastT].label}, ahead of your ${tgLabel} target — spreading the rest any thinner would drop you below full-time status.${pace} To use the extra time, add a minor or certificate, or lower your full-time floor in Constraints.` });
       } else {
         flags.push({ level: "info", icon: "flag-checkered",
-          text: `On track for your ${tgLabel} graduation target — every requirement fits.` });
+          text: `On track for your ${tgLabel} graduation target — every requirement fits.${pace}` });
       }
     }
 
@@ -3193,6 +3405,74 @@ const Solver = (() => {
       if (n > 10) n = Math.max(10, Math.ceil(planCr / capFW));
       while (n < fwEnabled.length && fwEnabled[n - 1] && fwEnabled[n - 1].season !== "W") n++;
       state.termBudget = fwEnabled[Math.min(n, fwEnabled.length) - 1].index;
+
+      // ---- TARGET PACE ------------------------------------------------
+      // A graduation target used to do exactly one thing: end the canvas.
+      // Measured across 25 majors x 4 targets, that made the two directions
+      // fail in opposite ways. A LATER target was a no-op — the plan still
+      // packed into its natural 8 terms and left the extra semesters empty
+      // (0.0 credit difference at 5- and 6-year targets). An EARLIER one was
+      // a guillotine — 6 terms filled at the usual pace and 20-40 credits
+      // dumped into "unscheduled" without the plan ever trying a heavier
+      // semester.
+      //
+      // A date the student picks is not a deadline to truncate against; it
+      // is a PACE. Credits still owed / semesters available gives the
+      // credits-per-semester that date implies, and everything downstream
+      // reads that one number:
+      //
+      //   stretch (pace < ~15)  -> a lower per-term ceiling. Terms settle just
+      //                            above the full-time line, which is what the
+      //                            student asked for: still full time, but with
+      //                            room for a job, research, or a lighter load.
+      //   compact (pace > ~15.5)-> a higher one, up to the profile's own credit
+      //                            cap, so the solver packs harder before it
+      //                            gives up and reports something unscheduled.
+      //   on pace (~15.5)       -> paceCap lands on 16, the value the seeding
+      //                            passes already used. Unchanged by design.
+      //
+      // What pace NEVER moves: prerequisites (canPlace is still the only gate),
+      // the MAP sheet's order and seasons, and cohort blocks. Pace decides how
+      // DENSE a semester is, never what may legally sit in it.
+      //
+      // The stretch is bounded by the full-time floor: you cannot pace 120
+      // credits across 12 semesters and stay full time, so idealTerms clamps
+      // to floor(credits / minCreditsFW) and the plan finishes EARLY of a
+      // target that far out. analyze() says so rather than padding filler
+      // across two invented semesters.
+      const tgIdx = terms.targetIdx;
+      if (tgIdx != null) {
+        const fwAvail = fwEnabled.filter(tm => tm.index <= tgIdx).length;
+        if (fwAvail > 0) {
+          const pace = planCr / fwAvail;
+          state.paceRaw = pace;
+          // Two numbers, because one was not enough. paceFill is what the
+          // fill passes aim AT; paceCap is what scoring penalizes ABOVE, and
+          // it sits a credit higher on purpose. Classes come in 2- and
+          // 3-credit lumps, so a ceiling equal to the mean demands every term
+          // hit the mean exactly: Accounting paces to 12.0 across ten
+          // semesters, filled all ten to precisely 12, and then had nowhere
+          // to put two 2-credit religion electives — with 120 credits of room
+          // and 124 credits of degree. One credit of slack absorbs the lumps.
+          // Both bounds are the REAL lines, not the comfort policy: BYU's
+          // full-time floor below, the student's own credit cap above. See
+          // floorFW() — the 14-credit comfort target yields to a pace the
+          // student asked for, and only to that.
+          // FLOOR, not ceil. Rounding the mean up quietly costs a semester:
+          // Accounting paces to 12.1 across ten, and a fill target of 13 packs
+          // it into nine and finishes a term early of the date the student
+          // typed. The +1 slack on paceCap is what absorbs the 2- and
+          // 3-credit lumps, so the fill target itself should sit AT the mean.
+          state.paceFill = Math.max(FULL_TIME_CREDITS, Math.min(capFW, Math.floor(pace)));
+          state.paceCap = Math.min(capFW, state.paceFill + 1);
+          state.stretch = pace < 14.5;
+          state.rush = pace > 15.5;      // target is tighter than the house pace
+          state.idealTerms = Math.max(1, Math.min(fwAvail, Math.floor(planCr / FULL_TIME_CREDITS)));
+          // the target owns the canvas in BOTH directions: a stretch needs the
+          // later terms unlocked, a compaction needs the budget pulled in.
+          state.termBudget = tgIdx;
+        }
+      }
     }
     // flowchart placement hints: courseId -> {y (1-based year), s (F/W)}. The
     // official department flowchart, where we have one, overrides the generic
@@ -3395,7 +3675,29 @@ const Solver = (() => {
         if (tm && tm.isFW && total < FULL_TIME_CREDITS) return null;   // total is the bad number
         return total;
       };
+      // ---- pace thins the sheet's SLOTS, never its coded courses ---------
+      // A MAP row prints ~15-16 credits. Stretching a MAP-bound plan to a
+      // 12-13 credit pace therefore means ~25 credits have to leave the sheet
+      // terms, and there is no way around that: the sheet's own density IS
+      // what the student is asking to change.
+      //
+      // Which credits leave is the whole question. The coded courses are the
+      // sequence — MATH 113 before 302, the junior core as a block, the season
+      // the row prints — and pace must not touch them. The labeled slots are
+      // generals, religion and elective lines, which is exactly what an
+      // advisor moves when a student says "I want a lighter semester."
+      //
+      // The coded loop below runs FIRST and claims the term's pace budget; the
+      // slot pass (takeSlot, further down) runs with paceActive on and stops
+      // when the term is at pace, leaving those slots to ordinary backfill in
+      // a later term. So the sheet keeps its order and seasons, and the pace
+      // is paid for out of the generals.
+      let paceActive = false;
+      const paceCeil = t => (paceActive && state.paceFill != null
+        && state.terms[t] && state.terms[t].isFW) ? state.paceFill : null;
       const sheetRoom = (t, cr) => {
+        const pc = paceCeil(t);
+        if (pc != null && state.load[t] + cr > pc + 0.5) return false;
         const ceil = sheetCeil(t);
         if (ceil == null) return true;    // nothing trustworthy to enforce
         return (sheetPinned.get(t) || 0) + cr <= ceil + 0.5;
@@ -3665,7 +3967,9 @@ const Solver = (() => {
         });
       });
       jobs.sort((a, b) => (b.specific ? 1 : 0) - (a.specific ? 1 : 0));
+      paceActive = true;              // see sheetRoom(): slots yield to the pace
       jobs.forEach(j => takeSlot(j.keys, j.t, j.cr, j.label));
+      paceActive = false;
       // REPEAT ORDER — the sort above fills specific slots before generic ones,
       // so slots are NOT filled in term order and instance #2 of a repeatable
       // could be bound to an earlier term than #1 (PORT 493 came out #2 in
@@ -3808,6 +4112,13 @@ const Solver = (() => {
     rescueUnscheduled(state);                  // retry courses seed() had to give up on
     spreadMajorWork(state);                    // trade late major work for early GE slots
     fixPinnedPrereqOrder(state);               // late passes can re-shuffle a repaired prereq
+    // The tail passes above can each ACTIVATE a term: enforceMapCaps overflows
+    // an evicted card to the latest term with room, rescueUnscheduled seats a
+    // course the seed gave up on. Nothing re-packed after them, so Chemistry
+    // finished with a Fall 2031 holding one 2-credit religion cornerstone that
+    // had a legal seat in the Winter before it. Score-gated, so a term that
+    // deserves to exist survives.
+    compact(state); closeGaps(state);
     topUpCredits(state);                       // re-assert the 120-credit graduation floor
     topUpFloor(state);                         // guarantee ≥12 on every surviving term
 

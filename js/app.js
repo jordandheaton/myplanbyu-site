@@ -1767,7 +1767,7 @@ const App = (() => {
     const years = [];
     for (let y = st.year; y <= st.year + span; y++) years.push(y);
     return `
-      <label class="wiz-lbl grad-lbl">Graduate by <span class="wiz-sub">(optional — leave blank for the best pace)</span></label>
+      <label class="wiz-lbl grad-lbl">Graduate by <span class="wiz-sub">(optional — a later date paces lighter semesters, an earlier one packs them; leave blank to let the planner choose)</span></label>
       <div class="grad-row">
         <select id="${idSeason}">
           <option value="">No target</option>
@@ -2438,7 +2438,19 @@ const App = (() => {
 
     const tg = plan.profile.settings && plan.profile.settings.targetGrad;
     if (tg && tg.year) {
-      lines.push(`STUDENT'S GRADUATION TARGET: ${tg.season === "W" ? "Winter" : "Fall"} ${tg.year} — the plan is paced to end by then; courses that can't fit are listed as unscheduled below.`);
+      // Say that the date CHANGED THE SEMESTER LOADS, not just the end point.
+      // Without this the advisor sees 12-credit semesters, reads them as the
+      // planner underloading the student, and offers to "fix" the thing the
+      // student deliberately asked for.
+      const fw = (result.terms || []).filter(t => t.isFW);
+      const used = new Map();
+      (result.placements || []).forEach(p => used.set(p.termIndex, (used.get(p.termIndex) || 0) + (p.credits || 0)));
+      const act = fw.filter(t => used.has(t.index));
+      const per = act.length
+        ? (act.reduce((s, t) => s + used.get(t.index), 0) / act.length).toFixed(1) : null;
+      lines.push(`STUDENT'S GRADUATION TARGET: ${tg.season === "W" ? "Winter" : "Fall"} ${tg.year} — the student chose this date, and the planner PACED THE WHOLE PLAN to it`
+        + (per ? `: ${act.length} Fall/Winter semesters averaging ${per} credits each` : "")
+        + `. A light semester here is the student's own choice, not an error — do not advise "adding more classes" to a paced plan unless they ask to finish sooner. Courses that could not fit by the date are listed as unscheduled below.`);
     }
     if (result.unscheduled?.length) {
       // Spell out what this list MEANS. As a bare "Unscheduled: <name>" the AI
