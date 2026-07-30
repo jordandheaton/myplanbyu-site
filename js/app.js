@@ -1412,26 +1412,46 @@ const App = (() => {
       const idx = (S.byTerm[t.code] || {})[courseId];
       if (idx && idx.length) { hit = { term: t, names: idx.map(i => S.names[i]).filter(Boolean) }; break; }
     }
-    if (!hit) {
-      return `<span class="cm-who cm-who-none">
-        <i class="fas fa-chalkboard-user"></i>
-        <span>Not offered in ${S.terms.map(t => esc(t.label)).join(" or ")} —
-        <a href="${sched}" target="_blank" rel="noopener">check the class schedule</a> closer to registration.</span>
+    const rmp = n => `<a class="cm-prof" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}"
+        target="_blank" rel="noopener"
+        title="${esc(n)} on Rate My Professors (BYU). Searched by NAME — RMP has no course pages.">${esc(n)}</a>`;
+    const sep = '<span class="cm-who-sep">·</span>';
+
+    if (hit) {
+      const shown = hit.names.slice(0, 4);
+      const more = hit.names.length - shown.length;
+      return `<span class="cm-who">
+        <i class="fas fa-chalkboard-user" title="From BYU's public class schedule"></i>
+        <span class="cm-who-term">${esc(hit.term.label)}:</span>
+        ${shown.map(rmp).join(sep)}${more > 0 ? `<span class="cm-who-more">+${more} more</span>` : ""}
+        <a class="cm-who-all" href="${sched}" target="_blank" rel="noopener"
+           title="All sections, times and seats on BYU's class schedule">sections ↗</a>
       </span>`;
     }
-    const shown = hit.names.slice(0, 4);
-    const more = hit.names.length - shown.length;
-    const links = shown.map(n =>
-      `<a class="cm-prof" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}"
-          target="_blank" rel="noopener"
-          title="${esc(n)} on Rate My Professors (BYU). Searched by name — RMP has no course pages.">${esc(n)}</a>`
-    ).join('<span class="cm-who-sep">·</span>');
-    return `<span class="cm-who">
-      <i class="fas fa-chalkboard-user" title="From BYU's public class schedule"></i>
-      <span class="cm-who-term">${esc(hit.term.label)}:</span>
-      ${links}${more > 0 ? `<span class="cm-who-more">+${more} more</span>` : ""}
-      <a class="cm-who-all" href="${sched}" target="_blank" rel="noopener"
-         title="All sections, times and seats on BYU's class schedule">sections ↗</a>
+
+    // HISTORY — a student planning four years out is mostly looking at courses
+    // no posted term lists, and "no data" is a poor answer when the archive has
+    // the same two professors teaching it every year. Hedged deliberately:
+    // "usually", the count of terms it rests on, and never the term the course
+    // actually sits in, because that is precisely what BYU has not decided.
+    const hist = (S.historic || {})[courseId];
+    if (hist && hist.length) {
+      const span = (S.historyTerms || []).length;
+      const shown = hist.slice(0, 3);
+      const names = shown.map(([i]) => S.names[i]).filter(Boolean);
+      const top = hist[0][1];
+      return `<span class="cm-who cm-who-hist">
+        <i class="fas fa-clock-rotate-left" title="From past terms in BYU's class-schedule archive"></i>
+        <span class="cm-who-term">Usually taught by</span>
+        ${names.map(rmp).join(sep)}
+        <span class="cm-who-more">(${top} of the last ${span} Fall/Winter terms${hist.length > shown.length ? ", among others" : ""})</span>
+        <span class="cm-who-note">— BYU hasn't posted this term yet.</span>
+      </span>`;
+    }
+    return `<span class="cm-who cm-who-none">
+      <i class="fas fa-chalkboard-user"></i>
+      <span>BYU hasn't posted who teaches this yet —
+      <a href="${sched}" target="_blank" rel="noopener">check the class schedule</a> closer to registration.</span>
     </span>`;
   }
 
@@ -2452,17 +2472,28 @@ const App = (() => {
         for (const t of SCHEDULE.terms) {
           const idx = (SCHEDULE.byTerm[t.code] || {})[p.courseId];
           if (idx && idx.length) {
-            rows.push(`- ${p.courseId} (${t.label}): ${idx.slice(0, 6).map(i => SCHEDULE.names[i]).join(", ")}`);
-            break;
+            rows.push(`- ${p.courseId} (${t.label}, CONFIRMED): ${idx.slice(0, 6).map(i => SCHEDULE.names[i]).join(", ")}`);
+            return;
           }
+        }
+        // Past terms, clearly marked as a pattern rather than an assignment —
+        // the advisor must never turn "has taught it four years running" into
+        // "will be teaching it", which is a promise BYU has not made.
+        const h = (SCHEDULE.historic || {})[p.courseId];
+        if (h && h.length) {
+          rows.push(`- ${p.courseId} (HISTORICAL, not yet posted): usually `
+            + h.slice(0, 3).map(([i, n]) => `${SCHEDULE.names[i]} (${n} of last `
+              + `${(SCHEDULE.historyTerms || []).length} Fall/Winter terms)`).join(", "));
         }
       });
       if (rows.length) {
         lines.push(`INSTRUCTORS ON RECORD (BYU's public class schedule, scraped ${SCHEDULE.scraped}; `
           + `only ${SCHEDULE.terms.map(t => t.label).join(" and ")} are posted). `
-          + `These are the sections BYU has published — ALWAYS say which term a name belongs to, `
-          + `never promise a professor will teach a course in a term not listed here, and if a course `
-          + `isn't listed say it simply isn't posted yet rather than that it has no instructor. `
+          + `Rows marked CONFIRMED are sections BYU has actually published — ALWAYS say which term `
+          + `a name belongs to. Rows marked HISTORICAL are who taught it in PAST terms: report them `
+          + `as a pattern ("has taught it 3 of the last 4 years"), NEVER as who will teach it, `
+          + `because BYU has not assigned that term yet. If a course appears in neither list, say it `
+          + `isn't posted yet rather than that it has no instructor. `
           + `For opinions on a professor, point the student to Rate My Professors and search the NAME.`);
         lines.push(...rows);
       }

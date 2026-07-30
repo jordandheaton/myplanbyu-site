@@ -1041,10 +1041,16 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 .cm-prof { font-weight: 600; }
 .cm-who-more, .cm-who-all { color: var(--ink-3); }
 .cm-who-all { margin-left: 2px; }
-/* "Not offered in the posted terms" is INFORMATION, not an error: most catalog
-   courses simply aren't taught in the two semesters BYU has published yet. */
+/* "BYU hasn't posted this yet" is INFORMATION, not an error: most catalog
+   courses simply aren't taught in the semesters BYU has published so far. */
 .cm-who-none { color: var(--ink-3); }
 .cm-who-none .fa-chalkboard-user { opacity: .6; }
+/* The HISTORICAL answer must not look as authoritative as the posted one --
+   it is a good guess about an assignment BYU has not made. Muted, and it
+   carries its own hedge inline rather than relying on colour to say so. */
+.cm-who-hist .cm-who-term { color: var(--ink-3); font-weight: 500; }
+.cm-who-hist .fa-clock-rotate-left { color: var(--ink-3); }
+.cm-who-note { color: var(--ink-3); font-style: italic; }
 
 /* Graduate-by pair: season then year, on its own row BELOW the checkbox grid.
    Previously the single combined select sat between two pairs of checkboxes,

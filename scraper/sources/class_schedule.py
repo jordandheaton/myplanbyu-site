@@ -174,7 +174,28 @@ def term_label(yt: str) -> str:
     return f"{SEASON_NAME.get(yt[4], '?')} {yt[:4]}"
 
 
-def scrape(limit_terms: int = 4) -> Dict[str, Any]:
+def past_fw_terms(live: List[str], count: int) -> List[str]:
+    """The most recent Fall/Winter terms BEFORE the earliest live one.
+
+    Only Fall and Winter: Spring and Summer are taught by a much smaller and
+    less representative slice of faculty, so including them would make "who
+    usually teaches this" noisier, not better. The archive runs to 2002; four
+    terms (two years) is the useful window — further back and the answer starts
+    describing faculty who have retired or moved on.
+    """
+    floor = min(int(t) for t in live) if live else 99999
+    out: List[str] = []
+    year = floor // 10
+    while len(out) < count and year > 2015:
+        for season in ("5", "1"):                    # Fall then Winter of that year
+            yt = f"{year}{season}"
+            if int(yt) < floor and len(out) < count:
+                out.append(yt)
+        year -= 1
+    return out
+
+
+def scrape(limit_terms: int = 4, history_terms: int = 4) -> Dict[str, Any]:
     s = session()
     depts = fetch_departments(s)
     terms = live_terms(s, limit_terms)
@@ -223,17 +244,65 @@ def scrape(limit_terms: int = 4) -> Dict[str, Any]:
     covered = set()
     for c in by_term.values():
         covered |= set(c)
+
+    # ---- HISTORY: who USUALLY teaches the courses BYU has not posted -------
+    # A student planning four years out is mostly looking at courses no live
+    # term lists, and "no data" is a poor answer when the archive has taught
+    # the same course eight times. So sweep past Fall/Winter terms and count
+    # how often each instructor appears.
+    #
+    # Kept ONLY for codes missing from the live terms — that is precisely when
+    # the UI falls back to it, and storing history for courses we can already
+    # answer exactly would roughly double the payload to say nothing new.
+    historic: Dict[str, List[List[int]]] = {}
+    hist_terms: List[str] = []
+    if history_terms > 0:
+        counts: Dict[str, Dict[int, int]] = {}
+        for yt in past_fw_terms(terms, history_terms):
+            t0 = time.time()
+            hits = 0
+            for dept in depts:
+                for _, c in fetch_department(s, dept, yt).items():
+                    code = f"{c.get('dept_name','')} {c.get('catalog_number','')}" \
+                           f"{c.get('catalog_suffix') or ''}".strip()
+                    if code in covered or (ours and code not in ours):
+                        continue
+                    bucket = counts.setdefault(code, {})
+                    seen = set()
+                    for sec in c.get("sections") or []:
+                        n = (sec.get("instructor_name") or "").strip()
+                        if not n or n.upper() in {"TBA", "TBD", "STAFF"} or n in seen:
+                            continue
+                        seen.add(n)
+                        # count TERMS taught, not sections: a professor with six
+                        # sections of one class is not six times as likely to be
+                        # the one teaching it next year.
+                        bucket[intern(n)] = bucket.get(intern(n), 0) + 1
+                    hits += 1
+                time.sleep(DELAY_S)
+            hist_terms.append(yt)
+            print(f"  [history] {term_label(yt)}: {hits} unlisted courses "
+                  f"({int(time.time()-t0)}s)")
+        for code, bucket in counts.items():
+            top = sorted(bucket.items(), key=lambda kv: (-kv[1], names[kv[0]]))[:5]
+            historic[code] = [[i, n] for i, n in top]
+
     return {
         "source": SOURCE,
         "url": INDEX_URL,
         "scraped": time.strftime("%Y-%m-%d"),
         "terms": [{"code": yt, "label": term_label(yt)} for yt in terms],
+        "historyTerms": [{"code": yt, "label": term_label(yt)} for yt in hist_terms],
         "instructors": names,
         "byTerm": by_term,
+        "historic": historic,
         "stats": {
             "catalogCodes": len(ours),
             "covered": len(covered),
             "coverage": round(100 * len(covered) / len(ours), 1) if ours else None,
+            "historic": len(historic),
+            "coverageWithHistory": round(
+                100 * len(covered | set(historic)) / len(ours), 1) if ours else None,
         },
     }
 
@@ -242,11 +311,14 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--terms", type=int, default=4,
                     help="how many currently-listed terms to pull (default 4)")
+    ap.add_argument("--history", type=int, default=4,
+                    help="past Fall/Winter terms to sweep for courses BYU has "
+                         "not posted yet (default 4 = two years; 0 to skip)")
     ap.add_argument("--out", default=str(DATA / "class_schedule.json"))
     args = ap.parse_args()
 
     try:
-        doc = scrape(args.terms)
+        doc = scrape(args.terms, args.history)
     except Exception as exc:                        # noqa: BLE001
         print(f"class_schedule: FAILED -- {exc}", file=sys.stderr)
         return 1
@@ -257,7 +329,8 @@ def main() -> int:
     st = doc["stats"]
     print(f"wrote {out}  ({out.stat().st_size/1024:.0f} KB)  "
           f"{len(doc['instructors'])} instructors, "
-          f"{st['covered']}/{st['catalogCodes']} catalog courses ({st['coverage']}%)")
+          f"{st['covered']}/{st['catalogCodes']} posted ({st['coverage']}%)"
+          f" + {st['historic']} from history -> {st['coverageWithHistory']}% total")
     return 0
 
 

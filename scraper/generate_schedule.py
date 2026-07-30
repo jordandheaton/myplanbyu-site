@@ -39,8 +39,12 @@ def main() -> int:
     payload = {
         "scraped": d.get("scraped"),
         "terms": d.get("terms", []),
+        "historyTerms": d.get("historyTerms", []),
         "names": d.get("instructors", []),
         "byTerm": d.get("byTerm", {}),
+        # [[nameIdx, termsTaught], ...] for courses NO live term lists — the
+        # "who usually teaches this" fallback for a course four years out.
+        "historic": d.get("historic", {}),
     }
     body = json.dumps(payload, separators=(",", ":"), ensure_ascii=False)
     js = (
