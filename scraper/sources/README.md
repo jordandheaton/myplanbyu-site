@@ -9,6 +9,7 @@ so the advisor can mix and cite them.
 
 | Script | Source | What it pulls | Output | Refresh |
 |---|---|---|---|---|
+| `class_schedule.py` | `commtech.byu.edu/noauth/classSchedule` (public, no login) | **Who actually teaches each course**, per posted term, via the page's own `getClasses.php` AJAX endpoint. Omitting the catalog number returns a whole department at once, so 187 requests covers the university (~2 min). Instructor names are interned; only courses in our catalog are kept. | `data/class_schedule.json` -> `js/schedule_data.js` | weekly |
 | `catalog.py` | Coursedog catalog (`catalog.byu.edu`) | All courses + program requirements | `data/catalog.json` | each semester |
 | `marriott_business.py` | `marriott.byu.edu/mba/academics/minors-certificates` | Business emphases / minors / certificates (incl. **Global Business Certificate**) + track-sheet PDFs | `data/marriott_business.json` | yearly |
 | `language_certs.py` | `cls.byu.edu/programs/certificate/courseoptions` | 21 language certificates (Language / Civilization / Literature course options) | `data/language_certs.json` | yearly |

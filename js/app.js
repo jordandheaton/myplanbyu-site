@@ -1386,6 +1386,55 @@ const App = (() => {
       </div></div>`;
   }
 
+  /* WHO TEACHES THIS — the one question the planner structurally could not
+     answer. The catalog knows a course exists and what it requires; only BYU's
+     class schedule knows who stands in front of it, and that is what decides
+     between two ways of filling the same slot.
+
+     Three rules the display has to keep:
+       1. NAME THE TERM. "Who teaches this" means nothing detached from a
+          semester — instructors change, and a bare name reads as permanent.
+       2. NEWEST TERM FIRST, and say when the course is not in the terms BYU
+          has posted at all. Silence would imply the course has no instructor;
+          about 45% of catalog courses simply are not taught in the two terms
+          currently published.
+       3. Rate My Professors is searched BY NAME. RMP has no course pages, so
+          each instructor links to their own search, not a dead course query. */
+  function whoTeaches(courseId) {
+    const S = typeof SCHEDULE !== "undefined" ? SCHEDULE : null;
+    const sched = "https://commtech.byu.edu/noauth/classSchedule/index.php";
+    if (!S || !S.terms || !S.terms.length) {
+      return `<span class="cm-who"><a href="${sched}" target="_blank" rel="noopener"
+        title="BYU's public class schedule — search this course to see who is teaching it."><i class="fas fa-chalkboard-user"></i> Who teaches this?</a></span>`;
+    }
+    let hit = null;
+    for (const t of S.terms) {                       // newest first
+      const idx = (S.byTerm[t.code] || {})[courseId];
+      if (idx && idx.length) { hit = { term: t, names: idx.map(i => S.names[i]).filter(Boolean) }; break; }
+    }
+    if (!hit) {
+      return `<span class="cm-who cm-who-none">
+        <i class="fas fa-chalkboard-user"></i>
+        <span>Not offered in ${S.terms.map(t => esc(t.label)).join(" or ")} —
+        <a href="${sched}" target="_blank" rel="noopener">check the class schedule</a> closer to registration.</span>
+      </span>`;
+    }
+    const shown = hit.names.slice(0, 4);
+    const more = hit.names.length - shown.length;
+    const links = shown.map(n =>
+      `<a class="cm-prof" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}"
+          target="_blank" rel="noopener"
+          title="${esc(n)} on Rate My Professors (BYU). Searched by name — RMP has no course pages.">${esc(n)}</a>`
+    ).join('<span class="cm-who-sep">·</span>');
+    return `<span class="cm-who">
+      <i class="fas fa-chalkboard-user" title="From BYU's public class schedule"></i>
+      <span class="cm-who-term">${esc(hit.term.label)}:</span>
+      ${links}${more > 0 ? `<span class="cm-who-more">+${more} more</span>` : ""}
+      <a class="cm-who-all" href="${sched}" target="_blank" rel="noopener"
+         title="All sections, times and seats on BYU's class schedule">sections ↗</a>
+    </span>`;
+  }
+
   function openCourseModal(uid) {
     const p = result.placements.find(x => x.uid === uid);
     if (!p) return;
@@ -1407,13 +1456,7 @@ const App = (() => {
         <span class="badge lg ${t.cls}">${t.label}</span>
         <div>
           <h3>${esc(p.display)} <span class="cm-cr">${p.credits.toFixed(1)} cr</span></h3>
-          ${!p.placeholder && !c.unlisted ? `<span class="cm-who">
-            <a href="https://commtech.byu.edu/noauth/classSchedule/index.php" target="_blank" rel="noopener" title="BYU's public class schedule — search this course to see the sections actually offered and who is teaching them. The planner is course-level and has no section or instructor data of its own.">
-              <i class="fas fa-chalkboard-user"></i> Who teaches this?</a>
-            <span class="cm-who-sep">·</span>
-            <a href="https://www.ratemyprofessors.com/school/135" target="_blank" rel="noopener" title="Rate My Professors, BYU. Search by INSTRUCTOR NAME — RMP has no course pages, so get the name from the class schedule first.">
-              <i class="fas fa-star-half-stroke"></i> Rate My Professors</a>
-          </span>` : ""}
+          ${!p.placeholder && !c.unlisted ? whoTeaches(p.courseId) : ""}
           <p class="cm-name">${c.unlisted
             ? `<span class="unlisted-tag">no course number yet</span> Your program lists this course, but the catalog hasn't published a course number for it. Ask your advisor for the number before you register.`
             : esc(p.name)}</p>
@@ -1740,7 +1783,17 @@ const App = (() => {
       ${gradTargetControls(prof, "pcTargetSeason", "pcTargetYear")}`;
     $("#prioModal").classList.add("open");
     $("#prioApply").onclick = () => {
+      // Changing the graduation date is NOT a small edit. Stability holds every
+      // course in the term it already occupies, which is right for a bucket
+      // pick and wrong for a re-pacing: the guard below only overrides it when
+      // holding costs a semester, so a STRETCH — whose whole point is gaining
+      // one — lost it every time. Computer Science set to Winter 2031 in the
+      // wizard lands on ten semesters ending on the target; changed to Winter
+      // 2031 from the panel it landed on nine, ending a term early. Re-pacing
+      // starts clean.
+      const before = JSON.stringify(prof.settings.targetGrad || null);
       prof.settings.targetGrad = readGradTarget("pcTargetSeason", "pcTargetYear");
+      const paceChanged = JSON.stringify(prof.settings.targetGrad || null) !== before;
       Object.assign(prof.settings, {
         maxCreditsFW: parseInt($("#pcMaxFW").value, 10) || 17,
         minCreditsFW: parseInt($("#pcMinFW").value, 10) || 14,
@@ -1750,7 +1803,7 @@ const App = (() => {
         scholarshipFullTime: $("#pcSchol").checked, religionPacing: $("#pcRel").checked,
       });
       closeModal("#prioModal");
-      solveActive();
+      solveActive(paceChanged ? { fresh: true } : {});
       toast("Re-optimized with new constraints.", "ok");
     };
   }
@@ -2385,6 +2438,36 @@ const App = (() => {
       lines.push("Placement notes for specific courses:");
       lines.push(...whyLines);
     }
+    // WHO TEACHES WHAT — from BYU's public class schedule. The advisor used to
+    // have to send every "who teaches X / which professor should I take"
+    // question away to two other websites. For the terms BYU has actually
+    // posted it can now answer, and the term label travels with the names so
+    // it can never present a Fall roster as if it were next Winter's. Capped
+    // and restricted to courses IN THIS PLAN — the point is the student's own
+    // classes, not a directory dump.
+    if (typeof SCHEDULE !== "undefined" && SCHEDULE.terms && SCHEDULE.terms.length) {
+      const rows = [];
+      (result.placements || []).forEach(p => {
+        if (rows.length >= 25 || p.placeholder) return;
+        for (const t of SCHEDULE.terms) {
+          const idx = (SCHEDULE.byTerm[t.code] || {})[p.courseId];
+          if (idx && idx.length) {
+            rows.push(`- ${p.courseId} (${t.label}): ${idx.slice(0, 6).map(i => SCHEDULE.names[i]).join(", ")}`);
+            break;
+          }
+        }
+      });
+      if (rows.length) {
+        lines.push(`INSTRUCTORS ON RECORD (BYU's public class schedule, scraped ${SCHEDULE.scraped}; `
+          + `only ${SCHEDULE.terms.map(t => t.label).join(" and ")} are posted). `
+          + `These are the sections BYU has published — ALWAYS say which term a name belongs to, `
+          + `never promise a professor will teach a course in a term not listed here, and if a course `
+          + `isn't listed say it simply isn't posted yet rather than that it has no instructor. `
+          + `For opinions on a professor, point the student to Rate My Professors and search the NAME.`);
+        lines.push(...rows);
+      }
+    }
+
     // locked flowchart cohorts (junior-core envelopes)
     const state = result.state;
     const blockLines = [];

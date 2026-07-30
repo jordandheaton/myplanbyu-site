@@ -2752,7 +2752,14 @@ const Solver = (() => {
         // replaces both with its own pace — otherwise this pass, which is not
         // score-gated, would quietly re-pack a deliberately stretched tail
         // back into the sheet terms at 16 credits and undo the whole thing.
-        const band = state.paceCap != null
+        // ...but a tail term BELOW the full-time line is a semester that should
+        // not exist, and dissolving it outranks the pace. Holding the band at
+        // ~13 left 21 of 125 paced plans ending on a starved term — Accounting
+        // finished on a Winter holding one 2-credit religion class. Pace is a
+        // preference about how full semesters are; this is about whether a
+        // semester is worth enrolling in at all, so the real policy band wins.
+        const starvedTail = state.load[t] < floorFW(state) - 0.01;
+        const band = (state.paceCap != null && !starvedTail)
           ? [Math.min(16, state.paceCap), Math.min(17, state.paceCap + 1)] : [16, 17];
         let home = null;
         for (const ceil of band) {

@@ -50,6 +50,13 @@ try {
   Invoke-Step -Name "maps"     -Arguments $mapsArgs                      -Python $py -Fatal | Out-Null
   Invoke-Step -Name "generate" -Arguments @("generate_data.py")           -Python $py -Fatal | Out-Null
   Invoke-Step -Name "timeline" -Arguments @("generate_timeline.py")       -Python $py -Fatal | Out-Null
+  # Class schedule LAST and NON-FATAL. It is the only step whose data is a
+  # nice-to-have -- every plan is still correct without instructor names -- and
+  # it depends on js\catalog_data.js, which the generate step above rewrites.
+  # Weekly is the right cadence: sections are added, cancelled and reassigned
+  # right through the registration window.
+  Invoke-Step -Name "sections" -Arguments @("sources\class_schedule.py")  -Python $py         | Out-Null
+  Invoke-Step -Name "schedule" -Arguments @("generate_schedule.py")        -Python $py         | Out-Null
 } catch {
   exit (Stop-RefreshRunWithError -Message $_.Exception.Message)
 }

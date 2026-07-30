@@ -1030,11 +1030,21 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
    schedule is the only source that knows who actually teaches a section next
    term, and the planner is course-level so it cannot know that itself. Two
    links in the honest order rather than one that pretends to skip a step. */
-.cm-who { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+.cm-who { display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
           font-size: .74rem; margin: 3px 0 5px; }
 .cm-who a { color: var(--royal); }
 .cm-who a:hover { text-decoration: underline; }
 .cm-who-sep { color: var(--ink-3); }
+/* The TERM label is not decoration -- an instructor name means nothing without
+   the semester it belongs to, so it reads as part of the same sentence. */
+.cm-who-term { color: var(--ink-2); font-weight: 600; }
+.cm-prof { font-weight: 600; }
+.cm-who-more, .cm-who-all { color: var(--ink-3); }
+.cm-who-all { margin-left: 2px; }
+/* "Not offered in the posted terms" is INFORMATION, not an error: most catalog
+   courses simply aren't taught in the two semesters BYU has published yet. */
+.cm-who-none { color: var(--ink-3); }
+.cm-who-none .fa-chalkboard-user { opacity: .6; }
 
 /* Graduate-by pair: season then year, on its own row BELOW the checkbox grid.
    Previously the single combined select sat between two pairs of checkboxes,
