@@ -1024,8 +1024,21 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   * { animation: none !important; transition: none !important; }
 }
 
-/* RMP link-out on the class modal — a LINK to the source, deliberately not an
-   integration: RMP has no official API, and the planner has no section or
-   instructor data, so ranking professors here would be confident fiction. */
-.cm-rmp { display: inline-block; font-size: .74rem; margin: 2px 0 4px; color: var(--royal); }
-.cm-rmp:hover { text-decoration: underline; }
+/* "Who teaches this?" -> BYU's own class schedule, then RMP by instructor NAME.
+   The first version linked RMP with the course code as the query, which always
+   returned nothing: RMP indexes professors, not courses. BYU's public class
+   schedule is the only source that knows who actually teaches a section next
+   term, and the planner is course-level so it cannot know that itself. Two
+   links in the honest order rather than one that pretends to skip a step. */
+.cm-who { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+          font-size: .74rem; margin: 3px 0 5px; }
+.cm-who a { color: var(--royal); }
+.cm-who a:hover { text-decoration: underline; }
+.cm-who-sep { color: var(--ink-3); }
+
+/* Graduate-by pair: season then year, on its own row BELOW the checkbox grid.
+   Previously the single combined select sat between two pairs of checkboxes,
+   which read as a layout accident. */
+.grad-lbl { display: block; margin: 14px 0 6px; }
+.grad-row { display: flex; gap: 10px; }
+.grad-row select { flex: 1 1 0; min-width: 0; }

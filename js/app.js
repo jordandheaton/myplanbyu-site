@@ -1407,8 +1407,13 @@ const App = (() => {
         <span class="badge lg ${t.cls}">${t.label}</span>
         <div>
           <h3>${esc(p.display)} <span class="cm-cr">${p.credits.toFixed(1)} cr</span></h3>
-          ${!p.placeholder && !c.unlisted ? `<a class="cm-rmp" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(p.courseId)}" target="_blank" rel="noopener" title="Student reviews of professors who have taught this course — Rate My Professors, BYU page. The planner has no section/instructor data, so check who actually teaches it next semester.">
-            <i class="fas fa-star-half-stroke"></i> Professor ratings (RMP)</a>` : ""}
+          ${!p.placeholder && !c.unlisted ? `<span class="cm-who">
+            <a href="https://commtech.byu.edu/noauth/classSchedule/index.php" target="_blank" rel="noopener" title="BYU's public class schedule — search this course to see the sections actually offered and who is teaching them. The planner is course-level and has no section or instructor data of its own.">
+              <i class="fas fa-chalkboard-user"></i> Who teaches this?</a>
+            <span class="cm-who-sep">·</span>
+            <a href="https://www.ratemyprofessors.com/school/135" target="_blank" rel="noopener" title="Rate My Professors, BYU. Search by INSTRUCTOR NAME — RMP has no course pages, so get the name from the class schedule first.">
+              <i class="fas fa-star-half-stroke"></i> Rate My Professors</a>
+          </span>` : ""}
           <p class="cm-name">${c.unlisted
             ? `<span class="unlisted-tag">no course number yet</span> Your program lists this course, but the catalog hasn't published a course number for it. Ask your advisor for the number before you register.`
             : esc(p.name)}</p>
@@ -1729,34 +1734,13 @@ const App = (() => {
           <input type="number" id="pcDcCap" min="0" max="30" value="${prof.settings.doubleCountCap}"></label>
         <label class="chk"><input type="checkbox" id="pcSpring" ${prof.settings.allowSpring ? "checked" : ""}> Allow Spring terms</label>
         <label class="chk"><input type="checkbox" id="pcSummer" ${prof.settings.allowSummer ? "checked" : ""}> Allow Summer terms</label>
-        <label>Graduate by (target)
-          <select id="pcTarget">
-            <option value="">No target — best pace (recommended)</option>
-            ${(() => {
-              // F/W terms across the horizon, "Winter 2028 (April)" style —
-              // April/December are what students actually say out loud
-              const out = [];
-              const st = prof.startTerm || { year: new Date().getFullYear(), season: "F" };
-              const cur = prof.settings.targetGrad || {};
-              for (let y = st.year; y < st.year + (prof.settings.horizonYears || 6); y++) {
-                for (const [se, mon] of [["F", "December"], ["W", "April"]]) {
-                  const yy = se === "W" ? y + 1 : y;
-                  if (yy === st.year && st.season === "W" && se === "F") continue;
-                  const sel = cur.year === yy && cur.season === se ? " selected" : "";
-                  out.push(`<option value="${yy}-${se}"${sel}>${se === "W" ? "Winter" : "Fall"} ${yy} (${mon} ${se === "W" ? yy : yy})</option>`);
-                }
-              }
-              return out.join("");
-            })()}
-          </select></label>
         <label class="chk"><input type="checkbox" id="pcSchol" ${prof.settings.scholarshipFullTime ? "checked" : ""}> Scholarship requires full-time</label>
         <label class="chk"><input type="checkbox" id="pcRel" ${prof.settings.religionPacing ? "checked" : ""}> Pace religion credits yearly</label>
-      </div>`;
+      </div>
+      ${gradTargetControls(prof, "pcTargetSeason", "pcTargetYear")}`;
     $("#prioModal").classList.add("open");
     $("#prioApply").onclick = () => {
-      const tgv = $("#pcTarget").value;
-      prof.settings.targetGrad = tgv
-        ? { year: parseInt(tgv, 10), season: tgv.split("-")[1] } : null;
+      prof.settings.targetGrad = readGradTarget("pcTargetSeason", "pcTargetYear");
       Object.assign(prof.settings, {
         maxCreditsFW: parseInt($("#pcMaxFW").value, 10) || 17,
         minCreditsFW: parseInt($("#pcMinFW").value, 10) || 14,
@@ -1769,6 +1753,39 @@ const App = (() => {
       solveActive();
       toast("Re-optimized with new constraints.", "ok");
     };
+  }
+
+  /* Graduate-by target as TWO dropdowns (season, then year) rather than one
+     combined list: "Winter" + "2028" is how a student says it out loud, and a
+     single 12-option list made them read a compound label to find their term.
+     Shared by the wizard and the constraints panel so the two cannot drift.
+     Season first, because that is the part people are sure about. */
+  function gradTargetControls(prof, idSeason, idYear) {
+    const cur = (prof.settings && prof.settings.targetGrad) || {};
+    const st = prof.startTerm || { year: new Date().getFullYear(), season: "F" };
+    const span = prof.settings && prof.settings.horizonYears || 6;
+    const years = [];
+    for (let y = st.year; y <= st.year + span; y++) years.push(y);
+    return `
+      <label class="wiz-lbl grad-lbl">Graduate by <span class="wiz-sub">(optional — leave blank for the best pace)</span></label>
+      <div class="grad-row">
+        <select id="${idSeason}">
+          <option value="">No target</option>
+          <option value="W"${cur.season === "W" ? " selected" : ""}>Winter (April)</option>
+          <option value="F"${cur.season === "F" ? " selected" : ""}>Fall (December)</option>
+        </select>
+        <select id="${idYear}">
+          ${years.map(y => `<option value="${y}"${cur.year === y ? " selected" : ""}>${y}</option>`).join("")}
+        </select>
+      </div>`;
+  }
+
+  /* Read the pair back. Season empty = no target; a year alone means nothing. */
+  function readGradTarget(idSeason, idYear) {
+    const se = $("#" + idSeason).value;
+    if (!se) return null;
+    const yr = parseInt($("#" + idYear).value, 10);
+    return yr ? { year: yr, season: se } : null;
   }
 
   /* ------------------------------ wizard ----------------------------- */
@@ -2092,6 +2109,7 @@ const App = (() => {
           <label class="chk"><input type="checkbox" id="wcSchol" ${wiz.settings.scholarshipFullTime ? "checked" : ""}> My scholarship requires full-time (12+ cr)</label>
           <label class="chk"><input type="checkbox" id="wcRel" ${wiz.settings.religionPacing ? "checked" : ""}> Pace religion credits across years</label>
         </div>
+        ${gradTargetControls(wiz, "wcTargetSeason", "wcTargetYear")}
         <p class="wiz-hint"><i class="fas fa-lightbulb"></i> Spring and Summer terms are optional — turning them on lets the planner finish sooner, at the cost of a shorter break.</p>`;
     }
     $("#wizBack").style.visibility = wizStep === 0 ? "hidden" : "visible";
@@ -2105,6 +2123,7 @@ const App = (() => {
         maxCreditsSpSu: parseInt($("#wcMaxSS").value, 10) || 8,
         allowSpring: $("#wcSpring").checked, allowSummer: $("#wcSummer").checked,
         scholarshipFullTime: $("#wcSchol").checked, religionPacing: $("#wcRel").checked,
+        targetGrad: readGradTarget("wcTargetSeason", "wcTargetYear"),
       });
     }
     if (wizStep === 1) {
