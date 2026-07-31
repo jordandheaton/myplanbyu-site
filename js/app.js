@@ -1431,25 +1431,37 @@ const App = (() => {
   function whoTeaches(courseId, schedTm) {
     const S = typeof SCHEDULE !== "undefined" ? SCHEDULE : null;
     const sched = "https://commtech.byu.edu/noauth/classSchedule/index.php";
+    // The block is a `.cm-sec` — the modal's own visual grammar ("PREREQUISITES
+    // · per catalog", "WHY IT'S HERE · solver reasoning") — instead of an
+    // unlabeled strip of chips under the title, which is how the first version
+    // shipped and why it read as clutter. One line per job, top to bottom:
+    // what this is (label + data-state), the names, how to read them, the
+    // live-sections action, and the registration note. The tan callout for
+    // the historical state is the same idea colour-coded: pattern, not roster.
+    const sec = (srcLabel, body, cls) => `
+      <div class="cm-sec cm-who-sec${cls ? " " + cls : ""}">
+        <label>Who teaches it ${srcLabel ? `<span class="cm-seclabel-src">· ${srcLabel}</span>` : ""}</label>
+        ${body}
+      </div>`;
     if (!S || !S.terms || !S.terms.length) {
-      return `<span class="cm-who"><a href="${sched}" target="_blank" rel="noopener"
-        title="BYU's public class schedule — search this course to see who is teaching it."><i class="fas fa-chalkboard-user"></i> Who teaches this?</a></span>`;
+      return sec("", `<p class="cm-pretext cm-none"><a href="${sched}" target="_blank" rel="noopener">Search BYU's class schedule ↗</a></p>`);
     }
-    const rmp = n => `<a class="cm-prof" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}"
+    const rmp = n => `<a class="cm-prof-chip" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}"
         target="_blank" rel="noopener"
-        title="${esc(n)} on Rate My Professors (BYU). Searched by NAME — RMP has no course pages.">${esc(n)}</a>`;
-    const sep = '<span class="cm-who-sep">·</span>';
+        title="${esc(n)} — opens their Rate My Professors reviews (BYU)">${esc(n)}</a>`;
     const namesBlock = names => {
       const head = names.slice(0, 4), rest = names.slice(4);
-      return head.map(rmp).join(sep)
-        + (rest.length ? `<button type="button" class="cm-who-more-btn" id="cmWhoMore">+${rest.length} more ▾</button>
-           <span class="cm-who-rest" id="cmWhoRest" hidden>${sep}${rest.map(rmp).join(sep)}</span>` : "");
+      return `<div class="cm-prof-row">${head.map(rmp).join("")}
+        ${rest.length ? `<button type="button" class="cm-prof-chip cm-prof-more" id="cmWhoMore">+${rest.length} more ▾</button>
+          <span class="cm-who-rest" id="cmWhoRest" hidden>${rest.map(rmp).join("")}</span>` : ""}</div>
+        <div class="cm-who-hint">tap a name for their Rate My Professors reviews</div>`;
     };
-    const sectionsBtn = (code, label) =>
+    const sectionsBtn = (code, label, n) =>
       `<button type="button" class="cm-sections-btn" id="cmSectionsBtn"
         data-course="${esc(courseId)}" data-term="${code}" data-label="${esc(label)}"
-        title="Live from BYU: every ${esc(label)} section with instructor, meeting time, and up-to-the-minute seat counts">
-        <i class="fas fa-table-list"></i> ${esc(label)} sections</button>`;
+        title="Fetched from BYU the moment you click — section times, instructors, and current seat availability">
+        <i class="fas fa-table-list"></i> See ${esc(label)} sections <span class="cm-live-dot"></span> live seat counts</button>`;
+    const noteLine = t => t ? `<div class="cm-who-note">${t}</div>` : "";
 
     const schedCode = termCodeOf(schedTm);
     const rosterOf = code => {
@@ -1460,13 +1472,9 @@ const App = (() => {
     // 1) CONFIRMED — the roster for the exact term the plan schedules it
     const own = schedCode && S.terms.find(t => t.code === schedCode) && rosterOf(schedCode);
     if (own) {
-      const note = regNote(S, schedCode, true);
-      return `<span class="cm-who">
-        <span class="cm-badge cm-badge-live" title="BYU has published this term's sections — this is the actual ${esc(schedTm.label)} teaching roster, not a guess">✓ ${esc(schedTm.label)} · confirmed</span>
-        ${namesBlock(own)}
-        ${sectionsBtn(schedCode, schedTm.label)}
-        ${note ? `<span class="cm-who-note">${esc(note)}</span>` : ""}
-      </span>`;
+      return sec(`<span class="cm-badge cm-badge-live">✓ confirmed for ${esc(schedTm.label)}</span>`,
+        namesBlock(own) + sectionsBtn(schedCode, schedTm.label)
+        + noteLine(esc(regNote(S, schedCode, true))));
     }
 
     // 2) A DIFFERENT posted term lists it — real data, wrong semester. Say
@@ -1474,12 +1482,9 @@ const App = (() => {
     for (const t of S.terms) {
       const names = rosterOf(t.code);
       if (names) {
-        return `<span class="cm-who">
-          <span class="cm-badge cm-badge-other" title="Confirmed roster for ${esc(t.label)} — shown because the term your plan schedules this course isn't posted yet">${esc(t.label)} roster</span>
-          ${namesBlock(names)}
-          ${sectionsBtn(t.code, t.label)}
-          <span class="cm-who-note">Your plan takes this ${esc(schedTm ? schedTm.label : "later")} — BYU hasn't posted that term. ${esc(regNote(S, schedCode, false))}</span>
-        </span>`;
+        return sec(`<span class="cm-badge cm-badge-other">latest roster — ${esc(t.label)}</span>`,
+          namesBlock(names) + sectionsBtn(t.code, t.label)
+          + noteLine(`Your plan takes this ${esc(schedTm ? schedTm.label : "later")}, which BYU hasn't posted — above is who's teaching it ${esc(t.label)}, the best available signal. ${esc(regNote(S, schedCode, false))}`));
       }
     }
 
@@ -1489,19 +1494,15 @@ const App = (() => {
     if (hist && hist.length) {
       const span = (S.historyTerms || []).length;
       const names = hist.slice(0, 3).map(([i]) => S.names[i]).filter(Boolean);
-      return `<span class="cm-who cm-who-hist">
-        <span class="cm-badge cm-badge-hist" title="From BYU's class-schedule archive — a pattern, not an assignment">↻ historically</span>
-        <span class="cm-who-term">Usually taught by</span>
-        ${names.map(rmp).join(sep)}
-        <span class="cm-who-more">(${hist[0][1]} of the last ${span} Fall/Winter terms${hist.length > names.length ? ", among others" : ""})</span>
-        <span class="cm-who-note">BYU hasn't posted this term yet. ${esc(regNote(S, schedCode, false))}</span>
-      </span>`;
+      return sec(`<span class="cm-badge cm-badge-hist">↻ based on past terms</span>`,
+        `<div class="cm-prof-row">${names.map(rmp).join("")}</div>
+         <div class="cm-who-hint">taught it ${hist[0][1]} of the last ${span} Fall/Winter terms${hist.length > names.length ? " (among others)" : ""} — tap a name for reviews</div>`
+        + noteLine(`BYU hasn't assigned this term yet. ${esc(regNote(S, schedCode, false))}`),
+        "cm-who-histsec");
     }
-    return `<span class="cm-who cm-who-none">
-      <i class="fas fa-chalkboard-user"></i>
-      <span>BYU hasn't posted who teaches this yet — ${esc(regNote(S, schedCode, false)) || ""}
-      <a href="${sched}" target="_blank" rel="noopener">check the class schedule</a> closer to registration.</span>
-    </span>`;
+    return sec("",
+      `<p class="cm-pretext cm-none">BYU hasn't posted who teaches this yet. ${esc(regNote(S, schedCode, false))}
+       <a href="${sched}" target="_blank" rel="noopener">Check the class schedule ↗</a></p>`);
   }
 
   /* LIVE SECTIONS — one click fetches this course's real section list through
@@ -1578,13 +1579,11 @@ const App = (() => {
         <span class="badge lg ${t.cls}">${t.label}</span>
         <div>
           <h3>${esc(p.display)} <span class="cm-cr">${p.credits.toFixed(1)} cr</span></h3>
-          ${!p.placeholder && !c.unlisted ? whoTeaches(p.courseId, term) : ""}
           <p class="cm-name">${c.unlisted
             ? `<span class="unlisted-tag">no course number yet</span> Your program lists this course, but the catalog hasn't published a course number for it. Ask your advisor for the number before you register.`
             : esc(p.name)}</p>
         </div>
       </div>
-      <div id="cmSections"></div>
       <div class="cm-grid">
         <div class="cm-cell"><label>Scheduled</label><b>${esc(term.label)}${p.pinned ? " 📌" : ""}${p.block ? " · cohort block" : ""}</b></div>
         <div class="cm-cell"><label>Offered</label><b>${[...c.off].map(s => Solver.SEASON_NAME[s]).join(", ")}</b></div>
@@ -1592,6 +1591,8 @@ const App = (() => {
           <span class="diff-meter"><span style="width:${c.diff * 10}%" class="${c.diff >= 7 ? "hot" : ""}"></span></span> <b>${c.diff}/10</b></div>
         <div class="cm-cell"><label>Time cost</label><b>×${(c.load || 1).toFixed(1)} of credit hours</b></div>
       </div>
+      ${!p.placeholder && !c.unlisted ? whoTeaches(p.courseId, term) : ""}
+      <div id="cmSections"></div>
       ${(c.preText || pre.length) ? `<div class="cm-sec"><label>Prerequisites <span class="cm-seclabel-src">· per catalog</span></label>
         ${c.preText ? `<p class="cm-pretext">${esc(c.preText)}</p>` : ""}
         ${pre.length ? `<div class="cm-chips">${pre.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>` : ""}</div>`

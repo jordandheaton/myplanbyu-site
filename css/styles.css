@@ -1030,17 +1030,29 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
    schedule is the only source that knows who actually teaches a section next
    term, and the planner is course-level so it cannot know that itself. Two
    links in the honest order rather than one that pretends to skip a step. */
-.cm-who { display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
-          font-size: .74rem; margin: 3px 0 5px; }
-.cm-who a { color: var(--royal); }
-.cm-who a:hover { text-decoration: underline; }
-.cm-who-sep { color: var(--ink-3); }
+/* The block lives as a `.cm-sec` ("WHO TEACHES IT") so it reads in the same
+   grammar as PREREQUISITES and WHY IT'S HERE, instead of an unlabeled strip
+   of links crammed under the course title — which is how v1 shipped, and
+   which read as clutter. One line per job: state, names, hint, action, note. */
+.cm-who-sec .cm-badge { vertical-align: 1px; margin-left: 2px; }
+.cm-prof-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px; }
+.cm-prof-chip { display: inline-block; font: inherit; font-size: .74rem;
+  font-weight: 600; color: var(--royal); background: var(--paper-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px;
+  text-decoration: none; cursor: pointer; }
+.cm-prof-chip:hover { border-color: var(--royal); text-decoration: none; }
+.cm-prof-more { color: var(--ink-2); background: none; border-style: dashed; }
+.cm-who-hint { font-size: .68rem; color: var(--ink-3); margin-bottom: 6px; }
+.cm-live-dot { display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; background: #2fa661; margin: 0 1px 0 4px;
+  animation: livePulse 2s ease-in-out infinite; }
+@keyframes livePulse { 50% { opacity: .35; } }
+/* historical = a pattern, not a roster: the whole block sits on the same tan
+   the badge uses, so the state is visible before a single word is read */
+.cm-who-histsec { background: #faf7ee; border: 1px solid #eadfc2;
+  border-radius: 10px; padding: 8px 10px; }
 /* The TERM label is not decoration -- an instructor name means nothing without
    the semester it belongs to, so it reads as part of the same sentence. */
-.cm-who-term { color: var(--ink-2); font-weight: 600; }
-.cm-prof { font-weight: 600; }
-.cm-who-more, .cm-who-all { color: var(--ink-3); }
-.cm-who-all { margin-left: 2px; }
 /* "BYU hasn't posted this yet" is INFORMATION, not an error: most catalog
    courses simply aren't taught in the semesters BYU has published so far. */
 .cm-who-none { color: var(--ink-3); }
@@ -1048,8 +1060,7 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 /* The HISTORICAL answer must not look as authoritative as the posted one --
    it is a good guess about an assignment BYU has not made. Muted, and it
    carries its own hedge inline rather than relying on colour to say so. */
-.cm-who-hist .cm-who-term { color: var(--ink-3); font-weight: 500; }
-.cm-who-note { color: var(--ink-3); font-style: italic; flex-basis: 100%; }
+.cm-who-note { color: var(--ink-3); font-style: italic; font-size: .72rem; margin-top: 5px; }
 
 /* Per-class data-state badge. Three states, three looks, so a student can
    tell at a glance whether they are reading BYU's actual roster for THEIR
@@ -1063,11 +1074,11 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
 
 /* "+N more" expander and the live-sections trigger read as quiet controls,
    not as data -- the names are the content, these are how you get more. */
-.cm-who-more-btn, .cm-sections-btn {
-  font: inherit; font-size: .7rem; color: var(--royal); background: none;
-  border: 1px solid var(--line); border-radius: 8px; padding: 1px 8px;
-  cursor: pointer; }
-.cm-who-more-btn:hover, .cm-sections-btn:hover { background: var(--paper-2); }
+.cm-sections-btn {
+  font: inherit; font-size: .74rem; font-weight: 600; color: var(--royal);
+  background: none; border: 1px solid var(--line); border-radius: 8px;
+  padding: 4px 12px; cursor: pointer; }
+.cm-sections-btn:hover { background: var(--paper-2); border-color: var(--royal); }
 .cm-who-rest { display: contents; }
 /* display:contents BEATS the hidden attribute's UA display:none (author rule
    wins the cascade), so without this line the "hidden" names rendered anyway
