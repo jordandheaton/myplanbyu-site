@@ -44,9 +44,15 @@ body {
   padding: 0 18px; height: 46px; flex: 0 0 auto;
 }
 .topbar-brand { display: flex; align-items: baseline; gap: 9px; font-weight: 800; }
-.topbar-brand .byu { font-size: 1.25rem; letter-spacing: .5px; }
-.topbar-brand .divider { opacity: .45; font-weight: 400; }
-.topbar-brand .app { font-size: 1.05rem; font-weight: 600; }
+/* the app name is the ONLY mark up here -- see index.html: the old
+   "BYU | myplanBYU" lockup wore the university's own header pattern */
+.topbar-brand .app { font-size: 1.2rem; font-weight: 800; letter-spacing: .2px; }
+/* the disclaimer sits where the wordmark used to: first thing the top-left
+   says. Words, not just styling, so it survives screenshots and squinting. */
+.unofficial-chip { font-size: .58rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; padding: 2px 8px; border-radius: 999px; align-self: center;
+  background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.3);
+  color: #fff; opacity: .92; white-space: nowrap; }
 .topbar-brand .tagline { font-size: .72rem; font-weight: 500; opacity: .55; margin-left: 6px; letter-spacing: .4px; }
 .topbar-right { display: flex; align-items: center; gap: 16px; font-size: .85rem; }
 .topbar-link { color: #cfe0f3; text-decoration: none; }
@@ -904,6 +910,8 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   .topbar { padding: 0 6px 0 14px; }
   .topbar-brand { gap: 7px; }
   .topbar-brand .tagline { display: none; }
+  /* the chip is the one thing that must SURVIVE the phone squeeze */
+  .unofficial-chip { font-size: .52rem; padding: 2px 6px; }
   .topbar-right { gap: 2px; }
   .topbar-icon {
     place-items: center; width: 40px; height: 40px;
