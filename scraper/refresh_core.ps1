@@ -61,4 +61,16 @@ try {
   exit (Stop-RefreshRunWithError -Message $_.Exception.Message)
 }
 
-exit (Complete-RefreshRun -Python $py -NoPublish:$NoPublish)
+$code = Complete-RefreshRun -Python $py -NoPublish:$NoPublish
+# Mirror the refreshed site into the standalone deploy repo that serves
+# myplan.jordanheaton.com (see publish_site.ps1 for why two homes exist).
+# Strictly AFTER the sanity gate and only on success -- a refresh the gate
+# rejected must never reach either deployment. Non-fatal: a failed mirror
+# does not turn a good refresh into a failed run.
+if ($code -eq 0 -and -not $NoPublish) {
+  try {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "publish_site.ps1") 2>&1 |
+      ForEach-Object { Write-Log ("publish_site: " + $_) }
+  } catch { Write-Log ("publish_site: FAILED -- " + $_.Exception.Message) }
+}
+exit $code

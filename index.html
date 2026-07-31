@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>myplanBYU — Degree Sequence Optimizer</title>
+  <!-- The app is served from two places: myplan.jordanheaton.com (the URL we
+       share) and jordanheaton.com/myplanBYU/ (kept alive so early testers'
+       saved plans, which live in that origin's localStorage, keep working).
+       One canonical so search engines don't index it twice. -->
+  <link rel="canonical" href="https://myplan.jordanheaton.com/" />
   <!-- myplanBYU's own mark (the map-pin from its portfolio card), not the JH
        badge — this is a product in its own right. Relative paths: these live
        in myplanBYU/, beside this file. -->
