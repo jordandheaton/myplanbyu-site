@@ -1649,12 +1649,16 @@ const App = (() => {
     };
     const remove = $("#cmRemoveBtn");
     if (remove) remove.onclick = () => removeCourse(p.courseId, p.display);
-    // instructor row: "+N more" expander and the live-sections fetch
+    // instructor row: "+N more" toggle and the live-sections fetch
     const whoMore = $("#cmWhoMore");
-    if (whoMore) whoMore.onclick = () => {
-      $("#cmWhoRest").hidden = false;
-      whoMore.hidden = true;
-    };
+    if (whoMore) {
+      const label = whoMore.textContent;          // "+58 more ▾"
+      whoMore.onclick = () => {
+        const rest = $("#cmWhoRest");
+        rest.hidden = !rest.hidden;
+        whoMore.textContent = rest.hidden ? label : "show fewer ▴";
+      };
+    }
     const secBtn = $("#cmSectionsBtn");
     if (secBtn) secBtn.onclick = () =>
       loadSections(secBtn.dataset.course, secBtn.dataset.term, secBtn.dataset.label);

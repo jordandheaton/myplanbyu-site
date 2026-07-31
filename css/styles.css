@@ -1069,6 +1069,10 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
   cursor: pointer; }
 .cm-who-more-btn:hover, .cm-sections-btn:hover { background: var(--paper-2); }
 .cm-who-rest { display: contents; }
+/* display:contents BEATS the hidden attribute's UA display:none (author rule
+   wins the cascade), so without this line the "hidden" names rendered anyway
+   and the +N button looked dead -- which is exactly how it shipped. */
+.cm-who-rest[hidden] { display: none; }
 
 /* LIVE sections table. The one live surface in the app: seat counts are
    fetched on click, so the header says so and full sections say "full"
