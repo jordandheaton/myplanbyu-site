@@ -30,6 +30,14 @@ param(
   # shares one bucket and a feedback round runs out almost immediately.
   # The monthly spend cap, not this, is the real money guard.
   [int] $Questions = 0,
+  # Monthly SPEND CAP in USD (server default 5.00). This is the real money
+  # guard -- and it is NOT your Anthropic account balance. Topping up the
+  # account does nothing on its own: the guard pauses the advisor once this
+  # many dollars of questions have been answered in the calendar month, and
+  # it resets on the 1st while the balance does not. Leave headroom below the
+  # balance for the monthly refresh, which uses the same key for flowchart
+  # extraction.
+  [double] $Budget = 0,
   # Stop an instance already holding the port and start a fresh one. Needed
   # whenever settings change: -Origin, -Proxies and the Python code itself are
   # all read ONLY at startup, so an already-running server silently keeps the
@@ -89,6 +97,7 @@ if ($running -and $Restart) {
 
 if ($Origin) { $env:ADVISOR_ALLOWED_ORIGINS = $Origin }
 if ($Questions -gt 0) { $env:ADVISOR_QUESTIONS_PER_IP = "$Questions" }
+if ($Budget -gt 0) { $env:ADVISOR_MONTHLY_BUDGET_USD = ("{0:F2}" -f $Budget) }
 $env:ADVISOR_TRUSTED_PROXIES = "$Proxies"
 $env:ADVISOR_PORT = "$Port"
 
