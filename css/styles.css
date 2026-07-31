@@ -285,6 +285,9 @@ body {
 }
 .ctx-menu button:hover { background: #f0f4f9; }
 .ctx-menu button.danger { color: var(--red-ink); }
+/* present but inert — "Restore removed" with nothing removed. Kept visible so
+   the course modal's pointer to it is never a dead reference. */
+.ctx-menu button.ctx-dim { color: var(--ink-3); }
 .ctx-menu i { width: 15px; color: var(--ink-3); }
 .ctx-menu button.danger i { color: var(--red-ink); }
 

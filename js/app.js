@@ -2489,7 +2489,7 @@ const App = (() => {
         <button data-a="shuffle"><i class="fas fa-dice"></i> Try an alternative</button>
         <button data-a="prio"><i class="fas fa-sliders"></i> Constraints…</button>
         <button data-a="pins"><i class="fas fa-thumbtack-slash"></i> Clear manual pins</button>
-        ${nRemoved ? `<button data-a="restore"><i class="fas fa-trash-arrow-up"></i> Restore removed (${nRemoved})</button>` : ""}
+        <button data-a="restore" ${nRemoved ? "" : 'class="ctx-dim"'}><i class="fas fa-trash-arrow-up"></i> Restore removed${nRemoved ? ` (${nRemoved})` : ""}</button>
         <button data-a="print"><i class="fas fa-print"></i> Print / PDF</button>`;
       document.body.appendChild(menu);
       const r = e.currentTarget.getBoundingClientRect();
@@ -2514,8 +2514,16 @@ const App = (() => {
         }
         if (a === "restore") {
           const plan = activePlan();
-          if (plan) { plan.profile.excluded = []; plan.updatedAt = Date.now(); save(); }
-          solveActive(); toast("Restored all removed courses.", "ok");
+          // The item is ALWAYS in the menu now — the course modal names it as
+          // the undo path, and an option that only exists once you have
+          // removed something reads as a broken reference (tester report).
+          // With nothing removed it answers honestly instead of no-op'ing.
+          if (!plan || !(plan.profile.excluded || []).length) {
+            toast("Nothing has been removed from this plan.", "ok");
+          } else {
+            plan.profile.excluded = []; plan.updatedAt = Date.now(); save();
+            solveActive(); toast("Restored all removed courses.", "ok");
+          }
         }
         if (a === "print") printPlan();
       });
