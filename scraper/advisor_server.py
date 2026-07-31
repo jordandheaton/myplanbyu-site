@@ -341,6 +341,126 @@ def health():
     return jsonify({"ok": True, "model": MODEL, "limits": guard.status()})
 
 
+# ---------------------------------------------------------------------------
+# Live SECTIONS proxy -- the planner's page is static and BYU's class-schedule
+# endpoints send no CORS headers, so the browser cannot ask BYU directly. This
+# route asks on its behalf and returns the one thing the weekly scrape cannot
+# carry: LIVE seat counts, plus meeting times and rooms. No AI call, no
+# Anthropic spend -- it is a data pass-through to a public, robots-permitted
+# endpoint, so it deliberately does NOT touch the monthly budget guard.
+#
+# Two-step lookup, both cached: getClasses(dept, term) resolves the course to
+# BYU's internal curriculum_id-title_code (cached 6h -- ids do not move within
+# a term), then getSections(courseId, term) fetches the live detail (cached
+# 3min -- long enough to absorb a classful of students clicking the same
+# course, short enough that seat counts stay honest).
+# ---------------------------------------------------------------------------
+_SCHED_BASE = "https://commtech.byu.edu/noauth/classSchedule"
+_SCHED_HEADERS = {
+    "User-Agent": "myplanBYU/1.0 (BYU student project; jordandheaton@gmail.com)",
+    "X-Requested-With": "XMLHttpRequest",
+    "Referer": f"{_SCHED_BASE}/index.php",
+}
+_DEPT_CACHE: dict = {}      # (dept, term) -> (expires, {code: courseId})
+_SECT_CACHE: dict = {}      # (courseId, term) -> (expires, payload)
+_SECTIONS_HITS: dict = {}
+_SECTIONS_PER_HOUR = 120    # plan-clicking is bursty; still far below human-scale abuse
+
+
+def _sections_rate_ok(ip: str) -> bool:
+    now = time.time()
+    hits = [t for t in _SECTIONS_HITS.get(ip, []) if now - t < 3600]
+    if len(hits) >= _SECTIONS_PER_HOUR:
+        _SECTIONS_HITS[ip] = hits
+        return False
+    hits.append(now)
+    _SECTIONS_HITS[ip] = hits
+    return True
+
+
+def _sched_dept_ids(dept: str, term: str) -> dict:
+    key = (dept, term)
+    hit = _DEPT_CACHE.get(key)
+    if hit and hit[0] > time.time():
+        return hit[1]
+    r = requests.post(f"{_SCHED_BASE}/ajax/getClasses.php", timeout=25, data={
+        "searchObject[yearterm]": term,
+        "searchObject[dept_name_or_keyword][dept]": dept,
+        "searchObject[dept_name_or_keyword][keyword]": dept,
+        "sessionId": "AAAAAAAAAAAAAAAAAAAA"}, headers=_SCHED_HEADERS)
+    ids = {}
+    if r.status_code == 200 and r.text.lstrip().startswith("{"):
+        for cid, c in (r.json() or {}).items():
+            code = (f"{c.get('dept_name', '')} {c.get('catalog_number', '')}"
+                    f"{c.get('catalog_suffix') or ''}").strip()
+            ids[code] = cid
+    _DEPT_CACHE[key] = (time.time() + 6 * 3600, ids)
+    return ids
+
+
+def _fmt_time(t: str) -> str:
+    if not t or len(t) != 4 or not t.isdigit():
+        return ""
+    h, m = int(t[:2]), t[2:]
+    return f"{(h - 1) % 12 + 1}:{m}{'p' if h >= 12 else 'a'}"
+
+
+@app.route("/api/sections")
+def sections():
+    course = (request.args.get("course") or "").strip().upper()
+    term = (request.args.get("term") or "").strip()
+    if not re.match(r"^[A-Z][A-Z& ]{0,6}\s\d{3}[A-Z]?$", course) or not re.match(r"^\d{5}$", term):
+        return jsonify({"error": "bad course or term"}), 400
+    if not _sections_rate_ok(client_ip(request.remote_addr, request.headers.get("X-Forwarded-For"))):
+        return jsonify({"error": "rate limited"}), 429
+    ck = (course, term)
+    hit = _SECT_CACHE.get(ck)
+    if hit and hit[0] > time.time():
+        return jsonify(hit[1])
+    dept = course.rsplit(" ", 1)[0]
+    try:
+        cid = _sched_dept_ids(dept, term).get(course)
+        if not cid:
+            payload = {"course": course, "term": term, "sections": [], "notFound": True}
+            _SECT_CACHE[ck] = (time.time() + 180, payload)
+            return jsonify(payload)
+        r = requests.post(f"{_SCHED_BASE}/ajax/getSections.php", timeout=25, data={
+            "courseId": cid, "sessionId": "AAAAAAAAAAAAAAAAAAAA", "yearterm": term},
+            headers=_SCHED_HEADERS)
+        raw = r.json() if r.status_code == 200 else {}
+    except Exception as exc:                          # noqa: BLE001
+        return jsonify({"error": f"BYU schedule unreachable: {exc}"[:200]}), 502
+    out = []
+    day_letter = [("mon", "M"), ("tue", "T"), ("wed", "W"),
+                  ("thu", "Th"), ("fri", "F"), ("sat", "Sa")]
+    for s in raw.get("sections") or []:
+        names = []
+        for i in s.get("instructors") or []:
+            n = (f"{i.get('preferred_first_name') or i.get('rest_of_name') or ''} "
+                 f"{i.get('preferred_surname') or i.get('surname') or ''}").strip()
+            if n and n not in names:
+                names.append(n)
+        times = []
+        for t in s.get("times") or []:
+            days = "".join(l for k, l in day_letter if t.get(k))
+            span = f"{_fmt_time(t.get('begin_time'))}-{_fmt_time(t.get('end_time'))}".strip("-")
+            where = " ".join(x for x in (t.get("building"), t.get("room")) if x)
+            times.append(" ".join(x for x in (days, span, where) if x))
+        av = s.get("availability") or {}
+        out.append({
+            "num": s.get("section_number"),
+            "instructors": names,
+            "times": times,
+            "mode": s.get("mode") or "",
+            "seats": av.get("seats_available"),
+            "size": av.get("class_size"),
+            "waitlist": av.get("waitlist_size"),
+        })
+    payload = {"course": course, "term": term, "sections": out}
+    _SECT_CACHE[ck] = (time.time() + 180, payload)
+    return jsonify(payload)
+
+
 @app.route("/api/feedback", methods=["POST", "OPTIONS"])
 def feedback():
     """Catch bug reports from the planner's feedback form.

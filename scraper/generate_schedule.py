@@ -38,6 +38,10 @@ def main() -> int:
     d = json.loads(SRC.read_text(encoding="utf-8"))
     payload = {
         "scraped": d.get("scraped"),
+        # {termCode: {cart, reg}} — when the registration cart opens and when
+        # priority registration begins, from the registrar's own table. The UI
+        # uses these to date its "not open yet" notices.
+        "regDates": d.get("regDates", {}),
         "terms": d.get("terms", []),
         "historyTerms": d.get("historyTerms", []),
         "names": d.get("instructors", []),

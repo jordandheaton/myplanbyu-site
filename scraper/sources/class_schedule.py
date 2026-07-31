@@ -135,6 +135,71 @@ def fetch_department(s: requests.Session, dept: str, yearterm: str) -> Dict[str,
     return {}
 
 
+REG_DATES_URL = "https://enrollment.byu.edu/registrar/dates-and-deadlines"
+
+
+def fetch_reg_dates(s: requests.Session) -> Dict[str, Dict[str, str]]:
+    """Registration milestones per term, from the registrar's own table.
+
+    {termCode: {"cart": "2026-08-01", "reg": "2026-10-19"}}
+
+    "cart" is the row the registrar titles "Class Schedule Available /
+    Registration Cart Opens" -- the day the term becomes plannable -- and
+    "reg" is "Priority Registration Begins", the day students can actually
+    register. The UI uses these to say WHY a term has no sections yet and
+    when that will change, instead of a dateless "check back later".
+
+    The table prints fewer date cells than term columns: Spring, Summer and
+    Spr-Sum share one date (their carts genuinely open together), so each
+    term column takes the last date at-or-before its position. Parsed
+    leniently and non-fatally -- a page redesign should cost us the notes,
+    never the scrape.
+    """
+    from datetime import datetime
+    try:
+        from bs4 import BeautifulSoup
+    except ImportError:
+        return {}
+    out: Dict[str, Dict[str, str]] = {}
+    try:
+        soup = BeautifulSoup(s.get(REG_DATES_URL, timeout=TIMEOUT_S).text, "html.parser")
+        season_code = {"fall": "5", "winter": "1", "spring": "3", "summer": "4"}
+        for table in soup.find_all("table"):
+            rows = table.find_all("tr")
+            if not rows:
+                continue
+            heads = [c.get_text(strip=True) for c in rows[0].find_all(["th", "td"])][1:]
+            terms: List[str] = []
+            for h in heads:
+                m = re.match(r"(Fall|Winter|Spring|Summer)\D*(\d{4})", h, re.I)
+                terms.append(f"{m.group(2)}{season_code[m.group(1).lower()]}" if m else "")
+            for row in rows[1:]:
+                cells = [c.get_text(strip=True) for c in row.find_all(["th", "td"])]
+                if not cells:
+                    continue
+                label = cells[0].lower()
+                key = ("cart" if "cart opens" in label or "schedule available" in label
+                       else "reg" if "priority registration" in label else None)
+                if not key:
+                    continue
+                dates = []
+                for c in cells[1:]:
+                    try:
+                        dates.append(datetime.strptime(c, "%b %d, %Y").strftime("%Y-%m-%d"))
+                    except ValueError:
+                        dates.append(None)
+                for i, code in enumerate(terms):
+                    if not code:
+                        continue
+                    # last real date at-or-before this column (shared cells)
+                    d = next((x for x in reversed(dates[:i + 1]) if x), None)
+                    if d:
+                        out.setdefault(code, {})[key] = d
+    except Exception as exc:                     # noqa: BLE001 - never fatal
+        print(f"  ! reg dates: {exc}", file=sys.stderr)
+    return out
+
+
 def catalog_codes() -> set:
     """Course codes the planner actually knows about."""
     if not CATALOG_JS.exists():
@@ -291,6 +356,7 @@ def scrape(limit_terms: int = 4, history_terms: int = 4) -> Dict[str, Any]:
         "source": SOURCE,
         "url": INDEX_URL,
         "scraped": time.strftime("%Y-%m-%d"),
+        "regDates": fetch_reg_dates(s),
         "terms": [{"code": yt, "label": term_label(yt)} for yt in terms],
         "historyTerms": [{"code": yt, "label": term_label(yt)} for yt in hist_terms],
         "instructors": names,

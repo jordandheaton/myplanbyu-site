@@ -1049,8 +1049,49 @@ button.chip { cursor: pointer; font: inherit; font-size: .72rem; font-weight: 70
    it is a good guess about an assignment BYU has not made. Muted, and it
    carries its own hedge inline rather than relying on colour to say so. */
 .cm-who-hist .cm-who-term { color: var(--ink-3); font-weight: 500; }
-.cm-who-hist .fa-clock-rotate-left { color: var(--ink-3); }
-.cm-who-note { color: var(--ink-3); font-style: italic; }
+.cm-who-note { color: var(--ink-3); font-style: italic; flex-basis: 100%; }
+
+/* Per-class data-state badge. Three states, three looks, so a student can
+   tell at a glance whether they are reading BYU's actual roster for THEIR
+   term, a roster borrowed from another posted term, or a historical pattern.
+   Colour alone must not carry it -- each badge says its state in words. */
+.cm-badge { font-size: .64rem; font-weight: 700; letter-spacing: .02em;
+            padding: 2px 7px; border-radius: 9px; white-space: nowrap; }
+.cm-badge-live  { background: #e3f4e8; color: #17663a; border: 1px solid #b7e0c4; }
+.cm-badge-other { background: #eef1f8; color: #3a4a86; border: 1px solid #ccd6ee; }
+.cm-badge-hist  { background: #f4f0e6; color: #7a6428; border: 1px solid #e4d9b8; }
+
+/* "+N more" expander and the live-sections trigger read as quiet controls,
+   not as data -- the names are the content, these are how you get more. */
+.cm-who-more-btn, .cm-sections-btn {
+  font: inherit; font-size: .7rem; color: var(--royal); background: none;
+  border: 1px solid var(--line); border-radius: 8px; padding: 1px 8px;
+  cursor: pointer; }
+.cm-who-more-btn:hover, .cm-sections-btn:hover { background: var(--paper-2); }
+.cm-who-rest { display: contents; }
+
+/* LIVE sections table. The one live surface in the app: seat counts are
+   fetched on click, so the header says so and full sections say "full"
+   rather than making the student subtract. */
+#cmSections:empty { display: none; }
+#cmSections { margin: 4px 0 10px; }
+.cm-sec-loading, .cm-sec-err { font-size: .78rem; color: var(--ink-2);
+  padding: 8px 10px; background: var(--paper-2); border-radius: 8px; }
+.cm-sec-head { font-size: .78rem; font-weight: 700; margin-bottom: 4px; }
+.cm-sec-sub { font-weight: 400; color: var(--ink-3); margin-left: 6px; font-size: .7rem; }
+.cm-sec-table { width: 100%; border-collapse: collapse; font-size: .74rem; }
+.cm-sec-table th { text-align: left; color: var(--ink-3); font-weight: 600;
+  padding: 3px 8px 3px 0; border-bottom: 1px solid var(--line); }
+.cm-sec-table td { padding: 4px 8px 4px 0; border-bottom: 1px solid var(--line);
+  vertical-align: top; }
+.cm-sec-table a { color: var(--royal); }
+.cm-seats-open { color: #17663a; }
+.cm-seats-full { color: #a33; }
+.cm-sec-tba { color: var(--ink-3); }
+@media (max-width: 640px) {
+  #cmSections { overflow-x: auto; }
+  .cm-sec-table { min-width: 480px; }
+}
 
 /* Graduate-by pair: season then year, on its own row BELOW the checkbox grid.
    Previously the single combined select sat between two pairs of checkboxes,

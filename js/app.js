@@ -1388,71 +1388,173 @@ const App = (() => {
 
   /* WHO TEACHES THIS — the one question the planner structurally could not
      answer. The catalog knows a course exists and what it requires; only BYU's
-     class schedule knows who stands in front of it, and that is what decides
-     between two ways of filling the same slot.
+     class schedule knows who stands in front of it.
 
-     Three rules the display has to keep:
-       1. NAME THE TERM. "Who teaches this" means nothing detached from a
-          semester — instructors change, and a bare name reads as permanent.
-       2. NEWEST TERM FIRST, and say when the course is not in the terms BYU
-          has posted at all. Silence would imply the course has no instructor;
-          about 45% of catalog courses simply are not taught in the two terms
-          currently published.
-       3. Rate My Professors is searched BY NAME. RMP has no course pages, so
-          each instructor links to their own search, not a dead course query. */
-  function whoTeaches(courseId) {
+     The display's rules:
+       1. THE SCHEDULED TERM DECIDES THE STATE. A course the plan puts in Fall
+          2026 must show the FALL 2026 roster when BYU has posted it — the
+          first cut showed the newest posted term instead, which put a
+          "Winter 2027:" roster on a Fall 2026 class and made confirmed data
+          read as guesswork.
+       2. LABEL EVERY STATE. "Confirmed" only when the roster is for the exact
+          term the plan schedules the course; a roster from a different posted
+          term says whose it is AND that the plan's term isn't posted;
+          history says "usually"; absence says "not posted", never "nobody".
+       3. ALL the names are reachable — four inline, the rest one tap away —
+          and every name links to its own Rate My Professors search. BY NAME,
+          because RMP indexes professors and has no course pages.
+       4. Date the waiting. The registrar publishes when each term's cart
+          opens and when registration begins; "opens Aug 1" beats "closed". */
+  const SEASON_TERM_DIGIT = { W: "1", S: "3", U: "4", F: "5" };
+  function termCodeOf(tm) {
+    return tm ? `${tm.year}${SEASON_TERM_DIGIT[tm.season] || ""}` : null;
+  }
+  function fmtRegDate(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1]} ${d}, ${y}`;
+  }
+  // "cart opens Aug 1" / "registration begins Oct 19" for a posted term, or
+  // "BYU posts this schedule around Dec 1" for one that isn't. Empty string
+  // when the registrar table doesn't reach that term — no date is better than
+  // an invented one.
+  function regNote(S, code, posted) {
+    const rd = (S.regDates || {})[code];
+    if (!rd) return "";
+    const today = new Date().toISOString().slice(0, 10);
+    if (!posted) {
+      return rd.cart > today ? `BYU posts this term's schedule around ${fmtRegDate(rd.cart)}.` : "";
+    }
+    if (rd.cart > today) return `Registration cart opens ${fmtRegDate(rd.cart)}.`;
+    if (rd.reg && rd.reg > today) return `Cart is open; registration begins ${fmtRegDate(rd.reg)}.`;
+    return "";
+  }
+  function whoTeaches(courseId, schedTm) {
     const S = typeof SCHEDULE !== "undefined" ? SCHEDULE : null;
     const sched = "https://commtech.byu.edu/noauth/classSchedule/index.php";
     if (!S || !S.terms || !S.terms.length) {
       return `<span class="cm-who"><a href="${sched}" target="_blank" rel="noopener"
         title="BYU's public class schedule — search this course to see who is teaching it."><i class="fas fa-chalkboard-user"></i> Who teaches this?</a></span>`;
     }
-    let hit = null;
-    for (const t of S.terms) {                       // newest first
-      const idx = (S.byTerm[t.code] || {})[courseId];
-      if (idx && idx.length) { hit = { term: t, names: idx.map(i => S.names[i]).filter(Boolean) }; break; }
-    }
     const rmp = n => `<a class="cm-prof" href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}"
         target="_blank" rel="noopener"
         title="${esc(n)} on Rate My Professors (BYU). Searched by NAME — RMP has no course pages.">${esc(n)}</a>`;
     const sep = '<span class="cm-who-sep">·</span>';
+    const namesBlock = names => {
+      const head = names.slice(0, 4), rest = names.slice(4);
+      return head.map(rmp).join(sep)
+        + (rest.length ? `<button type="button" class="cm-who-more-btn" id="cmWhoMore">+${rest.length} more ▾</button>
+           <span class="cm-who-rest" id="cmWhoRest" hidden>${sep}${rest.map(rmp).join(sep)}</span>` : "");
+    };
+    const sectionsBtn = (code, label) =>
+      `<button type="button" class="cm-sections-btn" id="cmSectionsBtn"
+        data-course="${esc(courseId)}" data-term="${code}" data-label="${esc(label)}"
+        title="Live from BYU: every ${esc(label)} section with instructor, meeting time, and up-to-the-minute seat counts">
+        <i class="fas fa-table-list"></i> ${esc(label)} sections</button>`;
 
-    if (hit) {
-      const shown = hit.names.slice(0, 4);
-      const more = hit.names.length - shown.length;
+    const schedCode = termCodeOf(schedTm);
+    const rosterOf = code => {
+      const idx = (S.byTerm[code] || {})[courseId];
+      return idx && idx.length ? idx.map(i => S.names[i]).filter(Boolean) : null;
+    };
+
+    // 1) CONFIRMED — the roster for the exact term the plan schedules it
+    const own = schedCode && S.terms.find(t => t.code === schedCode) && rosterOf(schedCode);
+    if (own) {
+      const note = regNote(S, schedCode, true);
       return `<span class="cm-who">
-        <i class="fas fa-chalkboard-user" title="From BYU's public class schedule"></i>
-        <span class="cm-who-term">${esc(hit.term.label)}:</span>
-        ${shown.map(rmp).join(sep)}${more > 0 ? `<span class="cm-who-more">+${more} more</span>` : ""}
-        <a class="cm-who-all" href="${sched}" target="_blank" rel="noopener"
-           title="All sections, times and seats on BYU's class schedule">sections ↗</a>
+        <span class="cm-badge cm-badge-live" title="BYU has published this term's sections — this is the actual ${esc(schedTm.label)} teaching roster, not a guess">✓ ${esc(schedTm.label)} · confirmed</span>
+        ${namesBlock(own)}
+        ${sectionsBtn(schedCode, schedTm.label)}
+        ${note ? `<span class="cm-who-note">${esc(note)}</span>` : ""}
       </span>`;
     }
 
-    // HISTORY — a student planning four years out is mostly looking at courses
-    // no posted term lists, and "no data" is a poor answer when the archive has
-    // the same two professors teaching it every year. Hedged deliberately:
-    // "usually", the count of terms it rests on, and never the term the course
-    // actually sits in, because that is precisely what BYU has not decided.
+    // 2) A DIFFERENT posted term lists it — real data, wrong semester. Say
+    //    both halves plainly; never let Winter's roster impersonate Fall's.
+    for (const t of S.terms) {
+      const names = rosterOf(t.code);
+      if (names) {
+        return `<span class="cm-who">
+          <span class="cm-badge cm-badge-other" title="Confirmed roster for ${esc(t.label)} — shown because the term your plan schedules this course isn't posted yet">${esc(t.label)} roster</span>
+          ${namesBlock(names)}
+          ${sectionsBtn(t.code, t.label)}
+          <span class="cm-who-note">Your plan takes this ${esc(schedTm ? schedTm.label : "later")} — BYU hasn't posted that term. ${esc(regNote(S, schedCode, false))}</span>
+        </span>`;
+      }
+    }
+
+    // 3) HISTORY — who USUALLY teaches it, from the archive. Hedged: "usually",
+    //    the count it rests on, and never a promise about an unassigned term.
     const hist = (S.historic || {})[courseId];
     if (hist && hist.length) {
       const span = (S.historyTerms || []).length;
-      const shown = hist.slice(0, 3);
-      const names = shown.map(([i]) => S.names[i]).filter(Boolean);
-      const top = hist[0][1];
+      const names = hist.slice(0, 3).map(([i]) => S.names[i]).filter(Boolean);
       return `<span class="cm-who cm-who-hist">
-        <i class="fas fa-clock-rotate-left" title="From past terms in BYU's class-schedule archive"></i>
+        <span class="cm-badge cm-badge-hist" title="From BYU's class-schedule archive — a pattern, not an assignment">↻ historically</span>
         <span class="cm-who-term">Usually taught by</span>
         ${names.map(rmp).join(sep)}
-        <span class="cm-who-more">(${top} of the last ${span} Fall/Winter terms${hist.length > shown.length ? ", among others" : ""})</span>
-        <span class="cm-who-note">— BYU hasn't posted this term yet.</span>
+        <span class="cm-who-more">(${hist[0][1]} of the last ${span} Fall/Winter terms${hist.length > names.length ? ", among others" : ""})</span>
+        <span class="cm-who-note">BYU hasn't posted this term yet. ${esc(regNote(S, schedCode, false))}</span>
       </span>`;
     }
     return `<span class="cm-who cm-who-none">
       <i class="fas fa-chalkboard-user"></i>
-      <span>BYU hasn't posted who teaches this yet —
+      <span>BYU hasn't posted who teaches this yet — ${esc(regNote(S, schedCode, false)) || ""}
       <a href="${sched}" target="_blank" rel="noopener">check the class schedule</a> closer to registration.</span>
     </span>`;
+  }
+
+  /* LIVE SECTIONS — one click fetches this course's real section list through
+     the advisor server (a plain data proxy; BYU's endpoint sends no CORS
+     headers, so the browser can't ask it directly). This is the only place in
+     the app with LIVE data: seat counts move by the minute during
+     registration, which is exactly why they can't ride the weekly scrape.
+     Every failure lands on the link-out — the student always has a path. */
+  function advisorApiBase() {
+    const url = (typeof window !== "undefined" && window.MYPLAN_ADVISOR_API)
+      || "http://127.0.0.1:5000/api";
+    if (typeof location !== "undefined" && location.protocol === "https:"
+        && /^http:\/\//i.test(url)) return "";      // mixed content — unusable
+    return url;
+  }
+  async function loadSections(course, term, label) {
+    const box = $("#cmSections");
+    if (!box) return;
+    const fallback = `<a href="https://commtech.byu.edu/noauth/classSchedule/index.php" target="_blank" rel="noopener">open BYU's class schedule ↗</a>`;
+    const api = advisorApiBase();
+    if (!api) { box.innerHTML = `<div class="cm-sec-err">Live sections need the advisor server — ${fallback}</div>`; return; }
+    box.innerHTML = `<div class="cm-sec-loading"><i class="fas fa-circle-notch fa-spin"></i> Fetching live ${esc(label)} sections from BYU…</div>`;
+    let d;
+    try {
+      const r = await fetch(`${api}/sections?course=${encodeURIComponent(course)}&term=${encodeURIComponent(term)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      d = await r.json();
+    } catch (e) {
+      box.innerHTML = `<div class="cm-sec-err">Couldn't reach the live schedule (${esc(String(e.message || e))}) — ${fallback}</div>`;
+      return;
+    }
+    if (!d.sections || !d.sections.length) {
+      box.innerHTML = `<div class="cm-sec-err">BYU lists no ${esc(label)} sections for ${esc(course)} right now — ${fallback}</div>`;
+      return;
+    }
+    const rmp = n => `<a href="https://www.ratemyprofessors.com/search/professors/135?q=${encodeURIComponent(n)}" target="_blank" rel="noopener">${esc(n)}</a>`;
+    const seat = s => s.seats == null ? "—"
+      : +s.seats > 0 ? `<b class="cm-seats-open">${esc(s.seats)}</b> of ${esc(s.size)}`
+      : `<b class="cm-seats-full">full</b> (${esc(s.size)}${+s.waitlist > 0 ? `, ${esc(s.waitlist)} waitlisted` : ""})`;
+    box.innerHTML = `
+      <div class="cm-sec-head">${esc(label)} sections — live from BYU
+        <span class="cm-sec-sub">seat counts are current as of right now</span></div>
+      <table class="cm-sec-table"><thead>
+        <tr><th>Sec</th><th>Instructor</th><th>When / where</th><th>Seats</th><th>Mode</th></tr>
+      </thead><tbody>
+        ${d.sections.map(s => `<tr>
+          <td>${esc(s.num || "")}</td>
+          <td>${s.instructors.length ? s.instructors.map(rmp).join(", ") : '<span class="cm-sec-tba">TBA</span>'}</td>
+          <td>${s.times.length ? s.times.map(esc).join("<br>") : "—"}</td>
+          <td>${seat(s)}</td>
+          <td>${esc(s.mode || "")}</td>
+        </tr>`).join("")}
+      </tbody></table>`;
   }
 
   function openCourseModal(uid) {
@@ -1476,12 +1578,13 @@ const App = (() => {
         <span class="badge lg ${t.cls}">${t.label}</span>
         <div>
           <h3>${esc(p.display)} <span class="cm-cr">${p.credits.toFixed(1)} cr</span></h3>
-          ${!p.placeholder && !c.unlisted ? whoTeaches(p.courseId) : ""}
+          ${!p.placeholder && !c.unlisted ? whoTeaches(p.courseId, term) : ""}
           <p class="cm-name">${c.unlisted
             ? `<span class="unlisted-tag">no course number yet</span> Your program lists this course, but the catalog hasn't published a course number for it. Ask your advisor for the number before you register.`
             : esc(p.name)}</p>
         </div>
       </div>
+      <div id="cmSections"></div>
       <div class="cm-grid">
         <div class="cm-cell"><label>Scheduled</label><b>${esc(term.label)}${p.pinned ? " 📌" : ""}${p.block ? " · cohort block" : ""}</b></div>
         <div class="cm-cell"><label>Offered</label><b>${[...c.off].map(s => Solver.SEASON_NAME[s]).join(", ")}</b></div>
@@ -1546,6 +1649,15 @@ const App = (() => {
     };
     const remove = $("#cmRemoveBtn");
     if (remove) remove.onclick = () => removeCourse(p.courseId, p.display);
+    // instructor row: "+N more" expander and the live-sections fetch
+    const whoMore = $("#cmWhoMore");
+    if (whoMore) whoMore.onclick = () => {
+      $("#cmWhoRest").hidden = false;
+      whoMore.hidden = true;
+    };
+    const secBtn = $("#cmSectionsBtn");
+    if (secBtn) secBtn.onclick = () =>
+      loadSections(secBtn.dataset.course, secBtn.dataset.term, secBtn.dataset.label);
   }
 
   /* Drop a course from the plan entirely. Cleans every place the profile could
@@ -2469,10 +2581,26 @@ const App = (() => {
       const rows = [];
       (result.placements || []).forEach(p => {
         if (rows.length >= 25 || p.placeholder) return;
+        // THE SCHEDULED TERM'S roster first. The first cut walked the posted
+        // terms newest-first and stopped at the first hit, so ACC 200 —
+        // scheduled Fall 2026, taught BOTH posted terms — was reported only
+        // with its Winter 2027 roster, and the advisor truthfully told the
+        // student Fall 2026 "wasn't posted" while the Fall roster sat unread
+        // in our own data. The term the plan schedules is the one the student
+        // is asking about; it wins whenever it is posted.
+        const tm = result.terms[p.termIndex];
+        const code = tm ? `${tm.year}${({ W: "1", S: "3", U: "4", F: "5" })[tm.season] || ""}` : null;
+        const nm = idx => idx.slice(0, 6).map(i => SCHEDULE.names[i]).join(", ");
+        const own = code && (SCHEDULE.byTerm[code] || {})[p.courseId];
+        if (own && own.length) {
+          rows.push(`- ${p.courseId} (${tm.label}, CONFIRMED — the same term the plan schedules it): ${nm(own)}`);
+          return;
+        }
         for (const t of SCHEDULE.terms) {
           const idx = (SCHEDULE.byTerm[t.code] || {})[p.courseId];
           if (idx && idx.length) {
-            rows.push(`- ${p.courseId} (${t.label}, CONFIRMED): ${idx.slice(0, 6).map(i => SCHEDULE.names[i]).join(", ")}`);
+            rows.push(`- ${p.courseId} (plan takes it ${tm ? tm.label : "later"}, which isn't posted; `
+              + `CONFIRMED for ${t.label} only): ${nm(idx)}`);
             return;
           }
         }
@@ -2490,7 +2618,9 @@ const App = (() => {
         lines.push(`INSTRUCTORS ON RECORD (BYU's public class schedule, scraped ${SCHEDULE.scraped}; `
           + `only ${SCHEDULE.terms.map(t => t.label).join(" and ")} are posted). `
           + `Rows marked CONFIRMED are sections BYU has actually published — ALWAYS say which term `
-          + `a name belongs to. Rows marked HISTORICAL are who taught it in PAST terms: report them `
+          + `a name belongs to, and when the row is CONFIRMED for the very term the student asks `
+          + `about, ANSWER with those names directly instead of sending them to look it up. `
+          + `Rows marked HISTORICAL are who taught it in PAST terms: report them `
           + `as a pattern ("has taught it 3 of the last 4 years"), NEVER as who will teach it, `
           + `because BYU has not assigned that term yet. If a course appears in neither list, say it `
           + `isn't posted yet rather than that it has no instructor. `
