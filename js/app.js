@@ -1771,6 +1771,15 @@ const App = (() => {
       start: `${p.startTerm.season}${p.startTerm.year}`,
       completed: p.completed || [],
       pinned: Object.keys(p.pins || {}),
+      // extras/fills/excluded are what the STUDENT chose by hand, and leaving
+      // them out made the "paste this back to reproduce" promise false: a
+      // course added from the search bar writes BOTH extras and pins, so a
+      // snapshot carrying only pins re-solves to a plan that never contains
+      // it. The first real bug report was unreproducible for exactly this
+      // reason — the pinned IHUM 202 simply vanished on replay.
+      extras: p.extras || [],
+      fills: p.fills || {},
+      excluded: p.excluded || [],
       settings: p.settings,
     };
     if (result) {
