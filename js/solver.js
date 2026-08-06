@@ -397,6 +397,18 @@ const Solver = (() => {
         // same program) forbids double counting, don't let the course share.
         const prog = bucketKey.split("::")[0];
         const guarded = noDblKeys.has(bucketKey);
+        // ONE COURSE, ONE GE AREA. University Core areas are alternatives, not
+        // a menu to fill at once: IHUM 202 is listed under BOTH Civilization 2
+        // and Letters because it may satisfy either, never both. The dropdown
+        // path has always behaved this way; nothing enforced it for the other
+        // paths, so a course arriving via _preRequired could close two areas at
+        // once and hand the student ~3 phantom credits. A tester caught this
+        // ("it should know IHUM 202 can't [count] for both"). Cross-program
+        // sharing — a major course also covering one GE — is untouched and
+        // still metered by the double-count cap below.
+        if (prog === "univ-core") {
+          for (const bk of rec.buckets) if (bk.startsWith("univ-core::")) return false;
+        }
         let sameProg = false;
         for (const bk of rec.buckets) {
           if (bk.split("::")[0] !== prog) continue;
@@ -443,6 +455,17 @@ const Solver = (() => {
       if (p.mapPlan) p.mapPlan.forEach(t => (t.items || []).forEach(it => {
         if (it.c && !it.alts && cat[it.c] && !cat[it.c].placeholder) _preRequired.add(it.c);
       }));
+    });
+    // A course the STUDENT added by hand is every bit as committed as one the
+    // sheet codes: they picked it, it occupies a term, they will sit in it. So
+    // a bucket listing it must count it as covered — exactly the rule the MAP
+    // block above states. Without this, extras were taken ONLY into
+    // `electives::extra`, so adding IHUM 202 to fill Civilization 2 scheduled
+    // the course AND left "Civilization 2 — choose a class" open beside it.
+    // First real bug report from a tester, and it hit every hand-added course
+    // that could satisfy any requirement.
+    (profile.extras || []).forEach(code => {
+      if (cat[code] && !cat[code].placeholder && !completed.has(code)) _preRequired.add(code);
     });
 
     /* Pass 1/2 — REQUIRED vs CHOICE (the LLM-guided pivot).
@@ -614,10 +637,18 @@ const Solver = (() => {
       });
     });
 
-    // Pass 2.5: user-added extras (from the per-semester search bar) — they
-    // count as electives unless they happen to fill a bucket elsewhere
+    // Pass 2.5: user-added extras (from the per-semester search bar). By now
+    // the bucket passes have already claimed any extra that satisfies a real
+    // requirement (see _preRequired above), so `electives::extra` is only the
+    // FALLBACK for one that satisfies nothing. Labelling it unconditionally
+    // was the other half of the tester's bug: it either overwrote the real
+    // requirement credit or spent double-count budget re-adding a bucket the
+    // course already had.
     (profile.extras || []).forEach(code => {
-      if (cat[code] && !completed.has(code)) take(code, "electives::extra", 1);
+      if (!cat[code] || completed.has(code)) return;
+      const rec = chosen.get(code);
+      if (rec && rec.buckets.size) return;      // already filling a requirement
+      take(code, "electives::extra", 1);
     });
 
     // sheet-coded courses (a MAP sheet places these in a specific term). A
