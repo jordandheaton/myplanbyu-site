@@ -15,7 +15,12 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";
 
 $sql = "SELECT body FROM feedback ORDER BY at"
 $raw = npx wrangler d1 execute myplan-advisor --remote --json --command $sql 2>$null
-$rows = ($raw | ConvertFrom-Json)[0].results
+# wrangler returns pretty-printed JSON, which PowerShell hands back as an ARRAY
+# OF LINES. Piping that straight into ConvertFrom-Json parses line-by-line and
+# silently yields nothing -- the reader reported "0 report(s)" with three rows
+# sitting in the table. Join first.
+$rows = @((($raw -join "`n") | ConvertFrom-Json)[0].results)
+if (-not $rows -or $rows.Count -eq 0) { Write-Host "No reports (or the query failed)."; exit 0 }
 if ($Last -gt 0 -and $rows.Count -gt $Last) { $rows = $rows | Select-Object -Last $Last }
 foreach ($r in $rows) {
     $b = $r.body | ConvertFrom-Json
