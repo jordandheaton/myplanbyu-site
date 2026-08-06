@@ -1607,9 +1607,10 @@ const App = (() => {
         <button class="btn primary sm" id="cmMoveBtn">Move & pin</button>
         ${p.pinned ? `<button class="btn ghost sm" id="cmUnpinBtn">Unpin</button>` : ""}
         ${fillOf(p.courseId) ? `<button class="btn ghost sm" id="cmUnfillBtn" title="Turn this back into an open 'choose a class' slot"><i class="fas fa-rotate-left"></i> Back to dropdown</button>` : ""}
+        <button class="btn ghost sm" id="cmDoneBtn" title="You've already taken this. It leaves the plan and counts toward the requirement it fills."><i class="fas fa-circle-check"></i> Already taken</button>
         <button class="btn ghost sm cm-remove" id="cmRemoveBtn" title="Drop this class from the plan entirely"><i class="fas fa-trash-can"></i> Remove</button>
       </div>
-      <p class="cm-removenote"><i class="fas fa-circle-info"></i> Removing drops the class from your plan. If a program requires it, that requirement will show as an open gap until you restore it (Plan Options → Restore removed).</p>`}
+      <p class="cm-removenote"><i class="fas fa-circle-info"></i> <b>Already taken</b> marks it complete — it leaves your schedule but still fills its requirement, which is how to record credit the transcript import missed or an older catalog rule granted. <b>Remove</b> drops it entirely and leaves an open gap (Plan Options → Restore removed).</p>`}
     `;
     $("#courseModal").classList.add("open");
     const btn = $("#cmMoveBtn");
@@ -1650,6 +1651,8 @@ const App = (() => {
     };
     const remove = $("#cmRemoveBtn");
     if (remove) remove.onclick = () => removeCourse(p.courseId, p.display);
+    const done = $("#cmDoneBtn");
+    if (done) done.onclick = () => markCompleted(p.courseId, p.display);
     // instructor row: "+N more" toggle and the live-sections fetch
     const whoMore = $("#cmWhoMore");
     if (whoMore) {
@@ -1663,6 +1666,45 @@ const App = (() => {
     const secBtn = $("#cmSectionsBtn");
     if (secBtn) secBtn.onclick = () =>
       loadSections(secBtn.dataset.course, secBtn.dataset.term, secBtn.dataset.label);
+  }
+
+  /* Mark a class ALREADY TAKEN, from the class card itself.
+     ------------------------------------------------------------------
+     Requested by the first tester, and it turns out to close two of his three
+     reports. Transcript import misses things, and BYU's rules move: SFL 200
+     used to satisfy REL C 200 and no longer does, so his completed course
+     showed as an outstanding requirement with no way to say otherwise. That is
+     not fixable from catalog data — the catalog describes today's rules, not
+     the ones in force when he enrolled — so the student needs a way to assert
+     it. This is that way, and it is also the fastest fix for anything the
+     import dropped.
+     UNLIKE Remove, this course still COUNTS: it goes into profile.completed,
+     so the requirement it satisfies closes rather than opening a gap. */
+  function markCompleted(courseId, display) {
+    const plan = activePlan();
+    if (!plan) return;
+    const prof = plan.profile;
+    prof.completed = prof.completed || [];
+    if (!prof.completed.includes(courseId)) prof.completed.push(courseId);
+    // A completed course must stop being scheduled: drop the hand-add, any
+    // dropdown pick that chose it, and its pin, or the solver keeps a card on
+    // the board for a class already done.
+    if (prof.extras) prof.extras = prof.extras.filter(c => c !== courseId);
+    if (prof.fills) {
+      for (const k of Object.keys(prof.fills)) {
+        prof.fills[k] = prof.fills[k].filter(c => c !== courseId);
+        if (!prof.fills[k].length) delete prof.fills[k];
+      }
+    }
+    if (prof.pins) delete prof.pins[courseId];
+    // If it was previously REMOVED, marking it done un-removes it — otherwise
+    // `excluded` would keep suppressing the credit the student just claimed.
+    if (prof.excluded) prof.excluded = prof.excluded.filter(c => c !== courseId);
+    plan.updatedAt = Date.now();
+    save();
+    closeModal("#courseModal");
+    solveActive();
+    toast(`${display} marked as already taken — it now counts toward your requirements.`, "ok");
   }
 
   /* Drop a course from the plan entirely. Cleans every place the profile could
