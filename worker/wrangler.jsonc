@@ -1,0 +1,29 @@
+/* myplanBYU advisor Worker — deployment config.
+   Deploys to <name>.workers.dev first; the advisor.jordanheaton.com custom
+   domain is attached only after the workers.dev deployment verifies, so the
+   old tunnel URL keeps working until the cutover moment. Secrets
+   (ANTHROPIC_API_KEY, PINECONE_API_KEY, IP_SALT) are set with
+   `wrangler secret put`, never in this file. */
+{
+  "name": "myplan-advisor",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-01",
+  // The site's pages already call advisor.jordanheaton.com, so claiming the
+  // name here is the whole cutover — no client change. Cloudflare only allows
+  // it once the old tunnel's CNAME for that hostname is deleted.
+  "routes": [{ "pattern": "advisor.jordanheaton.com", "custom_domain": true }],
+  "ai": { "binding": "AI" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "myplan-advisor",
+      "database_id": "85d43862-367f-4e55-a6de-2089050b86e6"
+    }
+  ],
+  "vars": {
+    "ADVISOR_ALLOWED_ORIGINS": "https://jordandheaton.github.io,https://jordanheaton.com,https://www.jordanheaton.com,https://myplan.jordanheaton.com",
+    "ADVISOR_MONTHLY_BUDGET_USD": "7.00",
+    "ADVISOR_QUESTIONS_PER_IP": "10",
+    "ADVISOR_QUOTA_WINDOW_HOURS": "24"
+  }
+}

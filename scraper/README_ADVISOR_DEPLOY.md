@@ -1,5 +1,17 @@
 # Deploying the AI Advisor
 
+> **CURRENT DEPLOYMENT (2026-08-06): a Cloudflare Worker — `myplanBYU/worker/`.**
+> `advisor.jordanheaton.com` is served by the Worker, not by this PC. Nothing
+> below about tunnels or `run_advisor.ps1` is part of the live path any more;
+> it is kept because Path A is still the fastest way to test a prompt change
+> locally, and because the reasoning explains why the Worker looks the way it
+> does. To deploy: `cd ../worker && npx wrangler deploy`. See
+> `worker/README.md`.
+>
+> **Why it moved.** The tunnel died on every reboot (it was never installed as
+> a service), and each death took the advisor, live sections, and the feedback
+> form offline until someone noticed. The Worker has no such failure mode.
+
 The planner itself is a static site and needs no server. The **AI Advisor** is
 the one part that does: `advisor_server.py` retrieves grounded BYU data from
 Pinecone and answers with Claude.
