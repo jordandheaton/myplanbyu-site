@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>myplanBYU — Degree Sequence Optimizer</title>
+  <title>myplanBYU â€” Degree Sequence Optimizer</title>
   <!-- The app is served from two places: myplan.jordanheaton.com (the URL we
        share) and jordanheaton.com/myplanBYU/ (kept alive so early testers'
        saved plans, which live in that origin's localStorage, keep working).
        One canonical so search engines don't index it twice. -->
   <link rel="canonical" href="https://myplan.jordanheaton.com/" />
   <!-- myplanBYU's own mark (the map-pin from its portfolio card), not the JH
-       badge — this is a product in its own right. Relative paths: these live
+       badge â€” this is a product in its own right. Relative paths: these live
        in myplanBYU/, beside this file. -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="alternate icon" href="favicon.ico" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <meta name="description" content="myplanBYU: a multi-objective degree-sequencing optimizer for BYU students. Pick a major, up to two minors, and certificates — a constraint solver builds the semester plan around your life." />
+  <meta name="description" content="myplanBYU: a multi-objective degree-sequencing optimizer for BYU students. Pick a major, up to two minors, and certificates â€” a constraint solver builds the semester plan around your life." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=def662f1" />
 </head>
 <body>
 
@@ -55,7 +55,7 @@
   <!-- ================= NOTICE ================= -->
   <div class="notice">
     Welcome to <b>myplanBYU</b>! Courses and program requirements come from the official BYU catalog
-    (auto-generated from catalog.byu.edu data) — always verify against official MyMAP and your advisor before registering.
+    (auto-generated from catalog.byu.edu data) â€” always verify against official MyMAP and your advisor before registering.
     <span id="dataStamp"></span>
   </div>
 
@@ -94,7 +94,7 @@
           <h1>Draft Plan</h1>
           <div class="board-sub"><span id="planTitleName"></span></div>
         </div>
-        <div class="board-tip">Tip: drag a class card to another semester — the solver validates every move against prerequisites, availability, and credit caps.</div>
+        <div class="board-tip">Tip: drag a class card to another semester â€” the solver validates every move against prerequisites, availability, and credit caps.</div>
         <div class="board-actions">
           <button class="btn ghost sm" id="prioritiesBtn"><i class="fas fa-sliders"></i> Constraints</button>
           <button class="btn primary sm" id="planOptionsBtn">Plan Options <i class="fas fa-chevron-down"></i></button>
@@ -117,7 +117,7 @@
   </main>
 
   <footer class="foot">
-    myplanBYU is an independent student project — not affiliated with BYU or MyMAP.
+    myplanBYU is an independent student project â€” not affiliated with BYU or MyMAP.
     Requirements shown are illustrative snapshots; official sources govern.
     <a href="#" id="footFeedback">Spot something wrong? Send feedback</a>
   </footer>
@@ -153,7 +153,7 @@
   <div class="modal" id="whatifModal">
     <div class="modal-box wide">
       <div class="modal-head">
-        <h3><i class="fas fa-code-compare"></i> What if…</h3>
+        <h3><i class="fas fa-code-compare"></i> What ifâ€¦</h3>
         <button class="modal-x" data-close="#whatifModal">&times;</button>
       </div>
       <div class="modal-body" id="whatifBody"></div>
@@ -200,57 +200,57 @@
         <p><b>myplanBYU</b> treats your degree as a <i>constrained set-cover and sequencing problem</i>.
         Unlike a static checklist, it generates an optimized multi-semester sequence around your actual life.</p>
 
-        <h4>1 · It starts from BYU's own documents</h4>
-        <p>161 of the 175 majors have an official <b>MAP sheet</b> — the advisement center's printed
+        <h4>1 Â· It starts from BYU's own documents</h4>
+        <p>161 of the 175 majors have an official <b>MAP sheet</b> â€” the advisement center's printed
         semester-by-semester plan. Where one exists, <b>the sheet IS the draft</b>: its courses are locked to
         their printed semesters and everything else (your completed classes, minors, certificates, GE)
-        adapts around that skeleton. Where the sheet and the course catalog disagree — a class listed
-        “Winter-only” that the sheet puts in Fall — <b>the sheet wins</b>, because it's the more current
+        adapts around that skeleton. Where the sheet and the course catalog disagree â€” a class listed
+        â€œWinter-onlyâ€ that the sheet puts in Fall â€” <b>the sheet wins</b>, because it's the more current
         document. Department flowcharts supply cohort envelopes (e.g. the IS Junior Core) that move as
         single blocks. Completed courses vacate their slots and the remaining sheet years pull forward.</p>
 
-        <h4>2 · Requirement buckets, not hardcoded lists</h4>
-        <p>Every program (major, minor, certificate, University Core) is a set of <b>buckets</b> — “3 credits
-        tagged <code>GE-Arts</code>”, “all of the IS Junior Core”, “6 credits of technique courses”. Courses carry
+        <h4>2 Â· Requirement buckets, not hardcoded lists</h4>
+        <p>Every program (major, minor, certificate, University Core) is a set of <b>buckets</b> â€” â€œ3 credits
+        tagged <code>GE-Arts</code>â€, â€œall of the IS Junior Coreâ€, â€œ6 credits of technique coursesâ€. Courses carry
         <b>tags</b> and can fill multiple buckets at once (double-counting), up to a credit cap you control.
         All 300+ catalog programs (175 majors, 117 minors, 22 certificates) are plannable today, drawing on
         7,100+ live catalog courses.</p>
 
-        <h4>3 · Hard constraints (never violated)</h4>
+        <h4>3 Â· Hard constraints (never violated)</h4>
         <ul>
           <li>Prerequisite chains, co-requisites, &amp; repeatable-course sequencing</li>
           <li>Season availability (Fall-only, Winter-only, Spring-only offerings)</li>
-          <li>Per-term credit caps, and a hard ≥12-credit full-time floor on every semester</li>
-          <li>Cohort blocks — e.g. the IS Junior Core moves as one Fall block, then one Winter block</li>
-          <li>Admission gates — limited-enrollment majors hold professional courses until the admit year</li>
-          <li>Your pins — “IS 303 in Winter 2027” stays exactly there</li>
+          <li>Per-term credit caps, and a hard â‰¥12-credit full-time floor on every semester</li>
+          <li>Cohort blocks â€” e.g. the IS Junior Core moves as one Fall block, then one Winter block</li>
+          <li>Admission gates â€” limited-enrollment majors hold professional courses until the admit year</li>
+          <li>Your pins â€” â€œIS 303 in Winter 2027â€ stays exactly there</li>
         </ul>
 
-        <h4>4 · A fixed policy, optimized hard</h4>
+        <h4>4 Â· A fixed policy, optimized hard</h4>
         <p>The solver seeds the schedule along the critical path, then runs a few thousand rounds of
-        hill-climbing — random legal moves kept only if the plan improves — plus deterministic cleanup
+        hill-climbing â€” random legal moves kept only if the plan improves â€” plus deterministic cleanup
         passes that compact surplus semesters, close mid-plan gaps, and fold stray tail courses back into
-        earlier terms. The policy it optimizes toward is fixed and deliberately boring: <b>14–16 credits</b>
-        per Fall/Winter (17 only when it saves a whole semester), an <b>8–10 semester</b> shape, religion
+        earlier terms. The policy it optimizes toward is fixed and deliberately boring: <b>14â€“16 credits</b>
+        per Fall/Winter (17 only when it saves a whole semester), an <b>8â€“10 semester</b> shape, religion
         paced ~2 credits per semester, no stacking 3+ historically hard classes, and graduation at
         <b>120 credits</b> without invented filler. The <b>Constraints</b> panel changes the levers that are
         genuinely yours: credit caps, Spring/Summer terms, the double-count cap, scholarship rules.</p>
 
-        <h4>5 · Honest flags</h4>
-        <p>Plans aren't just feasible — they're annotated: single-season courses you can't afford to miss,
+        <h4>5 Â· Honest flags</h4>
+        <p>Plans aren't just feasible â€” they're annotated: single-season courses you can't afford to miss,
         finals-week collision risk when hard classes stack, scholarship/full-time warnings, credit
-        shortfalls against the 120 requirement, application deadlines for limited-enrollment majors, and —
-        when a required course genuinely cannot fit — an honest “unscheduled” flag with the dial that fixes
+        shortfalls against the 120 requirement, application deadlines for limited-enrollment majors, and â€”
+        when a required course genuinely cannot fit â€” an honest â€œunscheduledâ€ flag with the dial that fixes
         it (usually one click to add a Spring term) instead of a silently broken plan.</p>
 
-        <h4>6 · The AI Advisor</h4>
-        <p>The chat panel answers questions grounded in live BYU data — course details, program requirements,
-        deadlines, scholarships, clubs — and can read your current draft plan (with your permission) so it
+        <h4>6 Â· The AI Advisor</h4>
+        <p>The chat panel answers questions grounded in live BYU data â€” course details, program requirements,
+        deadlines, scholarships, clubs â€” and can read your current draft plan (with your permission) so it
         discusses <i>your</i> schedule, not hypotheticals. It's the one part that runs on a server; it's
         rate-limited, and everything else on this page works without it.</p>
 
         <h4>Under the hood</h4>
-        <p>The planner is 100% client-side JavaScript — your plan solves on your own device in about half a
+        <p>The planner is 100% client-side JavaScript â€” your plan solves on your own device in about half a
         second, and the same inputs always produce the same plan. The repo includes an
         <code>OR-Tools CP-SAT</code> reference architecture (<code>docs/solver_reference.py</code>) for a future
         server-side V2 with section-level time conflicts.</p>
@@ -258,7 +258,7 @@
     </div>
   </div>
 
-  <!-- ============ BOTTOM APP BAR (phones only — see mobile.js) ============ -->
+  <!-- ============ BOTTOM APP BAR (phones only â€” see mobile.js) ============ -->
   <nav class="mnav" id="mnav" aria-label="App sections">
     <button data-view="plan" class="on"><i class="fas fa-map-location-dot"></i><span>Plan</span></button>
     <button data-view="progress"><i class="fas fa-chart-simple"></i><span>Progress</span></button>
@@ -287,7 +287,7 @@
     <div class="chat-msgs" id="chatMsgs"></div>
     <div class="chat-compose">
       <div class="chat-quick" id="chatQuick">
-        <button data-q="Critique my current semester plan. Point out anything unrealistic about the pacing, sequencing, or course load, and what you'd change.">✦ Critique my plan</button>
+        <button data-q="Critique my current semester plan. Point out anything unrealistic about the pacing, sequencing, or course load, and what you'd change.">âœ¦ Critique my plan</button>
         <button data-q="Does my current plan satisfy all of my program requirements? List anything I'm still missing.">Am I missing requirements?</button>
         <button data-q="What scholarships, clubs, or study abroad programs fit my majors and minors?">Opportunities for me</button>
       </div>
@@ -304,18 +304,18 @@
   <!-- AI Advisor backend. Leave commented out for local work: chat.js then
        defaults to http://127.0.0.1:5000/api, which is what scraper/advisor_server.py
        serves. To go live, uncomment and point it at the public HTTPS origin
-       (a Cloudflare tunnel URL works) — an https: page cannot call http://127.0.0.1,
+       (a Cloudflare tunnel URL works) â€” an https: page cannot call http://127.0.0.1,
        so without this the panel correctly reports itself offline.
        See scraper/README_ADVISOR_DEPLOY.md. -->
   <script>window.MYPLAN_ADVISOR_API = "https://advisor.jordanheaton.com/api";</script>
-  <script src="js/catalog_data.js"></script>
-  <script src="js/timeline_data.js"></script>
-  <script src="js/schedule_data.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/solver.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/chat.js"></script>
-  <script src="js/mobile.js"></script>
+  <script src="js/catalog_data.js?v=5b7460b2"></script>
+  <script src="js/timeline_data.js?v=81928840"></script>
+  <script src="js/schedule_data.js?v=f3e07b46"></script>
+  <script src="js/data.js?v=36313c19"></script>
+  <script src="js/solver.js?v=dfb2f91b"></script>
+  <script src="js/app.js?v=36d36a87"></script>
+  <script src="js/chat.js?v=c465409b"></script>
+  <script src="js/mobile.js?v=75ffb900"></script>
   <script>document.getElementById("topbarChatBtn").addEventListener("click", () => Chat.toggle(true));</script>
 </body>
 </html>
