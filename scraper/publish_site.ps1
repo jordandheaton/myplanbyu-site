@@ -42,6 +42,31 @@ foreach ($d in @("css", "js")) {
   if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
   Copy-Item (Join-Path $src $d) $dst -Recurse
 }
+# CACHE-BUST every local asset with a content hash.
+# ---------------------------------------------------------------------------
+# myplan.jordanheaton.com is PROXIED through Cloudflare, which caches .js and
+# .css at the edge. After a deploy the origin is correct but visitors keep
+# getting the old file until the TTL expires -- and worse, they get a MIXED
+# build: on 2026-08-06 the site served the new solver.js beside a 251-second-old
+# app.js (cf-cache-status: HIT). Those two files are versioned together; a
+# mismatched pair can misbehave in ways neither version does alone.
+#
+# Appending ?v=<hash of the file's bytes> makes each deploy a NEW url, so the
+# edge cache stops being a hazard and starts being free speed: unchanged files
+# keep their hash and stay cached, changed ones bust automatically. No API
+# token, no purge step, nothing to remember.
+$index = Join-Path $DeployRepo "index.html"
+$html = Get-Content $index -Raw
+$html = [regex]::Replace($html, '(?<attr>(?:src|href)=")(?<path>(?:js|css)/[^"?]+)"', {
+  param($m)
+  $rel = $m.Groups['path'].Value
+  $file = Join-Path $DeployRepo $rel        # forward slashes are fine on Windows
+  if (-not (Test-Path $file)) { return $m.Value }
+  $hash = (Get-FileHash $file -Algorithm SHA256).Hash.Substring(0, 8).ToLower()
+  '{0}{1}?v={2}"' -f $m.Groups['attr'].Value, $rel, $hash
+})
+Set-Content -Path $index -Value $html -Encoding utf8 -NoNewline
+
 # the custom domain lives IN the pages branch
 Set-Content -Path (Join-Path $DeployRepo "CNAME") -Value "myplan.jordanheaton.com" -Encoding ascii
 
