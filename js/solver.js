@@ -387,6 +387,40 @@ const Solver = (() => {
       if (b.noDbl) noDblKeys.add(`${p.id}::${b.id}`);
     }));
 
+    // WHICH University Core areas one course may close AT ONCE.
+    // ------------------------------------------------------------------
+    // BYU does let a single course satisfy two Core areas, and the official
+    // option lists say exactly which: a course double-counts iff BYU prints it
+    // under both areas. IHUM 202 is Civilization 2 AND Letters; a 202-level
+    // language is Languages of Learning AND Global & Cultural Awareness; the
+    // HONRS 22x seminars each span two. 237 courses qualify. Everything else
+    // is single-count because it appears in one list.
+    //
+    // Two cross-listings in the scrape are NOT double counts:
+    //   American Heritage -- several of its "options" are one half of a
+    //     two-course pairing (ECON 110 + HIST 221). ECON 110 lands in the pool,
+    //     but on its own it closes Social Science, not both.
+    //   Quantitative Reasoning vs Languages of Learning -- the catalog offers
+    //     an approved math/stat course as an ALTERNATIVE route to Languages of
+    //     Learning. Reading "listed in both" as "fills both" would hand every
+    //     STAT 121 student a free requirement.
+    // Religion, First-Year Writing and UNIV 101 never share with anything --
+    // that keeps one religion course from closing a Cornerstone and an
+    // Elective. (The hand-written fallback pool uses non-"ge-" bucket ids, so
+    // it lands on the strict side too; it is dead code whenever the scraped
+    // catalog is present, which is always.)
+    //
+    // Erring toward single-count costs a student one class they may not have
+    // needed; erring the other way leaves them short at graduation.
+    const geExclusive = (a, b) => {
+      const AREA = /^univ-core::ge-/;
+      if (!AREA.test(a) || !AREA.test(b)) return true;
+      const AH = "univ-core::ge-american-heritage";
+      if (a === AH || b === AH) return true;
+      return (a === "univ-core::ge-quantitative-reasoning" && b === "univ-core::ge-languages-of-learning") ||
+             (b === "univ-core::ge-quantitative-reasoning" && a === "univ-core::ge-languages-of-learning");
+    };
+
     const dcIds = new Set();    // which courses actually double-count
     const take = (id, bucketKey, instances = 1) => {
       if (excluded.has(id)) return false;   // student dropped this course
@@ -397,17 +431,12 @@ const Solver = (() => {
         // same program) forbids double counting, don't let the course share.
         const prog = bucketKey.split("::")[0];
         const guarded = noDblKeys.has(bucketKey);
-        // ONE COURSE, ONE GE AREA. University Core areas are alternatives, not
-        // a menu to fill at once: IHUM 202 is listed under BOTH Civilization 2
-        // and Letters because it may satisfy either, never both. The dropdown
-        // path has always behaved this way; nothing enforced it for the other
-        // paths, so a course arriving via _preRequired could close two areas at
-        // once and hand the student ~3 phantom credits. A tester caught this
-        // ("it should know IHUM 202 can't [count] for both"). Cross-program
-        // sharing — a major course also covering one GE — is untouched and
-        // still metered by the double-count cap below.
+        // A University Core course may close a second area only where BYU
+        // prints it under both — see geExclusive above.
         if (prog === "univ-core") {
-          for (const bk of rec.buckets) if (bk.startsWith("univ-core::")) return false;
+          for (const bk of rec.buckets) {
+            if (bk.startsWith("univ-core::") && geExclusive(bk, bucketKey)) return false;
+          }
         }
         let sameProg = false;
         for (const bk of rec.buckets) {
@@ -1625,9 +1654,28 @@ const Solver = (() => {
       if (mc != null && load[t] >= mc - 0.5) return;   // at the sheet's own total
       if (load[t] < minFW) structure += (minFW - load[t]) * 2.0;
     });
-    // over BYU's 18-credit registration cap (a rigid envelope can force a term
-    // over; everything MOVABLE should clear out of its way)
-    fwActive.forEach(t => { if (load[t] > BYU_HARD_CAP) structure += (load[t] - BYU_HARD_CAP) * 9; });
+    // OVER BYU'S 18-CREDIT REGISTRATION CAP.
+    // A rigid envelope can force a term over and the student has no way out:
+    // a locked cohort block, or a MAP sheet whose own printed total is 19.
+    // That stays a gentle nudge — it is the sheet's call, not the solver's.
+    // Anything MOVABLE stacked on top is different: it makes a term the
+    // student cannot register for, and at 9/credit compactness could simply
+    // buy its way through. Freeing two GE requirements let MISM compress from
+    // 10 terms to 8 by dropping 9 movable credits onto the locked Junior Core
+    // fall — a 21-credit term, cheaper than the two semesters it saved.
+    // Movable overage is now priced above anything compactness can pay.
+    fwActive.forEach(t => {
+      const over = load[t] - BYU_HARD_CAP;
+      if (over <= 0) return;
+      let forced = 0;
+      if (state.blockOf) assign.forEach((tt, uid) => {
+        if (tt === t && state.blockOf.has(uid)) forced += state.byUid.get(uid).course.credits;
+      });
+      const sheet = sheetTotal(state, t);
+      if (sheet != null) forced = Math.max(forced, Math.min(sheet, load[t]));
+      const movableOver = Math.max(0, Math.min(over, load[t] - forced));
+      structure += (over - movableOver) * 9 + movableOver * 60;
+    });
     // INTERIOR gap only: an empty Fall/Winter term BETWEEN the first and LAST
     // ACTIVE term is a skipped semester. Empty terms AFTER the plan ends are
     // just unused budget — penalizing up to the budget (as before) force-filled
@@ -2691,6 +2739,81 @@ const Solver = (() => {
           }
           if (target) { place(state, inst, target.index); moved = true; break; }
           place(state, inst, t);                         // nowhere else — keep
+        }
+        if (!moved) break;
+      }
+    });
+  }
+
+  /* REGISTRATION-CAP REPAIR — no Fall/Winter term ships above BYU's 18.
+     ---------------------------------------------------------------------
+     canPlace() refuses a course that would push a term past its cap, but the
+     tail passes have escape hatches (swap moves with ignoreCap, the
+     _mapCapOff overflow, cohort envelopes placed as a forced block) and
+     nothing re-checked afterwards. enforceMapCaps() is the equivalent repair
+     for sheet totals and returns immediately when a major has no MAP sheet —
+     so majors WITHOUT a sheet had no backstop at all. MISM shipped a
+     21-credit Fall 2028: the locked Junior Core block (12 cr) plus three
+     movable upper-division courses stacked on top of it. A student cannot
+     register for that term at all.
+
+     Scoring alone could not fix it: the over-cap penalty is one term in a sum
+     the search was free to outbid, and raising it 600x did not move a single
+     card, because the courses were never placed by a scored move.
+
+     Order matches enforceMapCaps: shed the cheapest thing first (filler
+     evaporates, then electives, then GE slots) and keep concrete required
+     courses where they are. Pins and cohort blocks are immovable. A sheet
+     that PRINTS a 19-credit semester outranks the cap and is left alone —
+     the sheet wins, as everywhere else. */
+  function enforceRegCap(state) {
+    const cost = u => {
+      if (/^ELECTIVE\+/.test(u)) return 0;
+      const c = state.byUid.get(u).course;
+      if (c.elective) return 1;
+      if (c.placeholder && (c.level == null || c.level <= 1)) return 2;
+      if (c.placeholder) return 3;
+      return 4;
+    };
+    state.terms.forEach(term => {
+      if (!term.isFW || !term.enabled) return;
+      const t = term.index;
+      const printed = state.mapCap ? state.mapCap.get(t) : undefined;
+      const ceil = printed != null ? Math.max(BYU_HARD_CAP, printed) : BYU_HARD_CAP;
+      let guard = 0;
+      while (state.load[t] > ceil + 0.01 && guard++ < 12) {
+        const uids = [...state.assign].filter(([, tt]) => tt === t).map(([u]) => u)
+          .filter(u => !state.pinnedUids.has(u) && !state.blockOf.has(u))
+          .sort((a, b) => cost(a) - cost(b));
+        let moved = false;
+        for (const u of uids) {
+          const inst = state.byUid.get(u);
+          if (/^ELECTIVE\+/.test(u)) {                   // padding just evaporates
+            unplace(state, inst);
+            state.byUid.delete(u);
+            state.instances = state.instances.filter(i => i.uid !== u);
+            delete state.cat[u];
+            moved = true; break;
+          }
+          unplace(state, inst);
+          // Earliest legal seat, so repairing an overload never extends the
+          // plan while an existing term still has room. The receiving term may
+          // go to BYU's real 18 rather than the 17-credit PREFERENCE — every
+          // later term sitting at 15-17 was why the first attempt at this pass
+          // found nowhere to put anything and left the 21 standing. 18 is a
+          // term the student can register for; 21 is not. canPlace still
+          // enforces every hard rule (season, prerequisites, admission gates,
+          // year floors, and a MAP sheet's own ceiling), and a first term
+          // capped for freshman pacing keeps that cap.
+          const target = state.terms.find(tm => {
+            if (!tm.enabled || tm.index === t) return false;
+            const after = state.load[tm.index] + inst.course.credits;
+            if (after > BYU_HARD_CAP) return false;
+            if (tm.index === 0 && state.firstTermCap != null && after > state.firstTermCap) return false;
+            return canPlace(state, inst, tm.index, true);
+          });
+          if (target) { place(state, inst, target.index); moved = true; break; }
+          place(state, inst, t);                         // nowhere else — keep, and warn
         }
         if (!moved) break;
       }
@@ -4159,6 +4282,7 @@ const Solver = (() => {
     compact(state); closeGaps(state);
     topUpCredits(state);                       // re-assert the 120-credit graduation floor
     topUpFloor(state);                         // guarantee ≥12 on every surviving term
+    enforceRegCap(state);                      // and ≤18 on every one of them — last word
 
     // seed()'s `unscheduled` is a snapshot taken before any optimizer pass ran,
     // so anything rescueUnscheduled() has since placed must stop being reported
