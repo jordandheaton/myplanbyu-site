@@ -187,7 +187,13 @@ const App = (() => {
   function render() {
     renderStudentBand();
     renderToolbar();
-    timeline = result ? buildTimeline() : { byTerm: new Map(), list: [] };
+    // buildTimeline() already returns its own correctly-shaped empty when
+    // there is no result. The hand-written stand-in that used to sit here had
+    // a `list` key nothing reads and lacked the four arrays renderTimeline
+    // counts, so deleting the LAST plan threw inside render() -- after the
+    // board and progress panes had cleared but BEFORE renderPlans(), leaving
+    // the deleted plan's card sitting in the sidebar. That was the "ghost".
+    timeline = buildTimeline();
     renderBoard();
     renderProgress();
     renderTimeline(timeline);
@@ -850,7 +856,11 @@ const App = (() => {
   function renderTimeline(tl) {
     const sec = $("#timelineSec"), el = $("#timelineList");
     if (!sec || !el) return;
-    const any = tl.deadlines.length || tl.recs.length || tl.schols.length || tl.abroad.length;
+    // Defensive: render() runs six panes in a row and a throw in any of them
+    // silently skips the rest. Counting a missing array must not be what
+    // decides whether the plan list gets drawn.
+    const n = k => (tl && tl[k] ? tl[k].length : 0);
+    const any = n("deadlines") || n("recs") || n("schols") || n("abroad");
     if (!any) { sec.hidden = true; return; }
     sec.hidden = false;
     const item = e => `
