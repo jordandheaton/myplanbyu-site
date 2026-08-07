@@ -337,27 +337,45 @@ const Solver = (() => {
      saved choice if any, else the lightest group(s) by completion credits.
      (A "choose 1 of 2 options" defaults to the shorter option — what most
      students pick — but stays switchable.) */
-  function groupCompletionCredits(g, cat) {
-    if (g.take === "all") return g.opts.reduce((s, id) => s + (cat[id]?.credits || 3), 0);
-    if (g.take && g.take.credits) return g.take.credits;
-    const avg = g.opts.reduce((s, id) => s + (cat[id]?.credits || 3), 0) / Math.max(1, g.opts.length);
-    return (typeof g.take === "number" ? g.take : 1) * avg;
+  /* What this group still COSTS the student, in credits.
+     `done` is the set of courses already completed, and it matters: the
+     cheapest option on paper is rarely the cheapest option for a particular
+     student. American Heritage is one course (A HTG 100, 3 cr) or an approved
+     pair such as ECON 110 + POLI 210 (6 cr) -- so on paper the single course
+     always wins, and a student who had ALREADY finished the pair was told to
+     go take A HTG 100 anyway. Counting only what is left to take fixes that
+     here, and equally for the 94 generated group buckets where a student
+     part-way through one option was being pushed onto another. */
+  function groupCompletionCredits(g, cat, done) {
+    const left = id => (done && done.has(id) ? 0 : (cat[id]?.credits || 3));
+    if (g.take === "all") return g.opts.reduce((s, id) => s + left(id), 0);
+    if (g.take && g.take.credits) {
+      const covered = g.opts.reduce((s, id) => s + (done && done.has(id) ? (cat[id]?.credits || 3) : 0), 0);
+      return Math.max(0, g.take.credits - covered);
+    }
+    const n = typeof g.take === "number" ? g.take : 1;
+    const doneN = done ? g.opts.filter(id => done.has(id)).length : 0;
+    const remaining = g.opts.filter(id => !(done && done.has(id)));
+    const avg = remaining.reduce((s, id) => s + (cat[id]?.credits || 3), 0) / Math.max(1, remaining.length);
+    return Math.max(0, n - doneN) * avg;
   }
   function pickGroups(profile, key, groups, cat, k) {
     // saved choices are ORIGINAL group indices (g.gi) so they stay stable even
     // when some groups have no resolvable courses and get filtered out
     const saved = (profile.groupChoice || {})[key];
     const savedArr = Array.isArray(saved) ? saved : (typeof saved === "number" ? [saved] : null);
+    // an explicit choice still wins -- this only orders the ones nobody picked
+    const done = new Set(profile.completed || []);
+    const cheapest = (a, b) =>
+      groupCompletionCredits(a, cat, done) - groupCompletionCredits(b, cat, done);
     if (savedArr) {
       const picked = groups.filter(g => savedArr.includes(g.gi));
       if (picked.length >= Math.min(k, groups.length)) return picked.slice(0, k);
       // partial save: keep what was chosen, top up with the lightest others
-      const rest = groups.filter(g => !savedArr.includes(g.gi)).sort((a, b) =>
-        groupCompletionCredits(a, cat) - groupCompletionCredits(b, cat));
+      const rest = groups.filter(g => !savedArr.includes(g.gi)).sort(cheapest);
       return [...picked, ...rest].slice(0, k);
     }
-    return groups.slice().sort((a, b) =>
-      groupCompletionCredits(a, cat) - groupCompletionCredits(b, cat)).slice(0, k);
+    return groups.slice().sort(cheapest).slice(0, k);
   }
 
   /*  Choose concrete courses to satisfy every bucket.
@@ -3469,13 +3487,43 @@ const Solver = (() => {
         const totalNeed = needC ?? (needN ?? 0) * 3;
         const gotDone = needC != null ? doneC : doneN * 3;
         const gotPlan = needC != null ? planC : planN * 3;
+        let pctDone = totalNeed ? Math.min(1, gotDone / totalNeed) : 1;
+        let pctPlan = totalNeed ? Math.min(1, (gotDone + gotPlan) / totalNeed) : 1;
+
+        // A GROUP bucket is measured in OPTIONS SATISFIED, not courses taken.
+        // Counting courses read "American Heritage 100% complete" off ECON 110
+        // alone -- one course out of a union of nine, but half of the only
+        // option it belongs to. The plan was right (it still scheduled
+        // A HTG 100); the progress bar contradicted it, which is the same
+        // false-complete that sent a student to graduation short in the first
+        // place. Same correction for the 94 generated group buckets.
+        if (isGroup) {
+          const k = b.pick.k || 1;
+          const plannedIds = new Set(opts.filter(id => chosen.get(id)?.buckets.has(key)));
+          const satisfied = (g, have) => {
+            const ids = (g.options || []).filter(id => cat[id]);
+            if (!ids.length) return false;
+            if (g.take === "all") return ids.every(id => have(id));
+            if (g.take && g.take.credits) {
+              const cr = ids.reduce((s, id) => s + (have(id) ? (cat[id].credits || 0) : 0), 0);
+              return cr >= g.take.credits - 0.01;
+            }
+            const n = typeof g.take === "number" ? g.take : 1;
+            return ids.filter(id => have(id)).length >= n;
+          };
+          const isDone = id => completed.has(id);
+          const isDoneOrPlanned = id => completed.has(id) || plannedIds.has(id);
+          const nDone = (b.groups || []).filter(g => satisfied(g, isDone)).length;
+          const nPlan = (b.groups || []).filter(g => satisfied(g, isDoneOrPlanned)).length;
+          pctDone = Math.min(1, nDone / k);
+          pctPlan = Math.min(1, nPlan / k);
+        }
         return {
           id: b.id, name: b.name, note: b.note || null,
           need: needC != null ? `${needC} cr`
               : isGroup ? `${b.pick.k || 1} of ${(b.groups || []).length} options`
               : `${needN} course${needN === 1 ? "" : "s"}`,
-          pctDone: totalNeed ? Math.min(1, gotDone / totalNeed) : 1,
-          pctPlan: totalNeed ? Math.min(1, (gotDone + gotPlan) / totalNeed) : 1,
+          pctDone, pctPlan,
           rows,
         };
       });
