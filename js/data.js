@@ -167,7 +167,24 @@ const DATA = (() => {
      program, so they stay hand-defined (they're stable and small).
      ---------------------------------------------------------------- */
   const HAVE_REAL = typeof CATALOG_DATA !== "undefined" && CATALOG_DATA && CATALOG_DATA.courses;
-  const GE_REAL = HAVE_REAL && CATALOG_DATA.ge ? CATALOG_DATA.ge.buckets : null;
+  let GE_REAL = HAVE_REAL && CATALOG_DATA.ge ? CATALOG_DATA.ge.buckets : null;
+
+  /* Courses BYU accepts for a Core area that the scraped option lists miss.
+     The scrape reads "University Core 2004-Present". Some routes are recorded
+     on the MAJOR instead and never appear there — M COM 320 is the Marriott
+     school's Advanced Written & Oral course, printed in the Accounting,
+     Information Systems and Construction FPM requirements but not in the Core
+     program. A tester lost the requirement because of it, and it affects every
+     business student. Patch it on top so a re-scrape can't drop it again. */
+  const GE_ALSO_ACCEPTS = {
+    "ge-advanced-written-oral-communication": ["M COM 320"],
+  };
+  if (GE_REAL) {
+    GE_REAL = GE_REAL.map(b => {
+      const extra = (GE_ALSO_ACCEPTS[b.id] || []).filter(c => !(b.options || []).includes(c));
+      return extra.length ? { ...b, options: [...(b.options || []), ...extra] } : b;
+    });
+  }
 
   const HAND_GE_BUCKETS = [
     { id: "am-heritage",name: "American Heritage",                 pick: { type: "courses", n: 1 }, tag: "am-heritage" },
