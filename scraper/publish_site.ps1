@@ -55,8 +55,15 @@ foreach ($d in @("css", "js")) {
 # edge cache stops being a hazard and starts being free speed: unchanged files
 # keep their hash and stay cached, changed ones bust automatically. No API
 # token, no purge step, nothing to remember.
+#
+# READ AND WRITE UTF-8 EXPLICITLY. index.html is UTF-8 with no BOM, and
+# PowerShell 5.1's Get-Content defaults to the system ANSI codepage when it
+# finds no BOM -- so it read every check mark and em dash as three Windows-1252
+# characters, and Set-Content wrote them back double-encoded. The site shipped
+# "âœ" where a check mark belonged and "â€" for every dash, and gained a BOM
+# it never had. Both sides must name the encoding; neither default is UTF-8.
 $index = Join-Path $DeployRepo "index.html"
-$html = Get-Content $index -Raw
+$html = Get-Content $index -Raw -Encoding UTF8
 $html = [regex]::Replace($html, '(?<attr>(?:src|href)=")(?<path>(?:js|css)/[^"?]+)"', {
   param($m)
   $rel = $m.Groups['path'].Value
@@ -65,7 +72,9 @@ $html = [regex]::Replace($html, '(?<attr>(?:src|href)=")(?<path>(?:js|css)/[^"?]
   $hash = (Get-FileHash $file -Algorithm SHA256).Hash.Substring(0, 8).ToLower()
   '{0}{1}?v={2}"' -f $m.Groups['attr'].Value, $rel, $hash
 })
-Set-Content -Path $index -Value $html -Encoding utf8 -NoNewline
+# -Encoding utf8 would ADD a BOM on 5.1; write the bytes ourselves instead so
+# the deployed file is byte-identical to the source apart from the ?v= stamps.
+[System.IO.File]::WriteAllText($index, $html, (New-Object System.Text.UTF8Encoding $false))
 
 # the custom domain lives IN the pages branch
 Set-Content -Path (Join-Path $DeployRepo "CNAME") -Value "myplan.jordanheaton.com" -Encoding ascii
