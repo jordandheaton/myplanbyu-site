@@ -45,9 +45,17 @@ BASELINE_PATH = HERE / "refresh_baseline.json"
 # A real catalog edit never removes 5% of the courses at once; a broken scrape
 # or a parser regression does.
 MAX_COUNT_DROP_FRAC = 0.05
-# generate_data.py logs one line per unresolved requirement. 24 findings was the
-# 2026-07-24 baseline; a jump of more than 8 means the parser regressed, not
+# generate_data.py logs one line per unresolved requirement. 63 findings is the
+# 2026-07-29 baseline; a jump of more than 8 means the parser regressed, not
 # that BYU edited eight programs in one week.
+#
+# ADDING A DETECTOR RE-BASELINES THE GATE. The count only compares across runs
+# that share a detector set. Three checks added 2026-07-27 (b9bb468) took a
+# steady 24 to 63 without anything regressing, and since --update writes only on
+# success the gate could not ratchet past it: it blocked every run from
+# 2026-08-02 on, each time reporting a parser regression that had not happened.
+# After adding a check, audit the findings it introduces, then write the new
+# count both here and in refresh_baseline.json.
 MAX_HEALTH_INCREASE = 8
 
 # Sources whose JSON is a flat list of documents. A drop to zero here is the
