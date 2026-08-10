@@ -21,9 +21,24 @@ fold the metrics into its log and status file.
     python _sanity_check.py                 # check only
     python _sanity_check.py --update        # check, then ratchet the baseline
                                             #   forward on success
+    python _sanity_check.py --accept        # record the CURRENT findings as the
+                                            #   baseline after a human audit
 
 `--update` is called only after a successful publish, so the baseline always
 reflects what is actually live.
+
+`--accept` is the manual escape hatch, and exists because `--update` cannot
+unstick the gate on its own: it writes only on success, so a findings count
+that rises for a legitimate reason blocks every future run forever. Adding a
+detector does exactly that -- three checks added 2026-07-27 took a steady 24
+findings to 63 and blocked the next three weekly refreshes, each time
+reporting a parser regression that had not happened.
+
+`--accept` overrides the health-findings rule ONLY. A collapsed scrape is not
+a detector change, so if any other rule is failing it refuses and changes
+nothing -- otherwise one careless `--accept` would bake half a catalog in as
+the new known-good and lower the guard permanently. Never call it from the
+scheduled job; audit the new findings first.
 
 Author: Jordan Heaton
 """
@@ -54,8 +69,8 @@ MAX_COUNT_DROP_FRAC = 0.05
 # steady 24 to 63 without anything regressing, and since --update writes only on
 # success the gate could not ratchet past it: it blocked every run from
 # 2026-08-02 on, each time reporting a parser regression that had not happened.
-# After adding a check, audit the findings it introduces, then write the new
-# count both here and in refresh_baseline.json.
+# After adding a check, audit the findings it introduces, then re-baseline with
+# `--accept` (which is what that flag is for) and update the count above.
 MAX_HEALTH_INCREASE = 8
 
 # Sources whose JSON is a flat list of documents. A drop to zero here is the
@@ -165,8 +180,13 @@ def collect_metrics() -> Dict[str, Any]:
 
 
 def evaluate(metrics: Dict[str, Any],
-             baseline: Dict[str, Any]) -> List[str]:
-    """Return the list of blocking reasons. Empty list means the gate passes."""
+             baseline: Dict[str, Any],
+             skip_health: bool = False) -> List[str]:
+    """Return the list of blocking reasons. Empty list means the gate passes.
+
+    `skip_health` drops rule 4 only, which is how `--accept` asks "is anything
+    wrong here BESIDES the findings count?" before it agrees to re-baseline.
+    """
     reasons: List[str] = []
 
     # --- rule 1: the generated output must be readable and non-empty ---------
@@ -215,21 +235,45 @@ def evaluate(metrics: Dict[str, Any],
                 % (name, old))
 
     # --- rule 4: the requirement parser must not regress --------------------
-    new_h = metrics.get("health_findings")
-    old_h = baseline.get("health_findings")
-    if isinstance(new_h, int) and isinstance(old_h, int):
-        if new_h > old_h + MAX_HEALTH_INCREASE:
-            reasons.append(
-                "health findings rose %d -> %d (limit +%d) -- requirement "
-                "parsing regressed" % (old_h, new_h, MAX_HEALTH_INCREASE))
+    if not skip_health:
+        new_h = metrics.get("health_findings")
+        old_h = baseline.get("health_findings")
+        if isinstance(new_h, int) and isinstance(old_h, int):
+            if new_h > old_h + MAX_HEALTH_INCREASE:
+                reasons.append(
+                    "health findings rose %d -> %d (limit +%d) -- requirement "
+                    "parsing regressed" % (old_h, new_h, MAX_HEALTH_INCREASE))
 
     return reasons
+
+
+def write_baseline(metrics: Dict[str, Any]) -> None:
+    """Record `metrics` as the new known-good baseline.
+
+    Shared by --update and --accept so the two paths cannot drift into writing
+    differently-shaped files.
+    """
+    BASELINE_PATH.write_text(
+        json.dumps({
+            "_readme": "Last known-good scrape metrics. Written by "
+                       "_sanity_check.py --update after a successful publish, "
+                       "or --accept after a human audit; the gate compares "
+                       "each new scrape against these numbers.",
+            "generated": metrics.get("js_generated"),
+            "metrics": {k: v for k, v in metrics.items()
+                        if k not in VOLATILE_KEYS},
+        }, indent=2) + "\n",
+        encoding="utf-8")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--update", action="store_true",
                     help="on success, write the new metrics as the baseline")
+    ap.add_argument("--accept", action="store_true",
+                    help="record the current findings as the baseline even "
+                         "though the health rule is failing (manual, after an "
+                         "audit); refuses if any other rule is failing")
     args = ap.parse_args()
 
     try:
@@ -245,6 +289,17 @@ def main() -> int:
     reasons = evaluate(metrics, base_metrics)
     ok = not reasons
 
+    # --accept re-baselines past a health-only failure. Anything else failing
+    # means the DATA is wrong, not the detector set, and is never acceptable.
+    accepted = False
+    if args.accept:
+        blocking = evaluate(metrics, base_metrics, skip_health=True)
+        if not blocking:
+            write_baseline(metrics)
+            accepted = True
+    elif ok and args.update:
+        write_baseline(metrics)
+
     verdict = {
         "ok": ok,
         "first_run": first_run,
@@ -252,21 +307,14 @@ def main() -> int:
         "metrics": metrics,
         "baseline_generated": None if first_run else baseline.get("generated"),
     }
+    if args.accept:
+        # Keep `ok` honest -- it reports the gate, not the override -- and say
+        # separately whether the baseline actually moved.
+        verdict["accepted"] = accepted
     print(json.dumps(verdict, indent=2))
 
-    if ok and args.update:
-        BASELINE_PATH.write_text(
-            json.dumps({
-                "_readme": "Last known-good scrape metrics. Written by "
-                           "_sanity_check.py --update after a successful "
-                           "publish; the gate compares each new scrape "
-                           "against these numbers.",
-                "generated": metrics.get("js_generated"),
-                "metrics": {k: v for k, v in metrics.items()
-                            if k not in VOLATILE_KEYS},
-            }, indent=2) + "\n",
-            encoding="utf-8")
-
+    if args.accept:
+        return 0 if accepted else 2
     if not ok:
         return 2
     return 0

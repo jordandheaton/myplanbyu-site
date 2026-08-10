@@ -68,6 +68,34 @@ to publish — the branch and index are checked first — so it always describes
 is live. A run on a feature branch refreshes the data and leaves the baseline
 alone.
 
+### When the findings count rises for a good reason
+
+Adding a health detector to `generate_data.py` raises the count on every run
+afterwards, and the gate reads that as a parser regression. Because `--update`
+writes only on success, the gate cannot ratchet itself out of it: it blocks
+every run from then on, and the site quietly keeps serving the last good build.
+That is not hypothetical — three checks added 2026-07-27 took a steady 24
+findings to 63 and blocked the 2026-08-02 and 2026-08-09 refreshes, reporting a
+regression that had not happened.
+
+Audit the new findings first, then re-baseline:
+
+```powershell
+& "C:\Users\jorda\venvs\myplan-scraper\Scripts\python.exe" _sanity_check.py --accept
+# exit 0 = baseline rewritten ("accepted": true), 2 = refused, nothing written
+```
+
+`--accept` overrides the health rule **only**. If a count collapsed or a source
+returned zero it refuses and changes nothing, so it can never bake a broken
+scrape in as the new known-good. It is a manual command — the scheduled job must
+keep calling the plain gate.
+
+Both baseline paths are covered by `test_sanity_check.py`:
+
+```powershell
+& "C:\Users\jorda\venvs\myplan-scraper\Scripts\python.exe" -m unittest test_sanity_check -v
+```
+
 ## Publishing
 
 The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
