@@ -1,5 +1,5 @@
 {
-  "_readme": "Last known-good scrape metrics. Written by _sanity_check.py --update after a successful publish; the gate compares each new scrape against these numbers.",
+  "_readme": "Last known-good scrape metrics. Written by _sanity_check.py --update after a successful publish, or --accept after a human audit; the gate compares each new scrape against these numbers.",
   "generated": "2026-07-29",
   "metrics": {
     "catalog_js_parsed": true,
