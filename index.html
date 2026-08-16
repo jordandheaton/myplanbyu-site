@@ -301,18 +301,24 @@
     </div>
   </div>
 
-  <!-- AI Advisor backend. Leave commented out for local work: chat.js then
-       defaults to http://127.0.0.1:5000/api, which is what scraper/advisor_server.py
-       serves. To go live, uncomment and point it at the public HTTPS origin
-       (a Cloudflare tunnel URL works) — an https: page cannot call http://127.0.0.1,
-       so without this the panel correctly reports itself offline.
+  <!-- AI Advisor backend — this assignment is LIVE. On the deployed site it
+       points the chat panel, live sections, and the feedback form (chat.js +
+       app.js) at the Cloudflare Worker behind advisor.jordanheaton.com
+       (worker/README.md); every question it answers is real, billed,
+       quota-metered spend. The hostname guard keeps local work off it: served
+       from localhost or file:// nothing is set, chat.js falls back to
+       http://127.0.0.1:5000/api (scraper/advisor_server.py), and the panel
+       correctly reports itself offline until that server is started.
        See scraper/README_ADVISOR_DEPLOY.md. -->
-  <script>window.MYPLAN_ADVISOR_API = "https://advisor.jordanheaton.com/api";</script>
+  <script>
+    if (location.hostname && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname))
+      window.MYPLAN_ADVISOR_API = "https://advisor.jordanheaton.com/api";
+  </script>
   <script src="js/catalog_data.js?v=5b7460b2"></script>
   <script src="js/timeline_data.js?v=81928840"></script>
-  <script src="js/schedule_data.js?v=f3e07b46"></script>
-  <script src="js/data.js?v=a3033dfc"></script>
-  <script src="js/solver.js?v=ab209424"></script>
+  <script src="js/schedule_data.js?v=584de28d"></script>
+  <script src="js/data.js?v=948b48c0"></script>
+  <script src="js/solver.js?v=b56e96c3"></script>
   <script src="js/app.js?v=f1e99c40"></script>
   <script src="js/chat.js?v=c465409b"></script>
   <script src="js/mobile.js?v=75ffb900"></script>

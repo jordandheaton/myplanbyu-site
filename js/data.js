@@ -179,8 +179,45 @@ const DATA = (() => {
   const GE_ALSO_ACCEPTS = {
     "ge-advanced-written-oral-communication": ["M COM 320"],
   };
+
+  /* AMERICAN HERITAGE IS NOT "PICK ONE".
+     -------------------------------------------------------------------
+     BYU's Requirement 1 is one standalone course OR one of four specific
+     two-course PAIRS. The catalog encodes that precisely: rules carrying
+     logic "and" over a pair of course ids. The GE generator flattens every
+     requirement into a single option list, so all of that became "pick 1 of
+     [A HTG 100, ECON 110, HIST 220, POLI 110]" — and the note it stamped on
+     the bucket ("some alternatives are two-course combinations") is the
+     generator admitting it dropped the structure.
+
+     The consequence was live and serious: ECON 110 is Marriott pre-core, so
+     every business student had American Heritage reported 100% COMPLETE off
+     ECON 110 alone. BYU does not accept that — ECON 110 counts only paired
+     with POLI 210 — and the student would find out at graduation.
+
+     The group pick type already models exactly this and 94 generated buckets
+     use it, so this is a data fix, not a solver change. Pairs transcribed
+     from the catalog's own AND rules; the G E 1xx equivalents in those rules
+     are transfer-credit placeholders, not courses anyone plans, so the
+     primary BYU course stands for each slot. */
+  const GE_REPLACE = {
+    "ge-american-heritage": {
+      id: "ge-american-heritage", name: "American Heritage",
+      pick: { type: "group", k: 1 },
+      groups: [
+        { label: "American Heritage (single course)", options: ["A HTG 100"], take: "all" },
+        { label: "HIST 220 + POLI 210", options: ["HIST 220", "POLI 210"], take: "all" },
+        { label: "HIST 221 + POLI 110", options: ["HIST 221", "POLI 110"], take: "all" },
+        { label: "HIST 221 + POLI 210", options: ["HIST 221", "POLI 210"], take: "all" },
+        { label: "ECON 110 + POLI 210", options: ["ECON 110", "POLI 210"], take: "all" },
+      ],
+      note: "One course (A HTG 100) or one approved two-course pair — a single half, such as ECON 110 on its own, does not satisfy it.",
+    },
+  };
+
   if (GE_REAL) {
     GE_REAL = GE_REAL.map(b => {
+      if (GE_REPLACE[b.id]) return GE_REPLACE[b.id];
       const extra = (GE_ALSO_ACCEPTS[b.id] || []).filter(c => !(b.options || []).includes(c));
       return extra.length ? { ...b, options: [...(b.options || []), ...extra] } : b;
     });
