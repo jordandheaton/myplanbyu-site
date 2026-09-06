@@ -36,11 +36,11 @@
             "credits": 3.0
           },
           {
-            "code": "MKTG 201",
+            "code": "IS 201",
             "credits": 3.0
           },
           {
-            "code": "IS 201",
+            "code": "MKTG 201",
             "credits": 3.0
           }
         ]
@@ -62,12 +62,8 @@
             "credits": 1.5
           },
           {
-            "code": "STAT 121",
+            "code": "ACC 241",
             "credits": 3.0
-          },
-          {
-            "code": "MSB 180",
-            "credits": 1.0
           }
         ]
       },
@@ -82,14 +78,6 @@
           {
             "code": "ACC 411",
             "credits": 1.5
-          },
-          {
-            "code": "FIN 402",
-            "credits": 3.0
-          },
-          {
-            "code": "HRM 391",
-            "credits": 3.0
           }
         ]
       },
@@ -97,6 +85,10 @@
         "year": 3,
         "season": "F",
         "courses": [
+          {
+            "code": "STAT 121",
+            "credits": 3.0
+          },
           {
             "code": "ACC 408",
             "credits": 1.5
@@ -114,8 +106,12 @@
             "credits": 3.0
           },
           {
-            "code": "PSE 571",
+            "code": "FIN 402",
             "credits": 3.0
+          },
+          {
+            "code": "MSB 490R",
+            "credits": 1.0
           }
         ]
       },
@@ -129,6 +125,14 @@
           },
           {
             "code": "ACC 407",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 571",
             "credits": 3.0
           }
         ]
@@ -148,7 +152,7 @@
         "season": "W",
         "courses": [
           {
-            "code": "ACC 241",
+            "code": "ACC 599R",
             "credits": 3.0
           }
         ]
@@ -160,10 +164,13 @@
         "year": 3,
         "season": "F",
         "courses": [
+          "STAT 121",
           "ACC 408",
           "ACC 409",
           "ACC 406",
-          "ACC 504"
+          "ACC 504",
+          "FIN 402",
+          "MSB 490R"
         ]
       },
       {
@@ -172,11 +179,13 @@
         "season": "W",
         "courses": [
           "ACC 405",
-          "ACC 407"
+          "ACC 407",
+          "HRM 391",
+          "PSE 571"
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/acc/wp-content/uploads/sites/27/Acc_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/acc/wp-content/uploads/sites/27/Acc_Flowchart_2026_WEB.pdf"
   },
   "Finance (BS)": {
     "terms": [
@@ -184,6 +193,10 @@
         "year": 1,
         "season": "F",
         "courses": [
+          {
+            "code": "MSB 490R",
+            "credits": 1.0
+          },
           {
             "code": "ECON 110",
             "credits": 3.0
@@ -199,10 +212,6 @@
           {
             "code": "IS 110",
             "credits": 1.0
-          },
-          {
-            "code": "MSB 180",
-            "credits": 1.0
           }
         ]
       },
@@ -211,12 +220,56 @@
         "season": "W",
         "courses": [
           {
+            "code": "FIN 180",
+            "credits": 0.5
+          },
+          {
             "code": "STAT 121",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "ACC 241",
             "credits": 3.0
           },
           {
-            "code": "FIN 180",
-            "credits": 0.5
+            "code": "M COM 320",
+            "credits": 3.0
+          },
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
+          },
+          {
+            "code": "IS 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 453",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "W",
+        "courses": [
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          },
+          {
+            "code": "ACC 310",
+            "credits": 3.0
           }
         ]
       },
@@ -231,6 +284,22 @@
           {
             "code": "FIN 326",
             "credits": 2.0
+          },
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          },
+          {
+            "code": "FIN 401",
+            "credits": 3.0
           }
         ]
       },
@@ -243,11 +312,21 @@
             "credits": 3.0
           }
         ]
+      },
+      {
+        "year": 4,
+        "season": "F",
+        "courses": [
+          {
+            "code": "MSB 494",
+            "credits": 3.0
+          }
+        ]
       }
     ],
     "cohorts": [
       {
-        "label": "Junior Core Fall Envelope",
+        "label": "Junior Core - Fall",
         "year": 3,
         "season": "F",
         "courses": [
@@ -256,7 +335,7 @@
         ]
       },
       {
-        "label": "Junior Core Winter Envelope",
+        "label": "Junior Core - Winter",
         "year": 3,
         "season": "W",
         "courses": [
@@ -264,7 +343,7 @@
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/bsfin/wp-content/uploads/sites/17/Fin_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/bsfin/wp-content/uploads/sites/17/Fin_Flowchart_2026_WEB.pdf"
   },
   "Global Supply Chain Management (BS)": {
     "terms": [
@@ -272,6 +351,10 @@
         "year": 1,
         "season": "F",
         "courses": [
+          {
+            "code": "MSB 490R",
+            "credits": 1.0
+          },
           {
             "code": "IS 201",
             "credits": 3.0
@@ -289,14 +372,6 @@
             "credits": 1.5
           },
           {
-            "code": "GSCM 211",
-            "credits": 1.5
-          },
-          {
-            "code": "MSB 180",
-            "credits": 1.0
-          },
-          {
             "code": "IS 110",
             "credits": 1.0
           }
@@ -305,16 +380,6 @@
       {
         "year": 1,
         "season": "W",
-        "courses": []
-      },
-      {
-        "year": 1,
-        "season": "Sp",
-        "courses": []
-      },
-      {
-        "year": 2,
-        "season": "F",
         "courses": [
           {
             "code": "ACC 200",
@@ -330,6 +395,28 @@
           },
           {
             "code": "M COM 320",
+            "credits": 3.0
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "season": "F",
+        "courses": [
+          {
+            "code": "GSCM 211",
+            "credits": 1.5
+          },
+          {
+            "code": "HRM 391",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "STRAT 392",
             "credits": 3.0
           }
         ]
@@ -395,24 +482,6 @@
         "season": "F",
         "courses": [
           {
-            "code": "HRM 391",
-            "credits": 3.0
-          },
-          {
-            "code": "PSE 390",
-            "credits": 3.0
-          },
-          {
-            "code": "STRAT 392",
-            "credits": 3.0
-          }
-        ]
-      },
-      {
-        "year": 4,
-        "season": "W",
-        "courses": [
-          {
             "code": "GSCM 585R",
             "credits": 3.0
           },
@@ -438,12 +507,11 @@
           "GSCM 401",
           "GSCM 403",
           "GSCM 404",
-          "GSCM 429",
-          "GSCM 380"
+          "GSCM 429"
         ]
       },
       {
-        "label": "Complete two courses during winter semesters",
+        "label": "Complete junior year, winter envelope",
         "year": 3,
         "season": "W",
         "courses": [
@@ -454,7 +522,7 @@
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/gscm/wp-content/uploads/sites/45/GSC_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/gscm/wp-content/uploads/sites/45/GSC_Flowchart_2026_WEB.pdf"
   },
   "Marketing (BS)": {
     "terms": [
@@ -463,7 +531,7 @@
         "season": "F",
         "courses": [
           {
-            "code": "MSB 180",
+            "code": "MSB 490R",
             "credits": 1.0
           },
           {
@@ -473,6 +541,10 @@
           {
             "code": "IS 110",
             "credits": 1.0
+          },
+          {
+            "code": "MKTG 201",
+            "credits": 3.0
           }
         ]
       },
@@ -486,15 +558,15 @@
         "season": "F",
         "courses": [
           {
-            "code": "MKTG 201",
-            "credits": 3.0
-          },
-          {
             "code": "IS 201",
             "credits": 3.0
           },
           {
             "code": "ACC 200",
+            "credits": 3.0
+          },
+          {
+            "code": "M COM 320",
             "credits": 3.0
           }
         ]
@@ -505,6 +577,10 @@
         "courses": [
           {
             "code": "FIN 201",
+            "credits": 3.0
+          },
+          {
+            "code": "MKTG 429",
             "credits": 3.0
           }
         ]
@@ -532,20 +608,6 @@
           {
             "code": "MSB 325",
             "credits": 3.0
-          },
-          {
-            "code": "MKTG 380",
-            "credits": 1.0
-          }
-        ]
-      },
-      {
-        "year": 3,
-        "season": "W",
-        "courses": [
-          {
-            "code": "MKTG 429",
-            "credits": 3.0
           }
         ]
       },
@@ -554,19 +616,15 @@
         "season": "F",
         "courses": [
           {
-            "code": "M COM 320",
-            "credits": 3.0
-          },
-          {
-            "code": "PSE 390",
-            "credits": 3.0
+            "code": "MKTG 380",
+            "credits": 1.0
           }
         ]
       }
     ],
     "cohorts": [
       {
-        "label": "Complete junior year, fall envelope",
+        "label": "Complete junior year, fall courses",
         "year": 3,
         "season": "F",
         "courses": [
@@ -594,7 +652,7 @@
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/mktg/wp-content/uploads/sites/46/Mktg_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/mktg/wp-content/uploads/sites/46/Mktg_Flowchart_2026_WEB.pdf"
   },
   "Entrepreneurial Management (BS)": {
     "terms": [
@@ -602,6 +660,10 @@
         "year": 1,
         "season": "F",
         "courses": [
+          {
+            "code": "MSB 490R",
+            "credits": 1.0
+          },
           {
             "code": "IS 110",
             "credits": 1.0
@@ -613,6 +675,10 @@
           {
             "code": "ENT 113",
             "credits": 1.0
+          },
+          {
+            "code": "IS 201",
+            "credits": 3.0
           },
           {
             "code": "ECON 110",
@@ -629,16 +695,12 @@
         "season": "W",
         "courses": [
           {
-            "code": "IS 201",
-            "credits": 3.0
-          },
-          {
             "code": "MKTG 201",
             "credits": 3.0
           },
           {
-            "code": "MSB 180",
-            "credits": 1.0
+            "code": "GSCM 201",
+            "credits": 1.5
           },
           {
             "code": "FIN 201",
@@ -655,16 +717,12 @@
         "season": "F",
         "courses": [
           {
-            "code": "GSCM 201",
-            "credits": 1.5
+            "code": "ENT 302",
+            "credits": 3.0
           },
           {
             "code": "GSCM 211",
             "credits": 1.5
-          },
-          {
-            "code": "ENT 302",
-            "credits": 3.0
           }
         ]
       },
@@ -711,10 +769,6 @@
             "credits": 1.0
           },
           {
-            "code": "ENT 382",
-            "credits": 1.0
-          },
-          {
             "code": "MSB 342",
             "credits": 1.0
           }
@@ -745,6 +799,10 @@
             "credits": 3.0
           },
           {
+            "code": "ENT 382",
+            "credits": 1.0
+          },
+          {
             "code": "GCI 381R",
             "credits": 1.0
           }
@@ -763,7 +821,7 @@
     ],
     "cohorts": [
       {
-        "label": "Complete junior year, fall courses",
+        "label": "Entrepreneurship Core - Fall",
         "year": 3,
         "season": "F",
         "courses": [
@@ -771,14 +829,11 @@
           "ENT 401",
           "MSB 325",
           "ENT 478",
-          "ENT 432",
-          "ENT 381",
-          "ENT 382",
-          "MSB 342"
+          "ENT 432"
         ]
       },
       {
-        "label": "Complete junior year, winter courses",
+        "label": "Entrepreneurship Core - Winter",
         "year": 3,
         "season": "W",
         "courses": [
@@ -786,12 +841,11 @@
           "ENT 411",
           "ENT 436",
           "ENT 434R",
-          "ENT 437",
-          "GCI 381R"
+          "ENT 437"
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/ent/wp-content/uploads/sites/44/Ent_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/ent/wp-content/uploads/sites/44/Ent_Flowchart_2026_WEB.pdf"
   },
   "Human Resource Management (BS)": {
     "terms": [
@@ -800,7 +854,7 @@
         "season": "F",
         "courses": [
           {
-            "code": "MSB 180",
+            "code": "MSB 490R",
             "credits": 1.0
           },
           {
@@ -820,14 +874,6 @@
             "credits": 3.0
           },
           {
-            "code": "MSB 300",
-            "credits": 2.0
-          },
-          {
-            "code": "M COM 320",
-            "credits": 3.0
-          },
-          {
             "code": "ECON 110",
             "credits": 3.0
           },
@@ -842,6 +888,10 @@
         "season": "W",
         "courses": [
           {
+            "code": "MSB 300",
+            "credits": 2.0
+          },
+          {
             "code": "FIN 201",
             "credits": 3.0
           },
@@ -850,8 +900,8 @@
             "credits": 1.5
           },
           {
-            "code": "MSB 380",
-            "credits": 1.0
+            "code": "M COM 320",
+            "credits": 3.0
           }
         ]
       },
@@ -862,6 +912,10 @@
           {
             "code": "GSCM 211",
             "credits": 1.5
+          },
+          {
+            "code": "MSB 380",
+            "credits": 1.0
           }
         ]
       },
@@ -876,14 +930,6 @@
           {
             "code": "HRM 326",
             "credits": 2.0
-          },
-          {
-            "code": "PSE 390",
-            "credits": 3.0
-          },
-          {
-            "code": "STRAT 392",
-            "credits": 3.0
           }
         ]
       },
@@ -922,11 +968,25 @@
             "credits": 3.0
           }
         ]
+      },
+      {
+        "year": 4,
+        "season": "W",
+        "courses": [
+          {
+            "code": "PSE 390",
+            "credits": 3.0
+          },
+          {
+            "code": "STRAT 392",
+            "credits": 3.0
+          }
+        ]
       }
     ],
     "cohorts": [
       {
-        "label": "Junior Year, Fall Envelope",
+        "label": "Complete junior year, fall envelope",
         "year": 3,
         "season": "F",
         "courses": [
@@ -935,7 +995,7 @@
         ]
       },
       {
-        "label": "Junior Year, Winter Envelope",
+        "label": "Complete junior year, winter envelope",
         "year": 3,
         "season": "W",
         "courses": [
@@ -946,7 +1006,7 @@
         ]
       },
       {
-        "label": "Senior Year, Fall Envelope",
+        "label": "Complete senior year, fall envelope",
         "year": 4,
         "season": "F",
         "courses": [
@@ -955,7 +1015,7 @@
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/hrm/wp-content/uploads/sites/47/HR_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/hrm/wp-content/uploads/sites/47/HR_Flowchart_2026_WEB.pdf"
   },
   "Experience Design & Management (BS)": {
     "terms": [
@@ -964,11 +1024,7 @@
         "season": "F",
         "courses": [
           {
-            "code": "MSB 180",
-            "credits": 1.0
-          },
-          {
-            "code": "IS 110",
+            "code": "MSB 490R",
             "credits": 1.0
           },
           {
@@ -976,15 +1032,15 @@
             "credits": 3.0
           },
           {
-            "code": "IS 201",
+            "code": "IS 110",
+            "credits": 1.0
+          },
+          {
+            "code": "M COM 320",
             "credits": 3.0
           },
           {
             "code": "ECON 110",
-            "credits": 3.0
-          },
-          {
-            "code": "M COM 320",
             "credits": 3.0
           }
         ]
@@ -996,14 +1052,6 @@
           {
             "code": "MKTG 201",
             "credits": 3.0
-          },
-          {
-            "code": "EXDM 300",
-            "credits": 3.0
-          },
-          {
-            "code": "FIN 201",
-            "credits": 3.0
           }
         ]
       },
@@ -1012,19 +1060,23 @@
         "season": "F",
         "courses": [
           {
-            "code": "GSCM 201",
-            "credits": 1.5
+            "code": "IS 201",
+            "credits": 3.0
           },
           {
-            "code": "HRM 391",
+            "code": "EXDM 300",
             "credits": 3.0
+          },
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
           },
           {
             "code": "STRAT 392",
             "credits": 3.0
           },
           {
-            "code": "PSE 390",
+            "code": "HRM 391",
             "credits": 3.0
           }
         ]
@@ -1036,6 +1088,10 @@
           {
             "code": "GSCM 211",
             "credits": 1.5
+          },
+          {
+            "code": "FIN 201",
+            "credits": 3.0
           }
         ]
       },
@@ -1043,10 +1099,6 @@
         "year": 3,
         "season": "F",
         "courses": [
-          {
-            "code": "EXDM 495",
-            "credits": 1.5
-          },
           {
             "code": "EXDM 405",
             "credits": 3.0
@@ -1062,6 +1114,10 @@
           {
             "code": "EXDM 422",
             "credits": 3.0
+          },
+          {
+            "code": "EXDM 495",
+            "credits": 1.5
           }
         ]
       },
@@ -1079,6 +1135,10 @@
           },
           {
             "code": "EXDM 418",
+            "credits": 3.0
+          },
+          {
+            "code": "PSE 390",
             "credits": 3.0
           }
         ]
@@ -1117,7 +1177,7 @@
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/exdm/wp-content/uploads/sites/48/ExDM_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/exdm/wp-content/uploads/sites/48/ExDM_Flowchart_2026_WEB.pdf"
   },
   "Electrical Engineering (BS)": {
     "terms": [
@@ -2114,6 +2174,10 @@
         "season": "F",
         "courses": [
           {
+            "code": "MSB 490R",
+            "credits": 1.0
+          },
+          {
             "code": "CS 111",
             "credits": 3.0
           },
@@ -2130,12 +2194,16 @@
             "credits": 3.0
           },
           {
-            "code": "ACC 200",
+            "code": "STAT 121",
             "credits": 3.0
           },
           {
             "code": "ECON 110",
             "credits": 3.0
+          },
+          {
+            "code": "GSCM 201",
+            "credits": 1.5
           }
         ]
       },
@@ -2148,11 +2216,7 @@
             "credits": 3.0
           },
           {
-            "code": "MSB 180",
-            "credits": 1.0
-          },
-          {
-            "code": "STAT 121",
+            "code": "ACC 200",
             "credits": 3.0
           },
           {
@@ -2160,23 +2224,13 @@
             "credits": 3.0
           },
           {
-            "code": "GSCM 201",
-            "credits": 1.5
-          }
-        ]
-      },
-      {
-        "year": 2,
-        "season": "F",
-        "courses": [
-          {
             "code": "GSCM 211",
             "credits": 1.5
           }
         ]
       },
       {
-        "year": 3,
+        "year": 2,
         "season": "F",
         "courses": [
           {
@@ -2198,7 +2252,7 @@
         ]
       },
       {
-        "year": 3,
+        "year": 2,
         "season": "W",
         "courses": [
           {
@@ -2216,7 +2270,7 @@
         ]
       },
       {
-        "year": 4,
+        "year": 3,
         "season": "F",
         "courses": [
           {
@@ -2230,7 +2284,13 @@
           {
             "code": "STRAT 392",
             "credits": 3.0
-          },
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "season": "W",
+        "courses": [
           {
             "code": "MKTG 201",
             "credits": 3.0
@@ -2241,7 +2301,7 @@
     "cohorts": [
       {
         "label": "Complete junior year, fall envelope",
-        "year": 3,
+        "year": 2,
         "season": "F",
         "courses": [
           "IS 401",
@@ -2252,7 +2312,7 @@
       },
       {
         "label": "Complete junior year, winter courses",
-        "year": 3,
+        "year": 2,
         "season": "W",
         "courses": [
           "IS 414",
@@ -2261,6 +2321,6 @@
         ]
       }
     ],
-    "_src": "https://marriott.byu.edu/infosys/wp-content/uploads/sites/35/IS_Flowchart_2026_web.pdf"
+    "_src": "https://marriott.byu.edu/infosys/wp-content/uploads/sites/35/IS_Flowchart_2026_WEB.pdf"
   }
 }
