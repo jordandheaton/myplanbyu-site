@@ -40,6 +40,12 @@ $LOG_DIR = Join-Path $env:LOCALAPPDATA "myplanBYU\logs"
 $PUBLISH_PATHS = @(
   "myplanBYU/js/catalog_data.js",
   "myplanBYU/js/timeline_data.js",
+  # Written by generate_schedule.py at the end of the weekly job. It was missing
+  # from this list until 2026-09-11, so every weekly refresh regenerated it and
+  # left it uncommitted: jordanheaton.com/myplanBYU served the July 30 sections
+  # while the working tree (and the myplan.jordanheaton.com mirror, which copies
+  # js\ straight from the tree) had September's.
+  "myplanBYU/js/schedule_data.js",
   "myplanBYU/scraper/refresh_baseline.json"
 )
 # Tracked source JSON is added by wildcard expansion at commit time.
@@ -440,13 +446,26 @@ function Publish-Refresh {
 
     $fetch = & git fetch origin main 2>&1
     Write-LogDetail $fetch
-    $rebase = & git rebase origin/main 2>&1
-    Write-LogDetail $rebase
-    if ($LASTEXITCODE -ne 0) {
-      Write-Log "publish: rebase onto origin/main CONFLICTED -- aborting rebase, not pushing"
-      $abort = & git rebase --abort 2>&1
-      Write-LogDetail $abort
-      return [pscustomobject]@{ Published = $false; Reason = "rebase conflict"; Sha = $null }
+    # Only rebase when origin/main actually moved. 'git rebase' refuses to start
+    # at all while the working tree has unstaged changes -- and this tree
+    # routinely does (unrelated in-progress portfolio work, synced by OneDrive).
+    # Before 2026-09-11 that refusal was logged as "rebase conflict" on every
+    # run, so the refresh committed locally and never pushed; the commits only
+    # reached GitHub when Jordan next pushed something by hand.
+    & git merge-base --is-ancestor origin/main HEAD 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+      Write-Log "publish: origin/main is already an ancestor of HEAD -- no rebase needed"
+    } else {
+      # --autostash parks the unrelated dirty files for the duration and
+      # restores them afterwards, including on --abort.
+      $rebase = & git rebase --autostash origin/main 2>&1
+      Write-LogDetail $rebase
+      if ($LASTEXITCODE -ne 0) {
+        Write-Log "publish: rebase onto origin/main CONFLICTED -- aborting rebase, not pushing"
+        $abort = & git rebase --abort 2>&1
+        Write-LogDetail $abort
+        return [pscustomobject]@{ Published = $false; Reason = "rebase conflict"; Sha = $null }
+      }
     }
 
     $push = & git push origin main 2>&1

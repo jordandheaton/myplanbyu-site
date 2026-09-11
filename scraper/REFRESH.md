@@ -21,8 +21,8 @@ That registers both tasks. Re-running is safe — it overwrites.
 
 | Task | When | Script | Steps |
 |---|---|---|---|
-| `myplanBYU\weekly core refresh` | Sunday 03:00 | `refresh_core.ps1` | catalog → academic dates → MAP sheets → `generate_data` → `generate_timeline` |
-| `myplanBYU\monthly full refresh` | 1st Sunday 04:00 | `refresh_full.ps1` | catalog → 10 sources → flowchart extraction → MAP sheets → generate → `embed_and_load` (Pinecone) |
+| `myplanBYU\weekly core refresh` | Sunday 03:00 | `refresh_core.ps1` | catalog → academic dates → MAP sheets → `generate_data` → `generate_timeline` → class schedule → mirror to `myplan.jordanheaton.com` |
+| `myplanBYU\monthly full refresh` | 1st Sunday 04:00 | `refresh_full.ps1` | catalog → 10 sources → flowchart extraction → MAP sheets → generate → `embed_and_load` (Pinecone) → mirror to `myplan.jordanheaton.com` |
 
 Both accept:
 
@@ -113,8 +113,16 @@ The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
   `catalog_scraped_at`. Without both, the embedded dates alone would be a real
   diff and every single run would commit and redeploy the site, burying the
   weeks BYU actually changed something;
-- rebases onto `origin/main` first, and aborts rather than resolving a conflict
-  unattended;
+- rebases onto `origin/main` only if it has actually moved, with `--autostash`
+  so unrelated dirty files in the working tree don't block it, and aborts rather
+  than resolving a real conflict unattended. (Until 2026-09-11 a plain
+  `git rebase` ran every time, and git refuses to start one while the tree has
+  unstaged changes — so with any in-progress portfolio edit lying around, every
+  run logged "rebase conflict" and never pushed);
+- also mirrors the site into the `myplanbyu-site` deploy repo
+  (`publish_site.ps1`) for `myplan.jordanheaton.com`. Both jobs do this; the
+  monthly one didn't until 2026-09-11, which is why the 2027 study abroad
+  programs it scraped on 2026-09-06 stayed off the subdomain;
 - writes the counts into the message:
   `myplanBYU: scheduled data refresh (7130 courses, 313 programs, 24 health findings)`.
 

@@ -85,4 +85,18 @@ try {
   exit (Stop-RefreshRunWithError -Message $_.Exception.Message)
 }
 
-exit (Complete-RefreshRun -Python $py -NoPublish:$NoPublish)
+$code = Complete-RefreshRun -Python $py -NoPublish:$NoPublish
+# Mirror into the standalone deploy repo for myplan.jordanheaton.com, exactly as
+# refresh_core.ps1 does. This job is the only one that re-scrapes the slow
+# sources (Kennedy study abroad, clubs, grants...), so without this step their
+# output reached jordanheaton.com/myplanBYU but not the subdomain until the
+# NEXT weekly run happened to regenerate from it. That is how the 2027 study
+# abroad programs scraped on 2026-09-06 sat unpublished on the subdomain for a
+# week. After the gate and only on success; non-fatal.
+if ($code -eq 0 -and -not $NoPublish) {
+  try {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "publish_site.ps1") 2>&1 |
+      ForEach-Object { Write-Log ("publish_site: " + $_) }
+  } catch { Write-Log ("publish_site: FAILED -- " + $_.Exception.Message) }
+}
+exit $code
