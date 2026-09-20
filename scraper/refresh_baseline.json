@@ -1,12 +1,12 @@
 {
   "_readme": "Last known-good scrape metrics. Written by _sanity_check.py --update after a successful publish, or --accept after a human audit; the gate compares each new scrape against these numbers.",
-  "generated": "2026-09-06",
+  "generated": "2026-09-20",
   "metrics": {
     "catalog_js_parsed": true,
     "js_courses": 7168,
     "js_programs": 312,
     "js_coreqs": 76,
-    "js_generated": "2026-09-06",
+    "js_generated": "2026-09-20",
     "timeline_js_parsed": true,
     "timeline_academic_dates": 4,
     "catalog_programs": 626,
