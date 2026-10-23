@@ -17,7 +17,8 @@
 # (student text) live -- so a leak there is structurally impossible, not just
 # gitignored. tests/ and HANDOFF.md stay local for the same reason as ever.
 #
-# Called at the end of refresh_core.ps1 (weekly, non-fatal) and by hand:
+# Called by Complete-RefreshRun in _pipeline.ps1 (both jobs; a non-zero exit is
+# recorded in _last_run.json and raises a toast) and by hand:
 #   powershell -File publish_site.ps1              # copy + commit + push
 #   powershell -File publish_site.ps1 -NoPush      # copy + commit only
 
@@ -32,6 +33,22 @@ if (-not (Test-Path (Join-Path $DeployRepo ".git"))) {
   Write-Host "deploy repo not found at $DeployRepo -- run the one-time setup first" -ForegroundColor Red
   exit 1
 }
+
+# START FROM WHAT IS LIVE, not from whatever this clone last committed.
+# ---------------------------------------------------------------------------
+# This repo is a mirror: every commit is a full snapshot of the working tree, so
+# local history has nothing worth merging. On 2026-09-11 a hand publish reached
+# origin from another clone (commit ae330a8, mostly CRLF churn). This clone
+# never had it, so every scheduled push from 2026-09-20 on was rejected as
+# non-fast-forward, and myplan.jordanheaton.com served 2026-09-06 data for six
+# weeks while each run's status said "ok". A soft reset onto origin/main keeps
+# the files and makes the next commit a plain fast-forward whatever happened
+# elsewhere. Unpushed local snapshots are squashed into it, which loses nothing.
+Set-Location $DeployRepo
+& git fetch origin main
+if ($LASTEXITCODE -ne 0) { Write-Host "publish_site: FETCH FAILED -- site not updated" -ForegroundColor Red; exit 1 }
+& git reset --soft origin/main
+if ($LASTEXITCODE -ne 0) { Write-Host "publish_site: RESET onto origin/main FAILED -- site not updated" -ForegroundColor Red; exit 1 }
 
 # mirror the site files; -Force overwrites, stale css/js are pruned below
 foreach ($f in @("index.html", "favicon.ico", "favicon.svg", "apple-touch-icon.png")) {
@@ -79,11 +96,11 @@ $html = [regex]::Replace($html, '(?<attr>(?:src|href)=")(?<path>(?:js|css)/[^"?]
 # the custom domain lives IN the pages branch
 Set-Content -Path (Join-Path $DeployRepo "CNAME") -Value "myplan.jordanheaton.com" -Encoding ascii
 
-Set-Location $DeployRepo
 & git add -A | Out-Null
 $dirty = (& git status --porcelain) -join ""
 if (-not $dirty) { Write-Host "publish_site: nothing changed"; exit 0 }
 & git commit -m "sync site from working tree ($(Get-Date -Format 'yyyy-MM-dd HH:mm'))" | Out-Null
+if ($LASTEXITCODE -ne 0) { Write-Host "publish_site: COMMIT FAILED -- site not updated" -ForegroundColor Red; exit 1 }
 if ($NoPush) { Write-Host "publish_site: committed (push skipped)"; exit 0 }
 & git push origin main
 if ($LASTEXITCODE -ne 0) { Write-Host "publish_site: PUSH FAILED" -ForegroundColor Red; exit 1 }

@@ -483,6 +483,32 @@ function Publish-Refresh {
   }
 }
 
+function Publish-SiteMirror {
+  <#
+    Mirrors the site into the myplan.jordanheaton.com deploy repo via
+    publish_site.ps1 and reports whether it worked.
+
+    Returns a PSCustomObject: Ok [bool], Note [string]
+
+    This used to run from the tail of each job AFTER _last_run.json was written,
+    with its exit code ignored. When its push started bouncing on 2026-09-20 the
+    status file kept saying "ok", no toast fired, and the subdomain served
+    September data for six weeks. Its result now goes into the status file and a
+    failure alerts like any other.
+  #>
+  $script = Join-Path $SCRAPER_DIR "publish_site.ps1"
+  $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $script 2>&1
+  $code = $LASTEXITCODE
+  $lines = @($out | ForEach-Object { "$_" } | Where-Object { $_ -ne "" })
+  foreach ($line in $lines) { Write-Log ("publish_site: " + $line) }
+  $note = "no output"
+  if ($lines.Count -gt 0) { $note = ($lines[-1] -replace '^publish_site:\s*', '') }
+  if ($code -ne 0) {
+    return [pscustomobject]@{ Ok = $false; Note = ("exit {0}: {1}" -f $code, $note) }
+  }
+  return [pscustomobject]@{ Ok = $true; Note = $note }
+}
+
 function Update-SanityBaseline {
   # Ratchet the known-good numbers forward. Called only after a real publish, so
   # the baseline always describes what is actually live.
@@ -528,7 +554,8 @@ function Write-RunStatus {
     [Parameter(Mandatory = $true)][string]$Outcome,   # ok | gate_failed | failed
     [AllowEmptyString()][string]$Detail = "",
     $Metrics = $null,
-    $Publish = $null
+    $Publish = $null,
+    $Mirror  = $null
   )
   $ended = Get-Date
   $status = [ordered]@{
@@ -542,12 +569,18 @@ function Write-RunStatus {
     published    = $false
     commit       = $null
     publish_note = $null
+    site_mirrored = $false
+    site_note    = $null
     metrics      = $Metrics
   }
   if ($Publish) {
     $status.published    = $Publish.Published
     $status.commit       = $Publish.Sha
     $status.publish_note = $Publish.Reason
+  }
+  if ($Mirror) {
+    $status.site_mirrored = $Mirror.Ok
+    $status.site_note     = $Mirror.Note
   }
   $json = $status | ConvertTo-Json -Depth 6
   # Written to both places on purpose: data\ is where you look while working in
@@ -659,25 +692,44 @@ function Complete-RefreshRun {
   if ($null -ne $blocker) {
     Write-Log ("publish: SKIPPED -- {0}" -f $blocker)
     Write-Log "publish: data refreshed locally; baseline untouched until a run from main ships it"
-    Write-RunStatus -Outcome "ok" -Detail "gate passed; publish skipped" -Metrics $gate.Metrics `
-                    -Publish ([pscustomobject]@{ Published = $false; Reason = $blocker; Sha = $null })
-    Write-Log "=== run completed OK (not published) ==="
-    Flush-LogQueue -Final
-    return 0
+    $pub = [pscustomobject]@{ Published = $false; Reason = $blocker; Sha = $null }
+    $detail = "gate passed; publish skipped"
+  } else {
+    # Baseline BEFORE publish, so the new known-good numbers ride in the same
+    # commit as the data they describe. Updating it afterwards would leave
+    # refresh_baseline.json permanently dirty and always one run behind the data
+    # it is supposed to describe.
+    # When the data did not change, the rewritten file is byte-identical, so this
+    # adds nothing to the diff and the run still no-ops.
+    Update-SanityBaseline -Python $Python
+    $pub = Publish-Refresh -Metrics $gate.Metrics
+    $detail = "gate passed"
   }
 
-  # Baseline BEFORE publish, so the new known-good numbers ride in the same
-  # commit as the data they describe. Updating it afterwards would leave
-  # refresh_baseline.json permanently dirty and always one run behind the data
-  # it is supposed to describe.
-  # When the data did not change, the rewritten file is byte-identical, so this
-  # adds nothing to the diff and the run still no-ops.
-  Update-SanityBaseline -Python $Python
+  # The subdomain mirror copies js\ straight from the working tree, so it runs
+  # even when the portfolio commit was blocked -- the gate has already passed.
+  $mirror = Publish-SiteMirror
 
-  $pub = Publish-Refresh -Metrics $gate.Metrics
+  Write-RunStatus -Outcome "ok" -Detail $detail -Metrics $gate.Metrics -Publish $pub -Mirror $mirror
 
-  Write-RunStatus -Outcome "ok" -Detail "gate passed" -Metrics $gate.Metrics -Publish $pub
-  Write-Log "=== run completed OK ==="
+  # A run that passed the gate but did not ship is NOT a quiet success. "index
+  # not clean" blocked every run from 2026-10-11 (OneDrive rolled .git\index
+  # back to an older snapshot) and the mirror push bounced from 2026-09-20; both
+  # logged "ok" and the live site went stale without anyone knowing.
+  $problems = @()
+  if (-not $pub.Published -and $pub.Reason -ne "no changes") {
+    $problems += ("jordanheaton.com not updated: " + $pub.Reason)
+  }
+  if (-not $mirror.Ok) {
+    $problems += ("myplan.jordanheaton.com not updated: " + $mirror.Note)
+  }
+  if ($problems.Count -gt 0) {
+    Send-FailureToast -Title ("myplanBYU refresh NOT published (" + $script:JobName + ")") `
+                      -Message ($problems -join "; ")
+    Write-Log "=== run completed OK but NOT fully published ==="
+  } else {
+    Write-Log "=== run completed OK ==="
+  }
   Flush-LogQueue -Final
   return 0
 }
