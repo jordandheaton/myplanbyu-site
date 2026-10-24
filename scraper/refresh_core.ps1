@@ -35,6 +35,14 @@ try {
   exit (Stop-RefreshRunWithError -Message ("environment preflight failed: " + $_.Exception.Message))
 }
 
+# DISABLED in Task Scheduler since 2026-10-24 -- GitHub Actions runs this job
+# now (.github/workflows/myplanbyu-refresh.yml). If it is ever re-enabled as a
+# fallback, start from GitHub's main so it can't collide with the bot's commits.
+$syncBlocker = Sync-WithOrigin
+if ($null -ne $syncBlocker) {
+  exit (Stop-RefreshRunWithError -Message ("sync with origin failed: " + $syncBlocker))
+}
+
 $mapsArgs = @("sources\maps.py")
 if ($Force) {
   $mapsArgs += "--force"

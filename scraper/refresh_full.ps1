@@ -37,6 +37,12 @@ try {
   exit (Stop-RefreshRunWithError -Message ("environment preflight failed: " + $_.Exception.Message))
 }
 
+# Start from GitHub's main: the weekly refresh commits there from Actions now.
+$syncBlocker = Sync-WithOrigin
+if ($null -ne $syncBlocker) {
+  exit (Stop-RefreshRunWithError -Message ("sync with origin failed: " + $syncBlocker))
+}
+
 # Non-fatal, order-independent. Kennedy paces itself at 0.7s/page (~3 min).
 $sources = @(
   @{ name = "marriott";    script = "sources\marriott_business.py" },

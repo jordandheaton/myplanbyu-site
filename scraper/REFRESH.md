@@ -1,7 +1,46 @@
 # Scheduled data refresh
 
-myplanBYU's data comes from BYU sources that change on BYU's calendar. Two
-Windows scheduled tasks keep it current and push the result to the live site.
+myplanBYU's data comes from BYU sources that change on BYU's calendar. Two jobs
+keep it current and push the result to the live site.
+
+## Where each job runs (since 2026-10-24)
+
+| Job | Runs on | When | Needs this PC? |
+|---|---|---|---|
+| Weekly core refresh | **GitHub Actions** — `.github/workflows/myplanbyu-refresh.yml` | Sunday 09:00 UTC (3 AM MDT / 2 AM MST) | No |
+| Monthly full refresh | **This PC** — Task Scheduler, `refresh_full.ps1` | 1st Sunday 04:00 local | Yes |
+
+**Why the split.** BYU serves most of its sites through CloudFront, which
+answers 403 to GitHub's runner IPs. The `BYU host probe` workflow
+(`.github/workflows/byu-host-probe.yml`, run by hand) checked every host on
+2026-10-24:
+
+- reachable from GitHub: commtech (class schedule), catalog, clubs,
+  marriott.byu.edu, humgrants, education.byu.edu
+- **blocked**: academiccalendar, enrollment.byu.edu (tuition, transfer guides,
+  registrar pages), kennedy (study abroad), cls (language certs), ph, careers,
+  experience, cfac, economics, ece, mfgen, me (flowcharts)
+
+The weekly job only needs reachable hosts plus the BYU API gateway, which serves
+the two things it used to scrape from blocked pages: academic dates and
+registration dates (`sources/byu_api.py`, credentials `BYU_CLIENT_ID` /
+`BYU_CLIENT_SECRET` in `.env` and as repository secrets). The monthly sources
+mostly live on blocked hosts and have no API, so that job stays here. Its data
+changes a few times a year; if this PC misses a month, the site keeps serving
+the last good copy.
+
+**Living with the bot.** The weekly workflow commits to `main` as
+"myplanBYU refresh", so pull before pushing. Both PC jobs start with
+`Sync-WithOrigin` (fast-forward to `origin/main`, autostashing unrelated dirty
+files) so they never regenerate on a stale base; if local `main` has diverged,
+the run stops before scraping and toasts.
+
+**The PC weekly task is DISABLED, not deleted.** To roll back:
+`Enable-ScheduledTask -TaskPath '\myplanBYU\' -TaskName 'weekly core refresh'`
+-- and disable the workflow's schedule, or the two will collide.
+
+The rest of this file describes the PC pipeline, which both scripts still use.
+The workflow runs the same scripts, in the same order, behind the same gate.
 
 ## Setup (once)
 

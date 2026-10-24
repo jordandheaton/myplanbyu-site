@@ -509,6 +509,55 @@ function Publish-SiteMirror {
   return [pscustomobject]@{ Ok = $true; Note = $note }
 }
 
+function Sync-WithOrigin {
+  <#
+    Fast-forwards the local main to origin/main BEFORE anything is scraped or
+    generated. Returns $null when the run may proceed, else a reason string.
+
+    Since 2026-10-24 the WEEKLY refresh runs on GitHub Actions and commits
+    straight to main, so this PC's main falls behind every Sunday. A job that
+    regenerated catalog_data.js on a stale base would commit it, fail to rebase
+    over the bot's version of the same file, and never publish. Starting from
+    origin's tip means the only overlap left is a bot run landing DURING this
+    one, which Publish-Refresh already handles (abort the rebase, toast).
+
+    Off main, nothing is touched (Publish-Refresh will skip the run anyway).
+    --autostash parks unrelated dirty portfolio files for the merge and puts
+    them back, as the publish rebase does.
+  #>
+  Push-Location $REPO_ROOT
+  try {
+    $branch = (& git rev-parse --abbrev-ref HEAD 2>&1) -join ""
+    if ($branch -ne "main") {
+      Write-Log ("sync: on '{0}', not main -- not syncing" -f $branch)
+      return $null
+    }
+    $fetch = & git fetch origin main 2>&1
+    if ($LASTEXITCODE -ne 0) {
+      Write-LogDetail $fetch
+      return "git fetch origin main failed"
+    }
+    & git merge-base --is-ancestor origin/main HEAD 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+      Write-Log "sync: main already contains origin/main"
+      return $null
+    }
+    & git merge-base --is-ancestor HEAD origin/main 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+      return "local main and origin/main have diverged -- reconcile by hand before the next run"
+    }
+    $merge = & git merge --ff-only --autostash origin/main 2>&1
+    Write-LogDetail $merge
+    if ($LASTEXITCODE -ne 0) {
+      return "fast-forward to origin/main failed (see log)"
+    }
+    Write-Log ("sync: fast-forwarded to origin/main ({0})" -f ((& git rev-parse --short HEAD 2>&1) -join ""))
+    return $null
+  } finally {
+    Pop-Location
+  }
+}
+
 function Update-SanityBaseline {
   # Ratchet the known-good numbers forward. Called only after a real publish, so
   # the baseline always describes what is actually live.
