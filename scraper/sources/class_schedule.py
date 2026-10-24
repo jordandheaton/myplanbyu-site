@@ -136,6 +136,74 @@ def fetch_department(s: requests.Session, dept: str, yearterm: str) -> Dict[str,
 
 
 REG_DATES_URL = "https://enrollment.byu.edu/registrar/dates-and-deadlines"
+CONTROL_DATES = ("/domains/legacy/academic/controls/controldatesws/v1/"
+                 "yearterm/{yt}/REGISTRATION")
+
+
+def api_reg_dates() -> Dict[str, str]:
+    """{termCode: "YYYY-MM-DD"} priority-registration start, from the BYU API.
+
+    The registrar's page sits behind CloudFront, which answers 403 to GitHub
+    Actions runners -- run there, fetch_reg_dates() came back empty and every
+    "registration begins ..." note in the planner would have vanished. The
+    start of ControlDatesWS's REGISTRATION window is the same date: it matched
+    every "Priority Registration Begins" value the page gave (checked
+    2026-10-24 for 20265, 20271, 20273, 20275). The API has no "cart opens"
+    date type, so that one still comes from the page or the last good run.
+    """
+    from datetime import date, datetime
+    sys.path.insert(0, str(HERE))
+    from byu_api import ByuApi       # local import: the page path needs no credentials
+
+    api = ByuApi()
+    today = date.today()
+    out: Dict[str, str] = {}
+    for year in (today.year, today.year + 1, today.year + 2):
+        for season in ("1", "3", "4", "5"):
+            data = api.get(CONTROL_DATES.format(yt=f"{year}{season}"))
+            rows = (((data or {}).get("ControlDatesWSService") or {}).get("response") or {})
+            for r in rows.get("date_list") or []:
+                if r.get("date_type") != "REGISTRATION":
+                    continue
+                try:
+                    start = datetime.strptime(r["start_date"][:8], "%Y%m%d").date()
+                    end = datetime.strptime(r["end_date"][:8], "%Y%m%d").date()
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if end >= today:             # a term still worth a "begins on" note
+                    out[f"{year}{season}"] = start.isoformat()
+    return out
+
+
+def merged_reg_dates(s: requests.Session, previous: Dict[str, Dict[str, str]]) -> Dict[str, Dict[str, str]]:
+    """regDates for the planner: "reg" from the API, else the registrar's page;
+    "cart" from the page. Any value neither source supplies this run is kept
+    from the last good file -- these dates don't move once published, so a
+    blocked page should cost freshness, never the notes."""
+    page = fetch_reg_dates(s)
+    try:
+        api = api_reg_dates()
+        print(f"  reg dates: {len(api)} terms from the BYU API")
+    except Exception as exc:                     # noqa: BLE001 - never fatal
+        print(f"  ! reg dates via API: {exc}", file=sys.stderr)
+        api = {}
+    from datetime import date
+    this_year = str(date.today().year)
+    # carried-forward terms from past years are only noise for the planner
+    previous = {c: v for c, v in previous.items() if c[:4] >= this_year}
+    out: Dict[str, Dict[str, str]] = {}
+    for code in sorted(set(page) | set(api) | set(previous)):
+        old, new = previous.get(code, {}), page.get(code, {})
+        entry = {}
+        cart = new.get("cart") or old.get("cart")
+        reg = api.get(code) or new.get("reg") or old.get("reg")
+        if cart:
+            entry["cart"] = cart
+        if reg:
+            entry["reg"] = reg
+        if entry:
+            out[code] = entry
+    return out
 
 
 def fetch_reg_dates(s: requests.Session) -> Dict[str, Dict[str, str]]:
@@ -198,6 +266,14 @@ def fetch_reg_dates(s: requests.Session) -> Dict[str, Dict[str, str]]:
     except Exception as exc:                     # noqa: BLE001 - never fatal
         print(f"  ! reg dates: {exc}", file=sys.stderr)
     return out
+
+
+def previous_reg_dates() -> Dict[str, Dict[str, str]]:
+    try:
+        doc = json.loads((DATA / "class_schedule.json").read_text(encoding="utf-8"))
+        return doc.get("regDates") or {}
+    except (OSError, ValueError):
+        return {}
 
 
 def catalog_codes() -> set:
@@ -356,7 +432,7 @@ def scrape(limit_terms: int = 4, history_terms: int = 4) -> Dict[str, Any]:
         "source": SOURCE,
         "url": INDEX_URL,
         "scraped": time.strftime("%Y-%m-%d"),
-        "regDates": fetch_reg_dates(s),
+        "regDates": merged_reg_dates(s, previous_reg_dates()),
         "terms": [{"code": yt, "label": term_label(yt)} for yt in terms],
         "historyTerms": [{"code": yt, "label": term_label(yt)} for yt in hist_terms],
         "instructors": names,
