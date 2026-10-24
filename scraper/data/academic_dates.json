@@ -1,35 +1,43 @@
 [
   {
-    "id": "academic_dates::winter-semester-2026",
-    "source": "academic_dates",
-    "type": "deadline",
-    "name": "Winter Semester 2026 Dates & Deadlines",
-    "url": "https://academiccalendar.byu.edu/",
-    "text": "Winter Semester 2026 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Winter Semester 2026:\nWinter Semester 2026 runs Jan 07 - Apr 15, 2026.\nAdd/Drop Deadline: Jan 14, 2026\nWithdraw Deadline: Apr 01, 2026\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
-  },
-  {
-    "id": "academic_dates::spring-term-2026",
-    "source": "academic_dates",
-    "type": "deadline",
-    "name": "Spring Term 2026 Dates & Deadlines",
-    "url": "https://academiccalendar.byu.edu/",
-    "text": "Spring Term 2026 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Spring Term 2026:\nSpring Term 2026 runs Apr 28 - Jun 15, 2026.\nAdd/Drop Deadline: May 05, 2026\nWithdraw Deadline: Jun 02, 2026\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
-  },
-  {
-    "id": "academic_dates::summer-term-2026",
-    "source": "academic_dates",
-    "type": "deadline",
-    "name": "Summer Term 2026 Dates & Deadlines",
-    "url": "https://academiccalendar.byu.edu/",
-    "text": "Summer Term 2026 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Summer Term 2026:\nSummer Term 2026 runs Jun 22 - Aug 10, 2026.\nAdd/Drop Deadline: Jun 29, 2026\nWithdraw Deadline: Jul 28, 2026\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
-  },
-  {
     "id": "academic_dates::fall-semester-2026",
     "source": "academic_dates",
     "type": "deadline",
     "name": "Fall Semester 2026 Dates & Deadlines",
     "url": "https://academiccalendar.byu.edu/",
-    "text": "Fall Semester 2026 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Fall Semester 2026:\nFall Semester 2026 runs Sep 02 - Dec 10, 2026.\nAdd/Drop Deadline: Sep 10, 2026\nWithdraw Deadline: Nov 24, 2026\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
+    "text": "Fall Semester 2026 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Fall Semester 2026:\nFall Semester 2026 runs Sep 02 - Dec 10, 2026.\nAdd/Drop Deadline: Sep 10, 2026\nWithdraw Deadline: Nov 24, 2026\nRegistration Opens: Jun 01, 2026\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
+  },
+  {
+    "id": "academic_dates::winter-semester-2027",
+    "source": "academic_dates",
+    "type": "deadline",
+    "name": "Winter Semester 2027 Dates & Deadlines",
+    "url": "https://academiccalendar.byu.edu/",
+    "text": "Winter Semester 2027 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Winter Semester 2027:\nWinter Semester 2027 runs Jan 06 - Apr 14, 2027.\nAdd/Drop Deadline: Jan 13, 2027\nWithdraw Deadline: Apr 01, 2027\nRegistration Opens: Oct 19, 2026\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
+  },
+  {
+    "id": "academic_dates::spring-term-2027",
+    "source": "academic_dates",
+    "type": "deadline",
+    "name": "Spring Term 2027 Dates & Deadlines",
+    "url": "https://academiccalendar.byu.edu/",
+    "text": "Spring Term 2027 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Spring Term 2027:\nSpring Term 2027 runs Apr 27 - Jun 14, 2027.\nAdd/Drop Deadline: May 04, 2027\nWithdraw Deadline: Jun 01, 2027\nRegistration Opens: Mar 01, 2027\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
+  },
+  {
+    "id": "academic_dates::summer-term-2027",
+    "source": "academic_dates",
+    "type": "deadline",
+    "name": "Summer Term 2027 Dates & Deadlines",
+    "url": "https://academiccalendar.byu.edu/",
+    "text": "Summer Term 2027 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Summer Term 2027:\nSummer Term 2027 runs Jun 21 - Aug 09, 2027.\nAdd/Drop Deadline: Jun 28, 2027\nWithdraw Deadline: Jul 27, 2027\nRegistration Opens: Mar 01, 2027\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
+  },
+  {
+    "id": "academic_dates::fall-semester-2027",
+    "source": "academic_dates",
+    "type": "deadline",
+    "name": "Fall Semester 2027 Dates & Deadlines",
+    "url": "https://academiccalendar.byu.edu/",
+    "text": "Fall Semester 2027 Dates & Deadlines -- BYU academic calendar. Key dates every student must know for Fall Semester 2027:\nFall Semester 2027 runs Sep 01 - Dec 09, 2027.\nAdd/Drop Deadline: Sep 09, 2027\nWithdraw Deadline: Nov 23, 2027\nRegistration Opens: Jun 07, 2027\nMissing the add/drop deadline means classes stay on your record; missing the withdraw deadline means a W or grade is assigned. Full calendar: academiccalendar.byu.edu."
   },
   {
     "id": "academic_dates::registration-dates-and-deadlines",

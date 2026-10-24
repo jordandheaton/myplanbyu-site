@@ -538,6 +538,349 @@
   ],
   "_src": "files/form/1717791604031/O8GAjaa0ZiJE.pdf"
  },
+ "Biology (BS)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 130",
+      "credits": 4.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 105",
+      "credits": 4.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 220",
+      "credits": 4.0
+     },
+     {
+      "code": "BIO 230",
+      "credits": 4.0
+     },
+     {
+      "code": "CHEM 106",
+      "credits": 2.0
+     },
+     {
+      "code": "CHEM 107",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "PHSCS 105",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 107",
+      "credits": 2.0
+     },
+     {
+      "code": "MMBIO 240",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "PHSCS 106",
+      "credits": 2.0
+     },
+     {
+      "code": "PHSCS 108",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "BIO 350",
+      "credits": 3.0
+     },
+     {
+      "code": "PWS 340",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "BIO 420",
+      "credits": 4.0
+     }
+    ]
+   }
+  ],
+  "map": [
+   {
+    "year": 1,
+    "season": "F",
+    "items": [
+     {
+      "slot": "ge",
+      "label": "First-year Writing or A HTG 100",
+      "cr": 3.0
+     },
+     {
+      "c": "BIO 130",
+      "cr": 4.0
+     },
+     {
+      "c": "UNIV 101",
+      "cr": 2.0
+     },
+     {
+      "c": "CHEM 105",
+      "cr": 4.0
+     },
+     {
+      "slot": "rel-corner",
+      "label": "Religion Cornerstone course",
+      "cr": 2.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "items": [
+     {
+      "slot": "ge",
+      "label": "First-year Writing or A HTG 100",
+      "cr": 3.0
+     },
+     {
+      "c": "BIO 220",
+      "alts": [
+       "BIO 230"
+      ],
+      "cr": 4.0
+     },
+     {
+      "c": "CHEM 106",
+      "cr": 2.0
+     },
+     {
+      "c": "CHEM 107",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General Elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-corner",
+      "label": "Religion Cornerstone course",
+      "cr": 2.0
+     }
+    ],
+    "total": 16.0
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "items": [
+     {
+      "c": "PHSCS 105",
+      "cr": 2.0
+     },
+     {
+      "c": "PHSCS 107",
+      "cr": 2.0
+     },
+     {
+      "c": "MMBIO 240",
+      "cr": 3.0
+     },
+     {
+      "slot": "ge",
+      "label": "Civilization 1 elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-corner",
+      "label": "Religion cornerstone course",
+      "cr": 2.0
+     }
+    ],
+    "total": 16.0
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "items": [
+     {
+      "c": "PHSCS 106",
+      "cr": 2.0
+     },
+     {
+      "c": "PHSCS 108",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "Biology elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "ge",
+      "label": "Civilization 2 elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "ge",
+      "label": "Arts or Letters Elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-corner",
+      "label": "Religion Cornerstone course",
+      "cr": 2.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "items": [
+     {
+      "c": "BIO 350",
+      "cr": 3.0
+     },
+     {
+      "c": "PWS 340",
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "Biology elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "ge",
+      "label": "Arts or Letters elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion elective",
+      "cr": 2.0
+     }
+    ],
+    "total": 14.0
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "items": [
+     {
+      "slot": "major",
+      "label": "Biology electives",
+      "cr": 6.0
+     },
+     {
+      "slot": "ge",
+      "label": "Adv. Written & Oral Communication",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion elective",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General electives",
+      "cr": 3.0
+     }
+    ],
+    "total": 14.0
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "items": [
+     {
+      "slot": "major",
+      "label": "Biology electives",
+      "cr": 5.0
+     },
+     {
+      "slot": "ge",
+      "label": "General electives",
+      "cr": 5.0
+     },
+     {
+      "slot": "ge",
+      "label": "Social Science elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion Elective",
+      "cr": 2.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "items": [
+     {
+      "c": "BIO 420",
+      "cr": 4.0
+     },
+     {
+      "slot": "major",
+      "label": "Biology elective",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "Global & Cultural Awareness elective",
+      "cr": 3.0
+     },
+     {
+      "slot": "ge",
+      "label": "General electives",
+      "cr": 6.0
+     }
+    ],
+    "total": 15.0
+   }
+  ],
+  "_src": "files/form/1741297902303/kW31FgsaFq0e.pdf"
+ },
  "Chemistry Education (BS)": {
   "terms": [
    {
