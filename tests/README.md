@@ -4,16 +4,16 @@ Regression tests for `js/solver.js`. No build step, no dependencies, no Node —
 `tests/index.html` loads the **same script tags the real app loads**, so the code
 under test is byte-for-byte what ships.
 
-> **Local only.** This directory is excluded via `.git/info/exclude`, not
-> `.gitignore` — it is backend tooling, never committed and never deployed. If you
-> ever do want it tracked, remove the `myplanBYU/tests/` line from that file.
+> **Committed, never deployed.** This was local-only while myplanBYU lived inside
+> the portfolio repo; it is tracked since the project got its own repo
+> (2026-10-24). `build_site.py` copies only the site, so tests/ is never served.
 
 ## Running
 
 ### Headless (fastest, and what CI would use)
 
 ```bash
-powershell -NoProfile -ExecutionPolicy Bypass -File myplanBYU/tests/headless.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/headless.ps1
 ```
 
 Runs the curated cases in headless Edge over `file://` — no server, no Node, no
@@ -33,7 +33,7 @@ install. Prints a summary, exits 0 when everything passes and 1 otherwise.
 Start the static server, then visit <http://localhost:8130/tests/index.html>:
 
 ```bash
-powershell -NoProfile -ExecutionPolicy Bypass -File myplanBYU/.claude/serve.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 ```
 
 Click **Run curated cases** and click any row to expand its findings. Use this when
