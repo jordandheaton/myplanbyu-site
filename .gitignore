@@ -1,0 +1,20 @@
+# Local tooling
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jordan's working notes -- local only
+HANDOFF.md
+
+# Site build output (build_site.py -> deploy workflow)
+_site/
+
+# Scraper run state and large generated data
+scraper/data/_*
+scraper/data/catalog.json
+
+# Worker local state and secrets staging
+worker/.wrangler/
+worker/.secrets.tmp.json
+worker/.dev.vars

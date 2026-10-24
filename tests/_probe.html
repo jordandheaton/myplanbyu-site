@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8" /><title>myplanBYU — solver probe</title></head>
+<body>
+<script src="../js/catalog_data.js"></script>
+<script src="../js/timeline_data.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/solver.js"></script>
+<script src="goldens.js"></script>
+<script src="cases.js"></script>
+<script src="invariants.js"></script>
+<script src="harness.js"></script>
+<script src="taxonomy.js"></script>
+<script>
+"use strict";
+/* =========================================================================
+   LOCAL-ONLY DIAGNOSTIC PROBE — not part of the suite, nothing asserts here.
+
+   taxonomy.js summarizes: it shows eight examples per symptom. That is the
+   right shape for "what hurts", and the wrong shape for "why". This page
+   emits the raw numbers instead, so a fix session can crosstab.
+
+     ?mode=rows           one row per major x student state (700), with the
+                          measurements behind every taxonomy symptom. Crosstab
+                          by state — that is how the mid-degree padding bug
+                          showed up (67 of 78 filler cases in one state).
+     ?mode=board&major=ID full term-by-term board for one major, every card
+                          with its credits, pin marker (*) and cohort block
+                          (@). Add &completed=1 for the sophomore state,
+                          &minor=1 for the business minor.
+     &limit=N             first N majors only (rows mode)
+
+   Driven by _probe.ps1 the same way headless.ps1 drives index.html: headless
+   Edge, --dump-dom, base64 payload in the emit element appended below.
+   (Do NOT write that element's literal markup in this comment - --dump-dom
+   emits script source too, and the driver's regex would match the comment.)
+   ========================================================================= */
+(() => {
+  const q = new URLSearchParams(location.search);
+  const mode = q.get("mode") || "rows";
+
+  /* ---- one row per combination ---------------------------------------- */
+  function rows() {
+    const out = [];
+    Taxonomy.matrix({ limitMajors: +q.get("limit") || 0 }).forEach(def => {
+      const profile = Cases.buildProfile({ majorId: def.majorId, name: def.majorName, ...def.extra });
+      let r = null, crash = null;
+      try { r = Solver.solve(profile); } catch (e) { crash = String(e && e.message); }
+      const row = { major: def.majorName, majorId: def.majorId, state: def.stateKey, crash };
+      if (r) {
+        const load = new Map(), pinned = new Map();
+        r.placements.forEach(p => {
+          load.set(p.termIndex, (load.get(p.termIndex) || 0) + (p.credits || 0));
+          if (p.pinned) pinned.set(p.termIndex, (pinned.get(p.termIndex) || 0) + (p.credits || 0));
+        });
+        const used = [...load.keys()].sort((a, b) => a - b);
+        const last = used[used.length - 1];
+        const pad = r.placements.filter(p => /^ELECTIVE\+/.test(p.courseId));
+        const cap = t => (r.state.mapCap ? (r.state.mapCap.get(t) ?? null) : null);
+        row.total = +[...load.values()].reduce((a, b) => a + b, 0).toFixed(1);
+        row.earned = r.terms.earnedCredits || 0;
+        row.fwUsed = used.filter(t => r.terms[t].isFW).length;
+        row.terms = used.length;
+        row.hasSheet = !!(r.state.mapCap && r.state.mapCap.size);
+        row.sheetTerms = r.state.mapCap ? r.state.mapCap.size : 0;
+        row.sheetCapSum = r.state.mapCap
+          ? +[...r.state.mapCap.values()].reduce((a, b) => a + b, 0).toFixed(1) : 0;
+        row.padN = pad.length;
+        row.padCr = +pad.reduce((a, p) => a + (p.credits || 0), 0).toFixed(1);
+        row.padTerms = [...new Set(pad.map(p => p.termIndex))].map(t => ({
+          t, isLast: t === last, gapToLast: last - t,
+          n: pad.filter(p => p.termIndex === t).length,
+          cr: +pad.filter(p => p.termIndex === t).reduce((a, p) => a + (p.credits || 0), 0).toFixed(1),
+          load: +(load.get(t) || 0).toFixed(1), pinned: +(pinned.get(t) || 0).toFixed(1), cap: cap(t),
+        }));
+        row.openElN = r.placements.filter(p => /^ELECTIVE \d/.test(p.courseId)).length;
+        row.unsched = (r.unscheduled || []).map(u => u.uid);
+        row.overCap = [...load.entries()].filter(([t, cr]) => r.terms[t].isFW && cr > 18)
+          .map(([t, cr]) => ({ t, cr: +cr.toFixed(1), pinned: +(pinned.get(t) || 0).toFixed(1), cap: cap(t) }));
+        const nonLastFW = [...load.entries()].filter(([t]) => r.terms[t].isFW && t !== last);
+        row.lowTerms = nonLastFW.filter(([t, cr]) => cr < 12 && (pinned.get(t) || 0) < cr / 2)
+          .map(([t, cr]) => ({ t, cr: +cr.toFixed(1) }));
+        row.fwLoads = nonLastFW.map(([, cr]) => +cr.toFixed(1));
+        const major = r.placements.filter(p => !p.bucket && !p.placeholder && !p.elective);
+        row.realN = major.length;
+        row.lateN = major.filter(p => p.termIndex >= last - 1).length;
+        row.flags = (r.flags || []).filter(f => f.level !== "info")
+          .map(f => String(f.text || "").slice(0, 110));
+      }
+      out.push(row);
+    });
+    return out;
+  }
+
+  /* ---- full board for one major --------------------------------------- */
+  function board() {
+    const extra = {};
+    if (q.get("completed")) extra.completed = Cases.SOPHOMORE;
+    if (q.get("minor")) extra.minorIds = ["minor-business"];
+    const id = q.get("major");
+    const prof = Cases.buildProfile({ majorId: id, name: id, ...extra });
+    // &target=2031 (Winter) or &target=2031F — board a paced plan, not just the
+    // natural one. The pace work needs to see WHICH card moved, not a count.
+    const tg = q.get("target");
+    if (tg) prof.settings.targetGrad = { year: parseInt(tg, 10), season: /F$/i.test(tg) ? "F" : "W" };
+    const r = Solver.solve(prof);
+    const load = new Map();
+    r.placements.forEach(p => load.set(p.termIndex, (load.get(p.termIndex) || 0) + (p.credits || 0)));
+    return {
+      major: id, state: Object.keys(extra),
+      paceCap: r.state.paceCap ?? null, paceRaw: r.state.paceRaw ?? null,
+      idealTerms: r.state.idealTerms ?? null, stretch: r.state.stretch ?? null,
+      unscheduled: r.unscheduled,
+      flags: (r.flags || []).map(f => f.text),
+      // Why is this term starving? For every card in a below-full-time term,
+      // ask validateMove() where else it could legally go. Guessing at
+      // canPlace()'s verdict from the outside wastes more time than asking.
+      starved: [...load.keys()].filter(t => r.terms[t].isFW && load.get(t) < 12).map(t => ({
+        t, label: r.terms[t].label, cr: +load.get(t).toFixed(1),
+        cards: r.placements.filter(p => p.termIndex === t).map(p => ({
+          uid: p.uid,
+          moves: r.terms.filter(tm => tm.isFW && tm.enabled && tm.index !== t)
+            .map(tm => `${tm.index}:${(() => { const v = Solver.validateMove(r, p.uid, tm.index);
+                        return v.ok ? "OK" : (v.reason || v.reasons || "no").toString().slice(0, 46); })()}`),
+        })),
+      })),
+      terms: [...load.keys()].sort((a, b) => a - b).map(t => ({
+        t, label: r.terms[t].label, cr: +load.get(t).toFixed(1),
+        cap: r.state.mapCap ? (r.state.mapCap.get(t) ?? null) : null,
+        items: r.placements.filter(p => p.termIndex === t)
+          .map(p => `${p.courseId}${p.pinned ? "*" : ""}${p.block ? "@" + p.block : ""}(${p.credits})`),
+      })),
+    };
+  }
+
+  /* ---- graduation-target stress matrix ---------------------------------
+     For each major x target: does the plan honestly degrade? Invariants:
+       - target >= the natural end  => plan essentially unchanged, 0 unscheduled
+       - target <  the natural end  => unscheduled grows, the target flag fires,
+                                       and NOTHING silently disappears: every
+                                       required course is either placed or in
+                                       the unscheduled list.
+     Credits(placed) + credits(unscheduled) must be ~constant across targets. */
+  function gradStress() {
+    const majors = (+new URLSearchParams(location.search).get("limit") || 0) > 0
+      ? DATA.majors.slice(0, +new URLSearchParams(location.search).get("limit"))
+      : DATA.majors.filter((m, i) => i % 7 === 0);   // every 7th: ~25 majors, all colleges
+    const out = [];
+    majors.forEach(m => {
+      const natural = (() => {
+        const r = Solver.solve(Cases.buildProfile({ majorId: m.id, name: m.name }));
+        const used = [...new Set(r.placements.map(p => p.termIndex))].sort((a, b) => a - b);
+        return { fw: used.filter(t => r.terms[t].isFW).length,
+                 lastLabel: r.terms[used[used.length - 1]].label,
+                 placedCr: r.placements.reduce((s, p) => s + (p.credits || 0), 0),
+                 unsched: r.unscheduled.length };
+      })();
+      [[3,"W"], [4,"W"], [5,"W"], [5,"F"], [6,"W"]].forEach(([years, season]) => {
+        const prof = Cases.buildProfile({ majorId: m.id, name: m.name });
+        prof.settings.targetGrad = { year: 2026 + years, season };
+        let r = null, crash = null;
+        try { r = Solver.solve(prof); } catch (e) { crash = String(e && e.message).slice(0, 120); }
+        if (!r) { out.push({ major: m.name, years, crash }); return; }
+        const used = [...new Set(r.placements.map(p => p.termIndex))].sort((a, b) => a - b);
+        const tgIdx = r.terms.targetIdx;
+        const load = new Map();
+        r.placements.forEach(p => load.set(p.termIndex, (load.get(p.termIndex) || 0) + (p.credits || 0)));
+        const pad = r.placements.filter(p => /^ELECTIVE\+/.test(p.courseId));
+        out.push({
+          major: m.name, years, season, crash,
+          starved: used.filter(t => r.terms[t].isFW && load.get(t) < 12).map(t => ({
+            label: r.terms[t].label, cr: +load.get(t).toFixed(1),
+            isLast: t === used[used.length - 1],
+            items: r.placements.filter(p => p.termIndex === t).length,
+          })),
+          naturalFw: natural.fw, naturalUnsched: natural.unsched,
+          fwLoads: used.filter(t => r.terms[t].isFW).map(t => +load.get(t).toFixed(1)),
+          padN: pad.length,
+          padWorst: Math.max(0, ...used.map(t => pad.filter(p => p.termIndex === t).length)),
+          lastLabel: r.terms[used[used.length - 1]].label,
+          naturalLast: natural.lastLabel,
+          paceCap: r.state.paceCap ?? null, idealTerms: r.state.idealTerms ?? null,
+          fwUsed: used.filter(t => r.terms[t].isFW).length,
+          placedCr: +r.placements.reduce((s, p) => s + (p.credits || 0), 0).toFixed(1),
+          naturalPlacedCr: +natural.placedCr.toFixed(1),
+          unsched: r.unscheduled.length,
+          unschedNames: r.unscheduled.slice(0, 4).map(u => u.uid),
+          pastTarget: tgIdx == null ? null : used.filter(t => t > tgIdx).length,
+          flagFired: (r.flags || []).some(f => /graduation target|graduating by/i.test(f.text || "")),
+        });
+      });
+    });
+    return out;
+  }
+
+  const text = JSON.stringify(mode === "board" ? board()
+    : mode === "gradstress" ? gradStress() : rows());
+  const pre = document.createElement("pre");
+  pre.id = "emit"; pre.hidden = true;
+  const bytes = new TextEncoder().encode(text);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  pre.textContent = btoa(bin);
+  document.body.appendChild(pre);
+  document.title = "DONE";
+})();
+</script>
+</body>
+</html>

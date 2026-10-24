@@ -6,8 +6,12 @@ All sources are LOCAL files (no network, no API keys):
                                             (limited-enrollment language) + colleges
   data/study_abroad.json                 -> Kennedy Center programs + term/cost,
                                             college-tagged via sources/opportunity_tags
-  ../../BYU Scholarship Matcher/data.js  -> curated scholarship deadlines
-                                            ({month, day}, college keys, urls)
+  data/scholarship_matcher.js            -> curated scholarship deadlines
+                                            ({month, day}, college keys, urls).
+                                            A snapshot of the portfolio's BYU
+                                            Scholarship Matcher data.js, copied in
+                                            2026-10-24 when myplanBYU got its own
+                                            repo -- edit it here.
 
 Output: js/timeline_data.js defining a single `TIMELINE` global consumed by
 app.js to draw per-term deadline chips + the Deadlines & Opportunities panel,
@@ -27,7 +31,7 @@ from generate_data import slugify                       # noqa: E402
 
 DATA = HERE / "data"
 OUT = HERE.parent / "js" / "timeline_data.js"
-SCHOL_JS = HERE.parent.parent / "BYU Scholarship Matcher" / "data.js"
+SCHOL_JS = DATA / "scholarship_matcher.js"
 
 SEASON = {"winter": "W", "spring": "S", "summer": "U", "fall": "F"}
 
