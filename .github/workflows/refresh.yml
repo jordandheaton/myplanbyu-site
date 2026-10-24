@@ -1,0 +1,217 @@
+# myplanBYU weekly data refresh, on GitHub Actions instead of Jordan's PC.
+#
+# The same steps as scraper/refresh_core.ps1, in the same order, behind the
+# same gate (_sanity_check.py). Runs on a fresh clone every time and fails
+# loudly: a failed run emails Jordan.
+#
+# Scheduled runs always publish. A manual run publishes only when the box is
+# checked; unchecked is a dry run (scrape, generate, gate, build the site,
+# report) and nothing is committed or deployed.
+#
+# Publishing = commit the data to main, then call deploy.yml. The call is
+# explicit because a push made with GITHUB_TOKEN does not trigger other
+# workflows, so deploy.yml's own push trigger would never fire for it.
+#
+# Moved here from the portfolio repo (jordandheaton.github.io) on 2026-10-24,
+# when this repo stopped being a deploy-only mirror. The PC's weekly Task
+# Scheduler job is DISABLED, not deleted -- see scraper/REFRESH.md to roll back.
+
+name: Refresh data
+
+on:
+  # Sunday 09:00 UTC = 3 AM Mountain in summer (MDT), 2 AM in winter (MST).
+  # GitHub may start scheduled runs some minutes late under load.
+  schedule:
+    - cron: "0 9 * * 0"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish (commit + deploy). Unchecked = dry run"
+        type: boolean
+        default: false
+      force_maps:
+        description: "Re-fetch every MAP sheet, not just changed ones"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# Never two refreshes at once: both would commit the same files.
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      pushed: ${{ steps.publish.outputs.pushed }}
+    defaults:
+      run:
+        working-directory: scraper
+    env:
+      # A scheduled run has no inputs, so `inputs.publish` alone would make
+      # every scheduled run a silent dry run.
+      PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish }}
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scraper/requirements-refresh.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-refresh.txt
+
+      - name: Git identity
+        run: |
+          git config --global user.name "myplanBYU refresh"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # --- scrape + generate (order is load-bearing; see REFRESH.md) ---------
+      - name: catalog
+        id: catalog
+        run: python sources/catalog.py
+      # BYU's CloudFront 403s runner IPs, so term dates come from the API
+      # gateway; without these secrets the step falls back to the (blocked)
+      # calendar page and fails non-fatally, keeping the previous file.
+      - name: dates
+        id: dates
+        continue-on-error: true
+        env:
+          BYU_CLIENT_ID: ${{ secrets.BYU_CLIENT_ID }}
+          BYU_CLIENT_SECRET: ${{ secrets.BYU_CLIENT_SECRET }}
+        run: python sources/academic_dates.py
+      - name: maps
+        id: maps
+        run: python sources/maps.py ${{ inputs.force_maps && '--force' || '' }}
+      - name: generate
+        id: generate
+        run: python generate_data.py
+      - name: timeline
+        id: timeline
+        run: python generate_timeline.py
+      # Instructors come from commtech (public, preferred names); the planner's
+      # registration dates come from the API, for the same CloudFront reason.
+      - name: sections
+        id: sections
+        continue-on-error: true
+        env:
+          BYU_CLIENT_ID: ${{ secrets.BYU_CLIENT_ID }}
+          BYU_CLIENT_SECRET: ${{ secrets.BYU_CLIENT_SECRET }}
+        run: python sources/class_schedule.py
+      - name: schedule
+        id: schedule
+        continue-on-error: true
+        run: python generate_schedule.py
+
+      # continue-on-error steps report "success" to the API and show a green
+      # check, so a failed one would be invisible outside the summary.
+      - name: Flag non-fatal failures
+        if: steps.dates.outcome == 'failure' || steps.sections.outcome == 'failure' || steps.schedule.outcome == 'failure'
+        run: |
+          echo "::warning::Non-fatal step failed; that source keeps its previous data. dates=${{ steps.dates.outcome }} sections=${{ steps.sections.outcome }} schedule=${{ steps.schedule.outcome }}"
+
+      # --- the publish gate --------------------------------------------------
+      - name: Sanity gate
+        id: gate
+        run: |
+          set +e
+          python _sanity_check.py > "$RUNNER_TEMP/gate.json"
+          code=$?
+          cat "$RUNNER_TEMP/gate.json"
+          if [ "$code" -ne 0 ]; then
+            echo "::error::Sanity gate blocked this refresh (exit $code) -- nothing published"
+            exit "$code"
+          fi
+
+      # Proves the site still assembles with the new data, in every run.
+      - name: Build site
+        id: build
+        working-directory: .
+        run: python build_site.py
+
+      # --- commit -------------------------------------------------------------
+      # Explicit paths only, mirroring PUBLISH_PATHS / PUBLISH_GLOB in _pipeline.ps1.
+      - name: Publish data
+        id: publish
+        if: env.PUBLISH == 'true'
+        working-directory: .
+        run: |
+          python scraper/_sanity_check.py --update > /dev/null
+          git add -- js/catalog_data.js js/timeline_data.js js/schedule_data.js \
+                     scraper/refresh_baseline.json scraper/data
+          if git diff --cached --quiet; then
+            echo "No data changes -- nothing to commit or deploy"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          counts=$(python - <<'PY'
+          import json, os
+          m = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "gate.json"))).get("metrics", {})
+          print(f'{m.get("js_courses")} courses, {m.get("js_programs")} programs, {m.get("health_findings")} health findings')
+          PY
+          )
+          git commit -m "Scheduled data refresh ($counts)"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # --- report ------------------------------------------------------------
+      - name: Summary
+        if: always()
+        working-directory: .
+        run: |
+          {
+            echo "## myplanBYU refresh ($([ "$PUBLISH" = true ] && echo publish || echo dry run))"
+            echo
+            echo "| step | outcome |"
+            echo "|---|---|"
+            echo "| catalog | ${{ steps.catalog.outcome }} |"
+            echo "| dates | ${{ steps.dates.outcome }} |"
+            echo "| maps | ${{ steps.maps.outcome }} |"
+            echo "| generate | ${{ steps.generate.outcome }} |"
+            echo "| timeline | ${{ steps.timeline.outcome }} |"
+            echo "| sections | ${{ steps.sections.outcome }} |"
+            echo "| schedule | ${{ steps.schedule.outcome }} |"
+            echo "| gate | ${{ steps.gate.outcome }} |"
+            echo "| build | ${{ steps.build.outcome }} |"
+            echo "| publish | ${{ steps.publish.outcome }} (pushed: ${{ steps.publish.outputs.pushed || 'n/a' }}) |"
+            echo
+            echo "### Gate"
+            echo '```json'
+            cat "$RUNNER_TEMP/gate.json" 2>/dev/null || echo "(gate did not run)"
+            echo '```'
+            echo "### Data diff vs. the commit this run started from"
+            echo '```'
+            git diff --stat ${{ github.sha }} -- js scraper/data | tail -25
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload refreshed data
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: myplanbyu-refresh-data
+          retention-days: 14
+          path: |
+            js/*_data.js
+            scraper/data/*.json
+            !scraper/data/catalog.json
+
+  # Only after a commit actually landed: an unchanged week redeploys nothing.
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.pushed == 'true'
+    uses: ./.github/workflows/deploy.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

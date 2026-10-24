@@ -36,7 +36,7 @@ try {
 }
 
 # DISABLED in Task Scheduler since 2026-10-24 -- GitHub Actions runs this job
-# now (.github/workflows/myplanbyu-refresh.yml). If it is ever re-enabled as a
+# now (.github/workflows/refresh.yml). If it is ever re-enabled as a
 # fallback, start from GitHub's main so it can't collide with the bot's commits.
 $syncBlocker = Sync-WithOrigin
 if ($null -ne $syncBlocker) {
@@ -69,8 +69,7 @@ try {
   exit (Stop-RefreshRunWithError -Message $_.Exception.Message)
 }
 
-# Gate, publish to jordanheaton.com, and mirror to myplan.jordanheaton.com (see
-# publish_site.ps1 for why two homes exist). The mirror runs only after the gate
-# passes; a failed mirror is recorded in _last_run.json and toasts, but does not
-# turn a good refresh into a failed run.
+# Gate, then commit and push; the push to main triggers deploy.yml, which
+# rebuilds myplan.jordanheaton.com. A run that passes the gate but doesn't
+# publish is recorded in _last_run.json and toasts.
 exit (Complete-RefreshRun -Python $py -NoPublish:$NoPublish)

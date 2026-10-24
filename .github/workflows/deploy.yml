@@ -1,0 +1,71 @@
+# Deploy the site to GitHub Pages (myplan.jordanheaton.com).
+#
+# build_site.py copies only the site (index.html, css/, js/, favicons) into
+# _site/ and cache-busts the js/css references; the scraper, Worker and tests
+# stay in the repo but are never served.
+#
+# Three ways in:
+#   - a push to main that touches the site (Jordan's pushes, the PC's monthly
+#     refresh);
+#   - workflow_call from refresh.yml. A push made with the workflow's own
+#     GITHUB_TOKEN does NOT trigger other workflows, so the refresh calls this
+#     directly after publishing instead of relying on the push event;
+#   - by hand.
+#
+# Pages source must be "GitHub Actions" (Settings -> Pages). The custom domain
+# is set there too; a CNAME file is not used by Actions deployments.
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - css/**
+      - js/**
+      - favicon.*
+      - apple-touch-icon.png
+      - build_site.py
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; never cancel one halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # ref: main, not the triggering SHA -- when refresh.yml calls this, the
+      # data it just pushed is newer than the commit the refresh started from.
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: python build_site.py
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

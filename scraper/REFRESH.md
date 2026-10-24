@@ -7,7 +7,7 @@ keep it current and push the result to the live site.
 
 | Job | Runs on | When | Needs this PC? |
 |---|---|---|---|
-| Weekly core refresh | **GitHub Actions** — `.github/workflows/myplanbyu-refresh.yml` | Sunday 09:00 UTC (3 AM MDT / 2 AM MST) | No |
+| Weekly core refresh | **GitHub Actions** — `.github/workflows/refresh.yml` | Sunday 09:00 UTC (3 AM MDT / 2 AM MST) | No |
 | Monthly full refresh | **This PC** — Task Scheduler, `refresh_full.ps1` | 1st Sunday 04:00 local | Yes |
 
 **Why the split.** BYU serves most of its sites through CloudFront, which
@@ -39,17 +39,27 @@ the run stops before scraping and toasts.
 `Enable-ScheduledTask -TaskPath '\myplanBYU\' -TaskName 'weekly core refresh'`
 -- and disable the workflow's schedule, or the two will collide.
 
+**Deploying.** The site deploys from `.github/workflows/deploy.yml`
+(`build_site.py` assembles only index.html, css/, js/ and the favicons, with
+`?v=` cache stamps). It runs on any push to `main` that touches the site --
+including the PC's monthly push -- and is called directly by `refresh.yml`
+after it commits, because a push made with the workflow's own token does not
+trigger other workflows. Until 2026-10-24 this repo was a deploy-only mirror fed
+by `publish_site.ps1` from the portfolio repo; that history is tagged
+`mirror-archive`.
+
 The rest of this file describes the PC pipeline, which both scripts still use.
 The workflow runs the same scripts, in the same order, behind the same gate.
 
 ## Setup (once)
 
 ```powershell
-cd "C:\Users\jorda\OneDrive - Brigham Young University\Portfolio\myplanBYU\scraper"
+cd C:\Users\jorda\repos\myplanBYU\scraper
 .\setup_schedule.ps1
 ```
 
-That registers both tasks. Re-running is safe — it overwrites.
+That registers both tasks. Re-running is safe — it overwrites. It re-enables
+the weekly task too, so disable it again afterwards (see above).
 
 ```powershell
 .\setup_schedule.ps1 -Status    # state, last run time, last result
@@ -60,8 +70,8 @@ That registers both tasks. Re-running is safe — it overwrites.
 
 | Task | When | Script | Steps |
 |---|---|---|---|
-| `myplanBYU\weekly core refresh` | Sunday 03:00 | `refresh_core.ps1` | catalog → academic dates → MAP sheets → `generate_data` → `generate_timeline` → class schedule → mirror to `myplan.jordanheaton.com` |
-| `myplanBYU\monthly full refresh` | 1st Sunday 04:00 | `refresh_full.ps1` | catalog → 10 sources → flowchart extraction → MAP sheets → generate → `embed_and_load` (Pinecone) → mirror to `myplan.jordanheaton.com` |
+| `myplanBYU\weekly core refresh` (disabled) | Sunday 03:00 | `refresh_core.ps1` | catalog → academic dates → MAP sheets → `generate_data` → `generate_timeline` → class schedule → push |
+| `myplanBYU\monthly full refresh` | 1st Sunday 04:00 | `refresh_full.ps1` | catalog → 10 sources → flowchart extraction → MAP sheets → generate → `embed_and_load` (Pinecone) → push |
 
 Both accept:
 
@@ -137,7 +147,8 @@ Both baseline paths are covered by `test_sanity_check.py`:
 
 ## Publishing
 
-The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
+A push to `main` that touches the site triggers `deploy.yml`, so the push *is*
+the deploy. The job:
 
 - **only publishes from `main`.** On any other branch it refreshes the data and
   stops — otherwise a run firing while you're on a feature branch would commit
@@ -158,10 +169,6 @@ The repo is a GitHub Pages site, so a push to `main` *is* the deploy. The job:
   `git rebase` ran every time, and git refuses to start one while the tree has
   unstaged changes — so with any in-progress portfolio edit lying around, every
   run logged "rebase conflict" and never pushed);
-- also mirrors the site into the `myplanbyu-site` deploy repo
-  (`publish_site.ps1`) for `myplan.jordanheaton.com`. Both jobs do this; the
-  monthly one didn't until 2026-09-11, which is why the 2027 study abroad
-  programs it scraped on 2026-09-06 stayed off the subdomain;
 - writes the counts into the message:
   `myplanBYU: scheduled data refresh (7130 courses, 313 programs, 24 health findings)`.
 
@@ -227,6 +234,9 @@ when the interpreter itself can't launch, so a stale `0` read as success.
 | `setup_schedule.ps1` | Task registration / `-Status` / `-Remove` |
 | `_sanity_check.py` | The publish gate |
 | `refresh_baseline.json` | Last known-good metrics (tracked) |
+| `../.github/workflows/refresh.yml` | The weekly job on GitHub Actions |
+| `../.github/workflows/deploy.yml` + `../build_site.py` | Builds and deploys the site to Pages |
+| `../.github/workflows/byu-host-probe.yml` | Manual check of which BYU hosts answer GitHub |
 | `data/_last_run.json` | Last run's outcome (local only; mirrored to the log dir) |
 | `%LOCALAPPDATA%\myplanBYU\logs\*.log` | Appended run logs — outside OneDrive on purpose |
 

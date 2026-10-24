@@ -20,7 +20,9 @@ $VENV_PY     = Join-Path $VENV_PATH "Scripts\python.exe"
 # The venv lives OUTSIDE OneDrive on purpose: a torch-sized venv inside a synced
 # folder is what corrupted the old scraper\.venv and hit the 260-char path cap.
 $SYSTEM_PY   = "C:\Users\jorda\AppData\Local\Programs\Python\Python312\python.exe"
-$REPO_ROOT   = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+# The myplanBYU repo root (scraper\..). Until 2026-10-24 this folder lived inside
+# the portfolio repo and the root was two levels up.
+$REPO_ROOT   = Split-Path $PSScriptRoot -Parent
 $SCRAPER_DIR = $PSScriptRoot
 $DATA_DIR    = Join-Path $PSScriptRoot "data"
 
@@ -36,20 +38,18 @@ $DATA_DIR    = Join-Path $PSScriptRoot "data"
 $LOG_DIR = Join-Path $env:LOCALAPPDATA "myplanBYU\logs"
 
 # Files the jobs are allowed to commit. Explicit list, never 'git add -A' --
-# the working tree routinely holds unrelated in-progress portfolio work.
+# the working tree can hold unrelated in-progress work.
 $PUBLISH_PATHS = @(
-  "myplanBYU/js/catalog_data.js",
-  "myplanBYU/js/timeline_data.js",
+  "js/catalog_data.js",
+  "js/timeline_data.js",
   # Written by generate_schedule.py at the end of the weekly job. It was missing
   # from this list until 2026-09-11, so every weekly refresh regenerated it and
-  # left it uncommitted: jordanheaton.com/myplanBYU served the July 30 sections
-  # while the working tree (and the myplan.jordanheaton.com mirror, which copies
-  # js\ straight from the tree) had September's.
-  "myplanBYU/js/schedule_data.js",
-  "myplanBYU/scraper/refresh_baseline.json"
+  # left it uncommitted, and the live site served July's sections in September.
+  "js/schedule_data.js",
+  "scraper/refresh_baseline.json"
 )
 # Tracked source JSON is added by wildcard expansion at commit time.
-$PUBLISH_GLOB = "myplanBYU/scraper/data"
+$PUBLISH_GLOB = "scraper/data"
 
 # --- module state -----------------------------------------------------------
 $script:LogPath  = $null
@@ -371,7 +371,7 @@ function Save-RejectedOutput {
   # Restore the tracked outputs to their last committed state.
   Push-Location $REPO_ROOT
   try {
-    $restore = & git restore -- "myplanBYU/js" "myplanBYU/scraper/data" 2>&1
+    $restore = & git restore -- "js" "scraper/data" 2>&1
     Write-LogDetail $restore
     Write-Log "gate: tracked files restored to last committed state"
   } finally {
@@ -483,32 +483,6 @@ function Publish-Refresh {
   }
 }
 
-function Publish-SiteMirror {
-  <#
-    Mirrors the site into the myplan.jordanheaton.com deploy repo via
-    publish_site.ps1 and reports whether it worked.
-
-    Returns a PSCustomObject: Ok [bool], Note [string]
-
-    This used to run from the tail of each job AFTER _last_run.json was written,
-    with its exit code ignored. When its push started bouncing on 2026-09-20 the
-    status file kept saying "ok", no toast fired, and the subdomain served
-    September data for six weeks. Its result now goes into the status file and a
-    failure alerts like any other.
-  #>
-  $script = Join-Path $SCRAPER_DIR "publish_site.ps1"
-  $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $script 2>&1
-  $code = $LASTEXITCODE
-  $lines = @($out | ForEach-Object { "$_" } | Where-Object { $_ -ne "" })
-  foreach ($line in $lines) { Write-Log ("publish_site: " + $line) }
-  $note = "no output"
-  if ($lines.Count -gt 0) { $note = ($lines[-1] -replace '^publish_site:\s*', '') }
-  if ($code -ne 0) {
-    return [pscustomobject]@{ Ok = $false; Note = ("exit {0}: {1}" -f $code, $note) }
-  }
-  return [pscustomobject]@{ Ok = $true; Note = $note }
-}
-
 function Sync-WithOrigin {
   <#
     Fast-forwards the local main to origin/main BEFORE anything is scraped or
@@ -603,8 +577,7 @@ function Write-RunStatus {
     [Parameter(Mandatory = $true)][string]$Outcome,   # ok | gate_failed | failed
     [AllowEmptyString()][string]$Detail = "",
     $Metrics = $null,
-    $Publish = $null,
-    $Mirror  = $null
+    $Publish = $null
   )
   $ended = Get-Date
   $status = [ordered]@{
@@ -618,18 +591,12 @@ function Write-RunStatus {
     published    = $false
     commit       = $null
     publish_note = $null
-    site_mirrored = $false
-    site_note    = $null
     metrics      = $Metrics
   }
   if ($Publish) {
     $status.published    = $Publish.Published
     $status.commit       = $Publish.Sha
     $status.publish_note = $Publish.Reason
-  }
-  if ($Mirror) {
-    $status.site_mirrored = $Mirror.Ok
-    $status.site_note     = $Mirror.Note
   }
   $json = $status | ConvertTo-Json -Depth 6
   # Written to both places on purpose: data\ is where you look while working in
@@ -755,22 +722,18 @@ function Complete-RefreshRun {
     $detail = "gate passed"
   }
 
-  # The subdomain mirror copies js\ straight from the working tree, so it runs
-  # even when the portfolio commit was blocked -- the gate has already passed.
-  $mirror = Publish-SiteMirror
-
-  Write-RunStatus -Outcome "ok" -Detail $detail -Metrics $gate.Metrics -Publish $pub -Mirror $mirror
+  # Publishing is the push: deploy.yml rebuilds myplan.jordanheaton.com on any
+  # push to main that touches js\. (The old two-repo mirror, publish_site.ps1,
+  # was retired 2026-10-24 when this became the source repo.)
+  Write-RunStatus -Outcome "ok" -Detail $detail -Metrics $gate.Metrics -Publish $pub
 
   # A run that passed the gate but did not ship is NOT a quiet success. "index
   # not clean" blocked every run from 2026-10-11 (OneDrive rolled .git\index
-  # back to an older snapshot) and the mirror push bounced from 2026-09-20; both
+  # back to an older snapshot) and a mirror push bounced from 2026-09-20; both
   # logged "ok" and the live site went stale without anyone knowing.
   $problems = @()
   if (-not $pub.Published -and $pub.Reason -ne "no changes") {
-    $problems += ("jordanheaton.com not updated: " + $pub.Reason)
-  }
-  if (-not $mirror.Ok) {
-    $problems += ("myplan.jordanheaton.com not updated: " + $mirror.Note)
+    $problems += ("myplan.jordanheaton.com not updated: " + $pub.Reason)
   }
   if ($problems.Count -gt 0) {
     Send-FailureToast -Title ("myplanBYU refresh NOT published (" + $script:JobName + ")") `

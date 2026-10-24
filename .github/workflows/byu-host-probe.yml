@@ -1,0 +1,58 @@
+# Which BYU sites answer GitHub's runners? A 30-second diagnostic, run by hand.
+#
+# BYU's CloudFront answers 403 to runner IPs on some hosts (academiccalendar,
+# enrollment.byu.edu -- found 2026-10-23), so every source has to be checked
+# from a runner before it can move off Jordan's PC. One GET per URL with the
+# scrapers' User-Agent; prints the status and what is serving the response.
+
+name: BYU host probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe
+        run: |
+          UA="myplanBYU-scraper/1.0 (+educational; contact jordandheaton@gmail.com)"
+          {
+            echo "| status | server | url |"
+            echo "|---|---|---|"
+            while read -r url; do
+              [ -z "$url" ] && continue
+              out=$(curl -s -o /dev/null -D - -A "$UA" --max-time 30 "$url" || true)
+              code=$(echo "$out" | awk 'toupper($1) ~ /^HTTP/ {c=$2} END {print c+0}')
+              server=$(echo "$out" | awk -F': ' 'tolower($1)=="server" {s=$2} tolower($1)=="via" && /cloudfront/ {cf=" (CloudFront)"} END {gsub(/\r/,"",s); print s cf}')
+              echo "| $code | $server | $url |"
+              sleep 1
+            done <<'URLS'
+          https://commtech.byu.edu/noauth/classSchedule/index.php
+          https://catalog.byu.edu/
+          https://academiccalendar.byu.edu/
+          https://kennedy.byu.edu/find-your-program
+          https://clubs.byu.edu
+          https://cls.byu.edu/programs/certificate/courseoptions/
+          https://marriott.byu.edu/financialaid/scholarships/
+          https://marriott.byu.edu/mba/academics/minors-certificates/
+          https://marriott.byu.edu/infosys/bsis/what-will-i-study/flowcharts/
+          https://ph.byu.edu/
+          https://enrollment.byu.edu/tuition
+          https://enrollment.byu.edu/transfer-team/transfer-guides
+          https://enrollment.byu.edu/financial-aid/scholarships
+          https://careers.byu.edu/
+          https://experience.byu.edu/
+          https://humgrants.byu.edu/
+          https://cfac.byu.edu/student-scholarships-and-grants/
+          https://economics.byu.edu/experiential-learning-grant
+          https://education.byu.edu/research/grants
+          https://ece.byu.edu/computerengineering
+          https://mfgen.byu.edu/mfgen-flowcharts
+          https://www.me.byu.edu/flowchart
+          URLS
+          } | tee -a "$GITHUB_STEP_SUMMARY"

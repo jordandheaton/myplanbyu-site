@@ -91,11 +91,7 @@ try {
   exit (Stop-RefreshRunWithError -Message $_.Exception.Message)
 }
 
-# Gate, publish, and mirror to myplan.jordanheaton.com -- all inside
-# Complete-RefreshRun, exactly as in refresh_core.ps1. This job is the only one
-# that re-scrapes the slow sources (Kennedy study abroad, clubs, grants...), so
-# without the mirror their output reached jordanheaton.com/myplanBYU but not the
-# subdomain until the NEXT weekly run happened to regenerate from it. That is how
-# the 2027 study abroad programs scraped on 2026-09-06 sat unpublished on the
-# subdomain for a week.
+# Gate, then commit and push -- exactly as in refresh_core.ps1; the push to main
+# triggers deploy.yml. This job stays on the PC because most of its sources
+# (Kennedy study abroad, enrollment.byu.edu, cls...) 403 GitHub's runners.
 exit (Complete-RefreshRun -Python $py -NoPublish:$NoPublish)
