@@ -1016,7 +1016,7 @@ const App = (() => {
 
   function renderPlans() {
     const el = $("#plansList");
-    el.innerHTML = plans.map(p => {
+    const cards = plans.map(p => {
       const active = p.id === activeId;
       const prof = p.profile;
       const major = DATA.programIndex[prof.majorId];
@@ -1040,7 +1040,11 @@ const App = (() => {
         </div>
         <div class="plan-card-edited">Last edited ${new Date(p.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
       </div>`;
-    }).join("") || `<p class="pr-empty">No plans saved yet.</p>`;
+    }).join("");
+    el.innerHTML = cards
+      ? cards + `<button class="link-btn plans-import" data-import><i class="fas fa-file-import"></i> Import a plan (JSON)</button>`
+      : `<p class="pr-empty">No plans saved yet.<br>Made one on jordanheaton.com/myplanBYU? Export it there (plan menu → Export JSON), then <button class="link-btn" data-import>import it here</button>.</p>`;
+    el.querySelectorAll("[data-import]").forEach(b => b.addEventListener("click", () => $("#importPlanFile").click()));
 
     $$(".plan-card").forEach(c => c.addEventListener("click", e => {
       if (e.target.closest(".plan-menu-btn")) return;
@@ -1098,6 +1102,39 @@ const App = (() => {
     a.download = plan.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".myplanbyu.json";
     a.click();
     URL.revokeObjectURL(a.href);
+  }
+
+  /* The inverse of exportPlan. Plans live in localStorage, which is per-origin,
+     so moving the app from jordanheaton.com/myplanBYU to myplan.jordanheaton.com
+     (2026-10-24) left early testers' plans behind on the old origin; export
+     there + import here is how they carry them over. Accepts the export
+     envelope or a bare plan object. Always creates a NEW plan -- an import
+     never overwrites one the student already has. */
+  function importPlanFile(file) {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { toast("That file is too big to be a myplanBYU plan."); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try { data = JSON.parse(reader.result); } catch (e) { toast("That file isn't valid JSON."); return; }
+      const plan = data && data.app === "myplanBYU" ? data.plan : data;
+      const profile = plan && plan.profile;
+      if (!profile || typeof profile !== "object" || typeof profile.majorId !== "string") {
+        toast("That doesn't look like a myplanBYU plan export.");
+        return;
+      }
+      if (!DATA.programIndex[profile.majorId]) {
+        toast("This plan's major isn't in the current catalog, so it can't be rebuilt here.");
+        return;
+      }
+      let name = String(plan.name || profile.name || "Imported plan").slice(0, 120);
+      if (plans.some(p => p.name === name)) name += " (imported)";
+      newPlanFromProfile(profile, name);
+      solveActive({ fresh: true });
+      toast(`Imported "${name}".`, "ok");
+    };
+    reader.onerror = () => toast("Couldn't read that file.");
+    reader.readAsText(file);
   }
 
   /* ------------------------- clean print / PDF ----------------------- */
@@ -2465,6 +2502,10 @@ const App = (() => {
     wireCollapse("#collapseRight", "#panelRight", "rightCollapsed");
 
     $("#newPlanBtn").addEventListener("click", () => openWizard());
+    $("#importPlanFile").addEventListener("change", e => {
+      importPlanFile(e.target.files[0]);
+      e.target.value = "";          // picking the same file twice should import twice
+    });
     $("#wizBack").addEventListener("click", () => { wizardCollect(); if (wizStep > 0) { wizStep--; renderWizard(); } });
     $("#wizNext").addEventListener("click", () => {
       wizardCollect();
