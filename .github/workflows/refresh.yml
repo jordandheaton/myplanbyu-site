@@ -57,9 +57,10 @@ jobs:
       PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish }}
       PYTHONUNBUFFERED: "1"
     steps:
+      # Shallow on purpose: history holds two 68 MB catalog.json blobs from
+      # before it was gitignored. The publish step's `git pull --rebase`
+      # deepens as far as it needs to.
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-python@v7
         with:

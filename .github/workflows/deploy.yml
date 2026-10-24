@@ -12,6 +12,10 @@
 #     directly after publishing instead of relying on the push event;
 #   - by hand.
 #
+# The push trigger did not fire for the 2026-10-24 force-push that replaced the
+# mirror history (the paths filter had no common base to diff against); that
+# first deploy was started by hand. Ordinary pushes trigger it.
+#
 # Pages source must be "GitHub Actions" (Settings -> Pages). The custom domain
 # is set there too; a CNAME file is not used by Actions deployments.
 
