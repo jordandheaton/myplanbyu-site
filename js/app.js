@@ -1041,9 +1041,7 @@ const App = (() => {
         <div class="plan-card-edited">Last edited ${new Date(p.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
       </div>`;
     }).join("");
-    el.innerHTML = cards
-      ? cards + `<button class="link-btn plans-import" data-import><i class="fas fa-file-import"></i> Import a plan (JSON)</button>`
-      : `<p class="pr-empty">No plans saved yet.<br>Made one on jordanheaton.com/myplanBYU? Export it there (plan menu → Export JSON), then <button class="link-btn" data-import>import it here</button>.</p>`;
+    el.innerHTML = cards + `<button class="link-btn plans-import" data-import><i class="fas fa-file-import"></i> Import a plan (JSON)</button>`;
     el.querySelectorAll("[data-import]").forEach(b => b.addEventListener("click", () => $("#importPlanFile").click()));
 
     $$(".plan-card").forEach(c => c.addEventListener("click", e => {
