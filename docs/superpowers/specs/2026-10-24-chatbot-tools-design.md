@@ -89,8 +89,8 @@ retrieval misses, the model doesn't know — so it guesses or deflects.
 - **Node is available** on Jordan's PC (v24), so the Worker can use the official
   Anthropic TypeScript/JS SDK (`@anthropic-ai/sdk`), bundled by wrangler.
 - **Repo is public.** No student data (including Jordan's) is ever committed.
-- **Development spend is not constrained** (Jordan). A runaway cap still exists
-  because the site is public (6.5).
+- **Spend: $10/month worst case, total** (Jordan) — live chatbot and test runs
+  together. Enforced by caps in code, not by hoping (6.5).
 
 ## 5. Decisions Jordan made
 
@@ -101,7 +101,9 @@ retrieval misses, the model doesn't know — so it guesses or deflects.
 - **Map each study abroad program's courses to GE areas** in the data pipeline,
   so "this fills your Arts GE" is a fact (6.8).
 - SAGE programs **do** run in summer — the current data is wrong (§1).
-- **No cost constraint during development**; quality over cost.
+- **$10/month worst case**, total. Use the **cheapest model that passes the test
+  set** — start with the smallest current model; the hard work is done by the
+  tools, not the model's knowledge.
 - Priority: "easiest Arts GE" with double-counting.
 - Long-term: the advisor should "just know" the student once BYU sign-in exists
   — so student data goes through one replaceable source (6.2).
@@ -204,10 +206,11 @@ this model, so steering is by the system prompt. Results are compact JSON with a
 | `get_sections` | for a course + term: each section's number, delivery mode, seats available / capacity, waitlist, instructors, days/times, room | Existing `/api/sections`; term codes `YYYY1/3/4/5`; returns `as_of` |
 | `search_byu_documents` | top passages from the existing Pinecone index (policies, program pages, study abroad pages…) with name, type, URL | New `/api/docsearch` wrapping today's `retrieve()` |
 
-**Server tool (Anthropic-hosted):** `web_search_20260209` with
-`allowed_domains: ["byu.edu"]` (covers subdomains) and `max_uses: 3`, for policy
-questions no dataset covers. *[Builder: verify current web-search pricing —
-historically about $10 per 1,000 searches.]*
+**Server tool (Anthropic-hosted):** web search with
+`allowed_domains: ["byu.edu"]` (covers subdomains) and `max_uses: 2`, for policy
+questions no dataset covers — the version depends on the chosen model (6.5).
+*[Builder: verify current web-search pricing — historically about $10 per 1,000
+searches.]*
 
 ### 6.4 "Easiest" — how `find_courses_for_requirement` ranks *[Jordan's priority; ranking order is his]*
 
@@ -242,21 +245,40 @@ prerequisites", "two on-demand sections in Winter 2027"). It never returns a
 difficulty claim. *Note:* `js/data.js` has a curated `diff` field on some
 courses; its source isn't documented, so it is **not** used *[my call]*.
 
-### 6.5 Model, cost, limits *[my call]*
+### 6.5 Model, cost, limits *(budget is Jordan's; the rest my call)*
 
-- **Model:** `claude-opus-5-5` (current Opus, $4 / $20 per M tokens; adaptive
-  thinking is always on; start at `effort: "medium"`, its default, and tune with
-  the test set). Server-side refusal fallback on (`fallbacks: "default"`, beta
-  `server-side-fallback-2026-07-01`).
-- **Estimated cost:** roughly $0.10–0.20 per question with a few tool rounds
-  (to be measured by the test harness, not trusted).
+- **Model — chosen by the test set, cheapest that passes.** The model only has
+  to pick tools, combine their results and follow the grounding rules; the
+  facts come from tools. Start with **`claude-haiku-5-5`** ($0.10 / $0.50 per M
+  tokens — about 10× cheaper per token than today's `claude-haiku-4-5`). Move to
+  `claude-sonnet-5-5` ($2 / $10) only if Haiku fails cases that prompt changes
+  can't fix; `claude-opus-5-5` is not planned. Record the decision and the test
+  results that drove it. Keep the model a single config value.
+- **Per-model details the builder must respect:** Haiku 5.5 — adaptive thinking
+  on by default, `effort` default `medium` (set it explicitly; try `low`), no
+  server-side refusal fallback, and web search is the basic
+  `web_search_20250305` (the `_20260209` variant needs Sonnet/Opus). Sonnet 5.5
+  — forced `tool_choice` returns 400 (use `auto` + prompt), `web_search_20260209`,
+  refusal fallback `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`).
+  Both run preserved thinking, so 6.1's append-only rule applies either way.
+- **Estimated cost per question** (a few tool rounds; to be *measured* by the
+  harness): Haiku 5.5 under $0.01; Sonnet 5.5 about $0.05–0.08. Web search adds
+  about $0.01 per search *[builder: verify current price]*, so it is the
+  last-resort tool and `max_uses` is 2.
 - **Prompt caching:** `system` and `tools` are frozen and cached; with an
   append-only history, every later round reads them from cache.
-- **Limits:** max 8 model rounds per question (the loop stops and the advisor
-  says it couldn't finish); `max_tokens` 16000 per round (non-streaming).
-  Development budget cap $100/month and 50 questions per visitor per day,
-  replacing today's $7 / 10 — runaway protection for a public endpoint, not a
-  budget. Both live in `wrangler.jsonc` as today.
+- **Hard spend ceiling — $10/month total (Jordan):** production cap **$8**, dev
+  environment cap **$2** (test runs; a full ~20-question run on Haiku costs
+  cents). Spend is charged per round from `usage` (input incl. cache reads,
+  output incl. thinking, plus web searches), as today's D1 `months` table does.
+  When a cap is hit, the advisor shows today's "out of budget this month"
+  message; the rest of the site is unaffected. If the test set forces Sonnet,
+  $8 covers roughly 100–150 questions/month — flag that to Jordan before
+  switching rather than raising the cap.
+- **Other limits:** max 8 model rounds per question (the loop stops and says it
+  couldn't finish); `max_tokens` 16000 per round (non-streaming); 20 questions
+  per visitor per day (up from 10 — the monthly cap is the real ceiling). All in
+  `wrangler.jsonc` per environment, as today.
 - **Quota integrity:** the Worker counts a *question* on its first round and
   must stop a client from passing endless "follow-up rounds" off as one
   question: the first response carries a signed round token (HMAC over IP-hash,
