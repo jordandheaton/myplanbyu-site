@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Work on branch **`advisor-tools`** in `C:\Users\jorda\repos\myplanBYU`. A push to `main` deploys the live site, so nothing merges to `main` before Task 11.
+- Work on branch **`advisor-tools`** in a **separate worktree** (`git worktree add ..\myplanBYU-advisor advisor-tools` → `C:\Users\jorda\repos\myplanBYU-advisor`). The main checkout `C:\Users\jorda\repos\myplanBYU` must stay on `main`: the PC's monthly refresh runs there and only publishes from `main`. A push to `main` deploys the live site, so nothing merges to `main` before Task 11.
 - **Never commit student data** (the repo is public). Jordan's test profile and verified cases live only in `tests/chat-eval/private/` (gitignored).
 - **Model: one config value, default `claude-haiku-5-5`**; Sonnet 5.5 only if the test set forces it, and only after asking Jordan. No Opus.
 - **Spend ceiling $10/month total: production cap `$8`, dev cap `$2`.** 20 questions per visitor per day. Max **8** model rounds per question. `max_tokens` **16000** per round (non-streaming).
