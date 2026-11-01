@@ -45,7 +45,7 @@
     "type": "club",
     "name": "Adam Smith Society",
     "url": "https://clubs.byu.edu",
-    "text": "Adam Smith Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets February at 5:00pm-6:30pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Adam Smith Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets February at 5:00pm-6:30pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::adhd-club",
@@ -53,7 +53,7 @@
     "type": "club",
     "name": "ADHD Club",
     "url": "https://clubs.byu.edu",
-    "text": "ADHD Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Wednesdays at 6-8 PM. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "ADHD Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Wednesdays at 6-8 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::aerial-club",
@@ -86,6 +86,14 @@
     "name": "A.I. in Medicine",
     "url": "https://clubs.byu.edu",
     "text": "A.I. in Medicine -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 5:00-7:00 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+  },
+  {
+    "id": "clubs::ai-security-association-training-responsible-ai-leaders",
+    "source": "clubs",
+    "type": "club",
+    "name": "AI Security Association - Training Responsible AI Leaders",
+    "url": "https://clubs.byu.edu",
+    "text": "AI Security Association - Training Responsible AI Leaders -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::allied-health-club",
@@ -173,7 +181,7 @@
     "type": "club",
     "name": "Anti-Racism Club",
     "url": "https://clubs.byu.edu",
-    "text": "Anti-Racism Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Every Other Wednesdays at 7:00 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Anti-Racism Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Every Other Wednesdays at 7:00 PM. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::arab-student-club",
@@ -206,6 +214,14 @@
     "name": "Art History Association",
     "url": "https://clubs.byu.edu",
     "text": "Art History Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+  },
+  {
+    "id": "clubs::asian-studies-student-assosiation",
+    "source": "clubs",
+    "type": "club",
+    "name": "Asian Studies Student Assosiation",
+    "url": "https://clubs.byu.edu",
+    "text": "Asian Studies Student Assosiation -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::association-for-information-systems",
@@ -285,7 +301,7 @@
     "type": "club",
     "name": "Ballet Association",
     "url": "https://clubs.byu.edu",
-    "text": "Ballet Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Ballet Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::barbershop-singing-club",
@@ -525,7 +541,7 @@
     "type": "club",
     "name": "BYU Apiology Association",
     "url": "https://clubs.byu.edu",
-    "text": "BYU Apiology Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets 02/19/2026 at 7pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "BYU Apiology Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets 02/19/2026 at 7pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::byu-artificial-intelligence-association",
@@ -677,7 +693,7 @@
     "type": "club",
     "name": "BYU Global Women’s Studies Honor Society",
     "url": "https://clubs.byu.edu",
-    "text": "BYU Global Women’s Studies Honor Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "BYU Global Women’s Studies Honor Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::byu-interfaith-student-association",
@@ -685,7 +701,7 @@
     "type": "club",
     "name": "BYU Interfaith Student Association",
     "url": "https://clubs.byu.edu",
-    "text": "BYU Interfaith Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "BYU Interfaith Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::byu-linux-association",
@@ -701,7 +717,7 @@
     "type": "club",
     "name": "BYU Neuroscience Student Association",
     "url": "https://clubs.byu.edu",
-    "text": "BYU Neuroscience Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets 3rd Friday of the month at 3:30pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "BYU Neuroscience Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets 3rd Wednesday of the month at 4:00 pm. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::byu-occupational-health-association",
@@ -789,7 +805,7 @@
     "type": "club",
     "name": "BYU Student Council for Exceptional Children",
     "url": "https://clubs.byu.edu",
-    "text": "BYU Student Council for Exceptional Children -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "BYU Student Council for Exceptional Children -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::byu-students-of-the-ancient-near-east",
@@ -837,7 +853,7 @@
     "type": "club",
     "name": "Calisthenics",
     "url": "https://clubs.byu.edu",
-    "text": "Calisthenics -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Calisthenics -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Saturdays at 8:30 AM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::caribbean-student-alliance",
@@ -853,7 +869,7 @@
     "type": "club",
     "name": "Car Maintenance Club",
     "url": "https://clubs.byu.edu",
-    "text": "Car Maintenance Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Car Maintenance Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::catholic-newman-club",
@@ -909,7 +925,7 @@
     "type": "club",
     "name": "Comparative Literature Student Association",
     "url": "https://clubs.byu.edu",
-    "text": "Comparative Literature Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Comparative Literature Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::competitive-doubles-tennis",
@@ -925,7 +941,7 @@
     "type": "club",
     "name": "Computer Science Grad Student Society",
     "url": "https://clubs.byu.edu",
-    "text": "Computer Science Grad Student Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Computer Science Grad Student Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::construction-management-student-association",
@@ -941,7 +957,7 @@
     "type": "club",
     "name": "Contemporary Dance Theatre",
     "url": "https://clubs.byu.edu",
-    "text": "Contemporary Dance Theatre -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets MWFS at MWF 3-6 pm & Sat 8-12. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Contemporary Dance Theatre -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets MWFS at MWF 3-6 pm & Sat 8-12. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::corn-hole-club",
@@ -949,7 +965,7 @@
     "type": "club",
     "name": "Corn Hole Club",
     "url": "https://clubs.byu.edu",
-    "text": "Corn Hole Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays at 6:30-8:00PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Corn Hole Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays at 6:30-8:00PM. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::corporate-finance-advisory-association-finance-society",
@@ -960,12 +976,12 @@
     "text": "Corporate Finance & Advisory Association (Finance Society) -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 7:00 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
-    "id": "clubs::corporate-strategy-association-strategy-society",
+    "id": "clubs::corporate-strategy-association",
     "source": "clubs",
     "type": "club",
-    "name": "Corporate Strategy Association (Strategy Society)",
+    "name": "Corporate Strategy Association",
     "url": "https://clubs.byu.edu",
-    "text": "Corporate Strategy Association (Strategy Society) -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets First and third Thursdays of the month at 7PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Corporate Strategy Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets First and third Thursdays of the month at 7PM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::cougar-swim-club",
@@ -1061,7 +1077,7 @@
     "type": "club",
     "name": "Dance Major Student Representative Council",
     "url": "https://clubs.byu.edu",
-    "text": "Dance Major Student Representative Council -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Dance Major Student Representative Council -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::delta-alpha-pi",
@@ -1117,7 +1133,7 @@
     "type": "club",
     "name": "Dynamite A Cappella Club",
     "url": "https://clubs.byu.edu",
-    "text": "Dynamite A Cappella Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays and Thursdays at 7-9. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Dynamite A Cappella Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays and Thursdays at 7-9. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::earthquake-engineering-research-institute",
@@ -1126,6 +1142,14 @@
     "name": "Earthquake Engineering Research Institute",
     "url": "https://clubs.byu.edu",
     "text": "Earthquake Engineering Research Institute -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 6PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+  },
+  {
+    "id": "clubs::economic-consulting-organization",
+    "source": "clubs",
+    "type": "club",
+    "name": "Economic Consulting Organization",
+    "url": "https://clubs.byu.edu",
+    "text": "Economic Consulting Organization -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::economics-student-association",
@@ -1173,7 +1197,7 @@
     "type": "club",
     "name": "Esports Club",
     "url": "https://clubs.byu.edu",
-    "text": "Esports Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays at 7:00-9:30 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Esports Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays at 7:00-9:30 PM. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::eta-sigma-phi",
@@ -1221,7 +1245,7 @@
     "type": "club",
     "name": "Familiar Ring A Cappella",
     "url": "https://clubs.byu.edu",
-    "text": "Familiar Ring A Cappella -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays & Thursdays at 7:00 – 8:00p. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Familiar Ring A Cappella -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays & Thursdays at 7:00 – 8:00p. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::family-history-association",
@@ -1349,7 +1373,7 @@
     "type": "club",
     "name": "German Association",
     "url": "https://clubs.byu.edu",
-    "text": "German Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "German Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::gerontology-student-association",
@@ -1493,7 +1517,7 @@
     "type": "club",
     "name": "Hong Kong Club",
     "url": "https://clubs.byu.edu",
-    "text": "Hong Kong Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays and Thurdays at 7-9pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Hong Kong Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays and Thurdays at 7-9pm. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::horology-club",
@@ -1541,7 +1565,7 @@
     "type": "club",
     "name": "Interdisciplinary Humanities Student Council",
     "url": "https://clubs.byu.edu",
-    "text": "Interdisciplinary Humanities Student Council -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Interdisciplinary Humanities Student Council -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::international-city-manager-s-association",
@@ -1581,7 +1605,7 @@
     "type": "club",
     "name": "Irish Dance Club",
     "url": "https://clubs.byu.edu",
-    "text": "Irish Dance Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Spring/Summer - TBD at TBD. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Irish Dance Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Friday at 6-7pm. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::juggling-club",
@@ -1597,7 +1621,7 @@
     "type": "club",
     "name": "Just Dance Club",
     "url": "https://clubs.byu.edu",
-    "text": "Just Dance Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Wednesdays at 7-8pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Just Dance Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Wednesdays at 7-8pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::karaoke-club",
@@ -1613,7 +1637,7 @@
     "type": "club",
     "name": "Kinnect",
     "url": "https://clubs.byu.edu",
-    "text": "Kinnect -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Kinnect -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::knights-of-the-y",
@@ -1853,7 +1877,7 @@
     "type": "club",
     "name": "Music Lovers",
     "url": "https://clubs.byu.edu",
-    "text": "Music Lovers -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuedays at 8:30 - 10:00 p.m.. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Music Lovers -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuedays at 8:30 - 10:00 p.m.. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::mu-sigma-rho-national-statistical-honor-society",
@@ -1869,7 +1893,7 @@
     "type": "club",
     "name": "Muslim Student Union",
     "url": "https://clubs.byu.edu",
-    "text": "Muslim Student Union -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Friday at 1:20. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Muslim Student Union -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Friday at 1:20. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::national-association-for-music-education-collegiate-chapter",
@@ -1877,7 +1901,7 @@
     "type": "club",
     "name": "National Association for Music Education Collegiate Chapter",
     "url": "https://clubs.byu.edu",
-    "text": "National Association for Music Education Collegiate Chapter -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "National Association for Music Education Collegiate Chapter -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::national-security-student-association",
@@ -1885,7 +1909,7 @@
     "type": "club",
     "name": "National Security Student Association",
     "url": "https://clubs.byu.edu",
-    "text": "National Security Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "National Security Student Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::national-student-speech-language-hearing-association",
@@ -1965,7 +1989,7 @@
     "type": "club",
     "name": "Persian Language and Culture Association",
     "url": "https://clubs.byu.edu",
-    "text": "Persian Language and Culture Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Persian Language and Culture Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::personal-finance-association",
@@ -1973,7 +1997,7 @@
     "type": "club",
     "name": "Personal Finance Association",
     "url": "https://clubs.byu.edu",
-    "text": "Personal Finance Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Personal Finance Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::phi-alpha-theta-history-honor-society",
@@ -2112,12 +2136,12 @@
     "text": "Private Equity and Venture Capital Association  (Finance Society) -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Wednesday at 7:00 pm. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
-    "id": "clubs::product-management-association-strategy-society",
+    "id": "clubs::product-management-association",
     "source": "clubs",
     "type": "club",
-    "name": "Product Management Association (Strategy Society)",
+    "name": "Product Management Association",
     "url": "https://clubs.byu.edu",
-    "text": "Product Management Association (Strategy Society) -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Every other Wednesday at 6:00 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Product Management Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Every other Wednesday at 6:00 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::pro-life-club",
@@ -2141,7 +2165,7 @@
     "type": "club",
     "name": "Psych Association",
     "url": "https://clubs.byu.edu",
-    "text": "Psych Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Psych Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::public-relations-student-society-of-america",
@@ -2213,7 +2237,7 @@
     "type": "club",
     "name": "Running Club",
     "url": "https://clubs.byu.edu",
-    "text": "Running Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets TTh at 5:00pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Running Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets TTh at 5:00pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::russian-association",
@@ -2237,7 +2261,7 @@
     "type": "club",
     "name": "Salsa Club",
     "url": "https://clubs.byu.edu",
-    "text": "Salsa Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays at 8:30-10:00PM. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Salsa Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Tuesdays at 8:30-10:00PM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::secret-chord-a-cappella",
@@ -2285,7 +2309,7 @@
     "type": "club",
     "name": "Sigma Delta Pi",
     "url": "https://clubs.byu.edu",
-    "text": "Sigma Delta Pi -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Sigma Delta Pi -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::skateboarding-club",
@@ -2302,14 +2326,6 @@
     "name": "Ski and Ride Club",
     "url": "https://clubs.byu.edu",
     "text": "Ski and Ride Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Last Wednesday of Every Month at 7:00 PM. Find it under \"Find an Organization\" at clubs.byu.edu."
-  },
-  {
-    "id": "clubs::slovene-club",
-    "source": "clubs",
-    "type": "club",
-    "name": "Slovene Club",
-    "url": "https://clubs.byu.edu",
-    "text": "Slovene Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Mondays and Fridays at -Mondays: 2:00-3:00PM -Fridays: 12:00-1:00PM. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::soccer-club",
@@ -2496,6 +2512,14 @@
     "text": "Student Dietetic Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
+    "id": "clubs::student-film-association",
+    "source": "clubs",
+    "type": "club",
+    "name": "Student Film Association",
+    "url": "https://clubs.byu.edu",
+    "text": "Student Film Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 12:00. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
+  },
+  {
     "id": "clubs::student-moms",
     "source": "clubs",
     "type": "club",
@@ -2549,7 +2573,7 @@
     "type": "club",
     "name": "Taiwanese Student Club",
     "url": "https://clubs.byu.edu",
-    "text": "Taiwanese Student Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Taiwanese Student Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::tall-club",
@@ -2590,6 +2614,14 @@
     "name": "Thai Club",
     "url": "https://clubs.byu.edu",
     "text": "Thai Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 7:00 pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+  },
+  {
+    "id": "clubs::the-fidelio-society",
+    "source": "clubs",
+    "type": "club",
+    "name": "The Fidelio Society",
+    "url": "https://clubs.byu.edu",
+    "text": "The Fidelio Society -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets 2nd and 4th Tuesday at 7:00pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::their-story-is-our-story-at-byu",
@@ -2781,7 +2813,7 @@
     "type": "club",
     "name": "Weightlifting Club",
     "url": "https://clubs.byu.edu",
-    "text": "Weightlifting Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 7pm. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Weightlifting Club -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Thursday at 7pm. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::west-coast-swing-club",
@@ -2896,12 +2928,12 @@
     "text": "Women in STEM -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
-    "id": "clubs::women-in-strategy-association-strategy-society",
+    "id": "clubs::women-in-strategy-association",
     "source": "clubs",
     "type": "club",
-    "name": "Women in Strategy Association (Strategy Society)",
+    "name": "Women in Strategy Association",
     "url": "https://clubs.byu.edu",
-    "text": "Women in Strategy Association (Strategy Society) -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Every month at 6-7:30 p.m.. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Women in Strategy Association -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Meets Every month at 6-7:30 p.m.. Find it under \"Find an Organization\" at clubs.byu.edu."
   },
   {
     "id": "clubs::women-of-color",
@@ -2973,6 +3005,6 @@
     "type": "club",
     "name": "Y Teach History",
     "url": "https://clubs.byu.edu",
-    "text": "Y Teach History -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Find it under \"Find an Organization\" at clubs.byu.edu."
+    "text": "Y Teach History -- official BYU student club / student organization. Joining clubs is free or low-cost and one of the best ways to build a network, get involved, and explore a career interest. Membership is restricted (an application or tryout is required). Find it under \"Find an Organization\" at clubs.byu.edu."
   }
 ]
