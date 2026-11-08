@@ -28,6 +28,14 @@
     "season": "W",
     "courses": [
      {
+      "code": "DANCE 140",
+      "credits": 1.0
+     },
+     {
+      "code": "DANCE 240R",
+      "credits": 1.0
+     },
+     {
       "code": "TMA 115",
       "credits": 3.0
      },
@@ -46,23 +54,19 @@
     "season": "F",
     "courses": [
      {
-      "code": "TMA 222",
-      "credits": 2.0
-     },
-     {
       "code": "TMA 102",
       "credits": 3.0
-     },
-     {
-      "code": "TMA 127",
-      "credits": 1.0
      },
      {
       "code": "TMA 201",
       "credits": 3.0
      },
      {
-      "code": "TMA 223",
+      "code": "TMA 222",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 238",
       "credits": 2.0
      }
     ]
@@ -84,11 +88,11 @@
       "credits": 3.0
      },
      {
-      "code": "TMA 267",
-      "credits": 2.0
+      "code": "TMA 260R",
+      "credits": 1.0
      },
      {
-      "code": "TMA 260R",
+      "code": "TMA 267",
       "credits": 2.0
      }
     ]
@@ -98,7 +102,7 @@
     "season": "F",
     "courses": [
      {
-      "code": "TMA 224",
+      "code": "TMA 236",
       "credits": 3.0
      },
      {
@@ -106,12 +110,12 @@
       "credits": 2.0
      },
      {
-      "code": "TMA 324",
+      "code": "TMA 328",
       "credits": 3.0
      },
      {
-      "code": "TMA 325",
-      "credits": 2.0
+      "code": "TMA 338",
+      "credits": 3.0
      }
     ]
    },
@@ -120,12 +124,8 @@
     "season": "W",
     "courses": [
      {
-      "code": "TMA 240",
+      "code": "TMA 325",
       "credits": 3.0
-     },
-     {
-      "code": "TMA 421",
-      "credits": 1.0
      },
      {
       "code": "TMA 422",
@@ -146,11 +146,17 @@
       "credits": 3.0
      },
      {
-      "code": "TMA 427",
-      "credits": 3.0
-     },
-     {
       "code": "TMA 491",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 438",
       "credits": 3.0
      }
     ]
@@ -161,16 +167,6 @@
     "year": 1,
     "season": "F",
     "items": [
-     {
-      "slot": "ge",
-      "label": "First year Writing or American Heritage",
-      "cr": 3.0
-     },
-     {
-      "slot": "rel-corner",
-      "label": "Religion Cornerstone course",
-      "cr": 2.0
-     },
      {
       "c": "UNIV 101",
       "cr": 2.0
@@ -188,9 +184,9 @@
       "cr": 3.0
      },
      {
-      "slot": "ge",
-      "label": "General Education",
-      "cr": 2.0
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
+      "cr": 7.0
      }
     ],
     "total": 15.0
@@ -200,19 +196,11 @@
     "season": "W",
     "items": [
      {
-      "slot": "ge",
-      "label": "First year Writing or American Heritage",
-      "cr": 3.0
-     },
-     {
-      "slot": "major",
-      "label": "DANCE 140 or 240R",
+      "c": "DANCE 140",
+      "alts": [
+       "DANCE 240R"
+      ],
       "cr": 1.0
-     },
-     {
-      "slot": "rel-corner",
-      "label": "Religion Cornerstone course",
-      "cr": 2.0
      },
      {
       "c": "TMA 115",
@@ -225,38 +213,39 @@
      {
       "c": "TMA 228",
       "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
+      "cr": 6.0
      }
     ],
-    "total": 14.0
+    "total": 15.0
    },
    {
     "year": 2,
     "season": "F",
     "items": [
      {
-      "c": "TMA 222",
-      "cr": 2.0
-     },
-     {
       "c": "TMA 102",
       "cr": 3.0
-     },
-     {
-      "c": "TMA 127",
-      "cr": 1.0
      },
      {
       "c": "TMA 201",
       "cr": 3.0
      },
      {
-      "c": "TMA 223",
+      "c": "TMA 222",
       "cr": 2.0
      },
      {
-      "slot": "ge",
-      "label": "General Education",
-      "cr": 4.0
+      "c": "TMA 238",
+      "cr": 2.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
+      "cr": 5.0
      }
     ],
     "total": 15.0
@@ -278,27 +267,27 @@
       "cr": 3.0
      },
      {
+      "c": "TMA 260R",
+      "cr": 1.0
+     },
+     {
       "c": "TMA 267",
       "cr": 2.0
      },
      {
-      "c": "TMA 260R",
-      "cr": 2.0
-     },
-     {
-      "slot": "ge",
-      "label": "General Education",
-      "cr": 3.0
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
+      "cr": 4.0
      }
     ],
-    "total": 14.0
+    "total": 15.0
    },
    {
     "year": 3,
     "season": "F",
     "items": [
      {
-      "c": "TMA 224",
+      "c": "TMA 236",
       "cr": 3.0
      },
      {
@@ -306,32 +295,33 @@
       "cr": 2.0
      },
      {
-      "c": "TMA 324",
+      "c": "TMA 328",
       "cr": 3.0
      },
      {
-      "c": "TMA 325",
+      "c": "TMA 338",
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "Acting Electives",
       "cr": 2.0
      },
      {
-      "slot": "ge",
-      "label": "General Education",
-      "cr": 4.0
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
+      "cr": 3.0
      }
     ],
-    "total": 14.0
+    "total": 16.0
    },
    {
     "year": 3,
     "season": "W",
     "items": [
      {
-      "c": "TMA 240",
+      "c": "TMA 325",
       "cr": 3.0
-     },
-     {
-      "c": "TMA 421",
-      "cr": 1.0
      },
      {
       "c": "TMA 422",
@@ -342,9 +332,14 @@
       "cr": 3.0
      },
      {
-      "slot": "ge",
-      "label": "General Education",
-      "cr": 6.0
+      "slot": "major",
+      "label": "Acting Electives",
+      "cr": 2.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
+      "cr": 5.0
      }
     ],
     "total": 15.0
@@ -355,10 +350,10 @@
     "items": [
      {
       "c": "TMA 428",
-      "cr": 1.0
+      "cr": 0.5
      }
     ],
-    "total": 1.0
+    "total": 0.5
    },
    {
     "year": 4,
@@ -369,45 +364,45 @@
       "cr": 3.0
      },
      {
-      "c": "TMA 427",
-      "cr": 3.0
-     },
-     {
       "c": "TMA 491",
-      "cr": 3.0
+      "cr": 1.0
      },
      {
       "slot": "major",
-      "label": "Acting electives",
-      "cr": 3.0
+      "label": "Acting Electives",
+      "cr": 6.0
      },
      {
-      "slot": "ge",
-      "label": "General Education",
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
       "cr": 5.0
      }
     ],
-    "total": 17.0
+    "total": 15.0
    },
    {
     "year": 4,
     "season": "W",
     "items": [
      {
-      "slot": "major",
-      "label": "Acting electives",
-      "cr": 9.0
+      "c": "TMA 438",
+      "cr": 3.0
      },
      {
-      "slot": "ge",
-      "label": "General Education",
+      "slot": "major",
+      "label": "Acting electives",
+      "cr": 6.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "General Education, Religion, or Electives",
       "cr": 6.0
      }
     ],
     "total": 15.0
    }
   ],
-  "_src": "files/form/1741198361555/iPPydhuzwhOS.pdf"
+  "_src": "files/form/1793821745352/Pq6juhoMtiDy.pdf"
  },
  "Asian Studies: China Studies (BA)": {
   "terms": [
@@ -1746,6 +1741,210 @@
   ],
   "_src": "files/form/1789167245455/vLa7Qr57y9kZ.pdf"
  },
+ "Film (BA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 102",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 187",
+      "credits": 3.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 105",
+      "credits": 1.0
+     },
+     {
+      "code": "TMA 114",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 185",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 291",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 292",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 293",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 391",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "map": [
+   {
+    "year": 1,
+    "season": "F",
+    "items": [
+     {
+      "c": "TMA 102",
+      "cr": 3.0
+     },
+     {
+      "c": "TMA 187",
+      "cr": 3.0
+     },
+     {
+      "c": "UNIV 101",
+      "cr": 2.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE/Religion/Elective hours",
+      "cr": 4.0
+     },
+     {
+      "slot": "ge",
+      "label": "First-year Writing",
+      "cr": 3.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "items": [
+     {
+      "c": "TMA 105",
+      "cr": 1.0
+     },
+     {
+      "c": "TMA 114",
+      "cr": 3.0
+     },
+     {
+      "c": "TMA 185",
+      "cr": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "items": [
+     {
+      "c": "TMA 291",
+      "alts": [
+       "TMA 292"
+      ],
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "Film major electives",
+      "cr": 10.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE/Religion/Elective hours",
+      "cr": 2.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "items": [
+     {
+      "c": "TMA 293",
+      "alts": [
+       "TMA 391"
+      ],
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "Film major electives",
+      "cr": 4.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE/Religion/Elective hours",
+      "cr": 8.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "items": [
+     {
+      "c": "TMA 391",
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "Film electives",
+      "cr": 6.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE/Religion/Elective hours",
+      "cr": 6.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "items": [
+     {
+      "slot": "major",
+      "label": "Advanced Film Critical Studies course",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE/Religion/Elective hours",
+      "cr": 12.0
+     }
+    ],
+    "total": 15.0
+   }
+  ],
+  "_src": "files/form/1793821617721/SkgAPO04naND.pdf"
+ },
  "German Studies (BA)": {
   "terms": [
    {
@@ -2428,6 +2627,462 @@
   ],
   "_src": "files/form/1742829165814/h07lraZWvCQS.pdf"
  },
+ "Music Dance Theatre (BFA)": {
+  "terms": [
+   {
+    "year": 1,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MDT 161",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 115",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 122",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 128",
+      "credits": 2.0
+     },
+     {
+      "code": "UNIV 101",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MUSIC 113",
+      "credits": 2.0
+     },
+     {
+      "code": "MUSIC 260R",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 140",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 228",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 260",
+      "credits": 1.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 238",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 267",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MDT 290",
+      "credits": 4.0
+     },
+     {
+      "code": "MDT 229",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "courses": [
+     {
+      "code": "MUSIC 360R",
+      "credits": 2.0
+     },
+     {
+      "code": "TMA 422",
+      "credits": 2.0
+     },
+     {
+      "code": "MDT 300",
+      "credits": 3.0
+     },
+     {
+      "code": "MDT 329",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "courses": [
+     {
+      "code": "MDT 361",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 427",
+      "credits": 3.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "courses": [
+     {
+      "code": "TMA 491",
+      "credits": 1.0
+     },
+     {
+      "code": "MDT 426",
+      "credits": 3.0
+     }
+    ]
+   }
+  ],
+  "map": [
+   {
+    "year": 1,
+    "season": "F",
+    "items": [
+     {
+      "slot": "ge",
+      "label": "First Year Writing or AHTG 100",
+      "cr": 3.0
+     },
+     {
+      "c": "MDT 161",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 131 or Jazz approved course",
+      "cr": 1.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 290 or Ballet approved course",
+      "cr": 1.0
+     },
+     {
+      "c": "TMA 115",
+      "cr": 3.0
+     },
+     {
+      "c": "TMA 122",
+      "cr": 2.0
+     },
+     {
+      "c": "TMA 128",
+      "cr": 2.0
+     },
+     {
+      "c": "UNIV 101",
+      "cr": 2.0
+     }
+    ],
+    "total": 16.0
+   },
+   {
+    "year": 1,
+    "season": "W",
+    "items": [
+     {
+      "slot": "ge",
+      "label": "First Year Writing or AHTG 100",
+      "cr": 3.0
+     },
+     {
+      "c": "MUSIC 113",
+      "cr": 2.0
+     },
+     {
+      "c": "MUSIC 260R",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 135 or Tap approved course",
+      "cr": 1.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 240 or Cont. Modern approved course",
+      "cr": 1.5
+     },
+     {
+      "c": "TMA 140",
+      "cr": 2.0
+     },
+     {
+      "c": "TMA 228",
+      "cr": 3.0
+     },
+     {
+      "c": "TMA 260",
+      "cr": 1.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     }
+    ],
+    "total": 17.5
+   },
+   {
+    "year": 2,
+    "season": "F",
+    "items": [
+     {
+      "c": "MUSIC 260R",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 231R or Jazz approved course",
+      "cr": 1.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 241R or Cont. Mod. approved course",
+      "cr": 2.0
+     },
+     {
+      "c": "TMA 238",
+      "cr": 2.0
+     },
+     {
+      "c": "TMA 267",
+      "cr": 2.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General Education",
+      "cr": 3.0
+     }
+    ],
+    "total": 14.0
+   },
+   {
+    "year": 2,
+    "season": "W",
+    "items": [
+     {
+      "c": "MUSIC 260R",
+      "cr": 2.0
+     },
+     {
+      "c": "MDT 290",
+      "cr": 4.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 235 or Tap approved course",
+      "cr": 1.0
+     },
+     {
+      "c": "MDT 229",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General Education",
+      "cr": 3.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 2,
+    "season": "S",
+    "items": [
+     {
+      "slot": "ge",
+      "label": "General Education",
+      "cr": 6.0
+     }
+    ],
+    "total": 6.0
+   },
+   {
+    "year": 3,
+    "season": "F",
+    "items": [
+     {
+      "c": "MUSIC 360R",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 291R or Ballet approved course",
+      "cr": 2.5
+     },
+     {
+      "slot": "major",
+      "label": "DANCE Elective",
+      "cr": 1.0
+     },
+     {
+      "c": "TMA 422",
+      "cr": 2.0
+     },
+     {
+      "c": "MDT 300",
+      "cr": 3.0
+     },
+     {
+      "c": "MDT 329",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     }
+    ],
+    "total": 15.5
+   },
+   {
+    "year": 3,
+    "season": "W",
+    "items": [
+     {
+      "c": "MUSIC 360R",
+      "cr": 2.0
+     },
+     {
+      "c": "MDT 361",
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "DANCE 390R or Ballet approved course",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "MDT Elective",
+      "cr": 2.0
+     },
+     {
+      "slot": "major",
+      "label": "TMA 220/420 On-Campus Performance or approved course",
+      "cr": 1.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General Education",
+      "cr": 3.0
+     }
+    ],
+    "total": 15.0
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "items": [
+     {
+      "slot": "major",
+      "label": "DANCE 331 OR Jazz approved course",
+      "cr": 1.5
+     },
+     {
+      "slot": "major",
+      "label": "DANCE Elective",
+      "cr": 1.0
+     },
+     {
+      "c": "TMA 427",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General Education",
+      "cr": 6.0
+     }
+    ],
+    "total": 13.5
+   },
+   {
+    "year": 4,
+    "season": "W",
+    "items": [
+     {
+      "c": "TMA 491",
+      "cr": 1.0
+     },
+     {
+      "c": "MDT 426",
+      "cr": 3.0
+     },
+     {
+      "slot": "major",
+      "label": "MDT Electives",
+      "cr": 1.5
+     },
+     {
+      "slot": "rel-elective",
+      "label": "Religion",
+      "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "General Education",
+      "cr": 6.0
+     }
+    ],
+    "total": 13.5
+   }
+  ],
+  "_src": "files/form/1793821789519/WlQF0MZRfC9P.pdf"
+ },
  "Technology and Engineering Education (BS)": {
   "terms": [
    {
@@ -2852,10 +3507,6 @@
     "season": "F",
     "courses": [
      {
-      "code": "TMA 111",
-      "credits": 1.0
-     },
-     {
       "code": "TMA 140",
       "credits": 2.0
      },
@@ -2896,7 +3547,7 @@
       "credits": 3.0
      },
      {
-      "code": "TMA 240",
+      "code": "TMA 236",
       "credits": 3.0
      }
     ]
@@ -2912,22 +3563,12 @@
     ]
    },
    {
-    "year": 3,
+    "year": 4,
     "season": "F",
     "courses": [
      {
-      "code": "TMA 395",
-      "credits": 3.0
-     }
-    ]
-   },
-   {
-    "year": 4,
-    "season": "W",
-    "courses": [
-     {
-      "code": "TMA 491",
-      "credits": 1.0
+      "code": "TMA 460",
+      "credits": 2.0
      }
     ]
    }
@@ -2943,7 +3584,8 @@
       "cr": 3.0
      },
      {
-      "c": "TMA 111",
+      "slot": "major",
+      "label": "TMA 11",
       "cr": 1.0
      },
      {
@@ -2955,8 +3597,8 @@
       "cr": 2.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
       "cr": 7.0
      }
     ],
@@ -2972,11 +3614,6 @@
       "cr": 3.0
      },
      {
-      "slot": "rel-corner",
-      "label": "Religion cornerstone course",
-      "cr": 2.0
-     },
-     {
       "c": "TMA 115",
       "cr": 3.0
      },
@@ -2989,12 +3626,12 @@
       "cr": 1.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
-      "cr": 3.0
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
+      "cr": 5.0
      }
     ],
-    "total": 16.0
+    "total": 15.0
    },
    {
     "year": 2,
@@ -3009,7 +3646,7 @@
       "cr": 3.0
      },
      {
-      "c": "TMA 240",
+      "c": "TMA 236",
       "cr": 3.0
      },
      {
@@ -3018,8 +3655,8 @@
       "cr": 2.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
       "cr": 5.0
      }
     ],
@@ -3041,12 +3678,12 @@
      {
       "slot": "major",
       "label": "Theatre electives",
-      "cr": 2.0
+      "cr": 3.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
-      "cr": 8.0
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
+      "cr": 7.0
      }
     ],
     "total": 15.0
@@ -3056,7 +3693,8 @@
     "season": "F",
     "items": [
      {
-      "c": "TMA 395",
+      "slot": "major",
+      "label": "TMA 395 or Theatre elective courses",
       "cr": 3.0
      },
      {
@@ -3065,8 +3703,8 @@
       "cr": 4.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
       "cr": 8.0
      }
     ],
@@ -3078,12 +3716,17 @@
     "items": [
      {
       "slot": "major",
-      "label": "Theatre electives courses",
-      "cr": 7.0
+      "label": "TMA 396 or Theatre elective courses",
+      "cr": 3.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
+      "slot": "major",
+      "label": "Theatre elective courses",
+      "cr": 4.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
       "cr": 8.0
      }
     ],
@@ -3094,9 +3737,8 @@
     "season": "F",
     "items": [
      {
-      "slot": "major",
-      "label": "TMA 411 or TMA 460",
-      "cr": 1.0
+      "c": "TMA 460",
+      "cr": 2.0
      },
      {
       "slot": "major",
@@ -3104,9 +3746,9 @@
       "cr": 6.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
-      "cr": 8.0
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
+      "cr": 7.0
      }
     ],
     "total": 15.0
@@ -3116,24 +3758,20 @@
     "season": "W",
     "items": [
      {
-      "c": "TMA 491",
-      "cr": 1.0
-     },
-     {
       "slot": "major",
       "label": "Theatre electives",
-      "cr": 7.0
+      "cr": 9.0
      },
      {
-      "slot": "ge",
-      "label": "GE courses, university requirements and/or general electives",
-      "cr": 8.0
+      "slot": "rel-elective",
+      "label": "GE, religion, or electives",
+      "cr": 6.0
      }
     ],
     "total": 15.0
    }
   ],
-  "_src": "files/form/1742500205355/LOpRff4s2P5n.pdf"
+  "_src": "files/form/1793821665423/I0twJi8E1TpH.pdf"
  },
  "Theatre Education K-12 (BA)": {
   "terms": [
@@ -3188,6 +3826,10 @@
     "season": "W",
     "courses": [
      {
+      "code": "TMA 377A",
+      "credits": 2.0
+     },
+     {
       "code": "TMA 260",
       "credits": 1.0
      },
@@ -3206,16 +3848,16 @@
     "season": "F",
     "courses": [
      {
-      "code": "TMA 355",
-      "credits": 2.0
-     },
-     {
       "code": "TMA 336",
       "credits": 3.0
      },
      {
       "code": "TMA 375",
       "credits": 2.0
+     },
+     {
+      "code": "TMA 377C",
+      "credits": 3.0
      },
      {
       "code": "TMA 395",
@@ -3228,11 +3870,29 @@
     "season": "W",
     "courses": [
      {
-      "code": "TMA 377B",
-      "credits": 2.0
+      "code": "TMA 377D",
+      "credits": 3.0
+     },
+     {
+      "code": "TMA 457",
+      "credits": 3.0
      },
      {
       "code": "SC ED 353",
+      "credits": 2.0
+     }
+    ]
+   },
+   {
+    "year": 4,
+    "season": "F",
+    "courses": [
+     {
+      "code": "TMA 377B",
+      "credits": 3.0
+     },
+     {
+      "code": "SC ED 375",
       "credits": 3.0
      }
     ]
@@ -3242,15 +3902,7 @@
     "season": "W",
     "courses": [
      {
-      "code": "TMA 255",
-      "credits": 1.0
-     },
-     {
       "code": "TMA 491",
-      "credits": 2.0
-     },
-     {
-      "code": "SC ED 375",
       "credits": 2.0
      },
      {
@@ -3266,11 +3918,6 @@
     "season": "F",
     "items": [
      {
-      "slot": "ge",
-      "label": "First-Year Writing or A HTG 100",
-      "cr": 3.0
-     },
-     {
       "c": "TMA 115",
       "cr": 3.0
      },
@@ -3279,13 +3926,18 @@
       "cr": 2.0
      },
      {
-      "slot": "rel-elective",
-      "label": "GE, religion, or elective",
-      "cr": 7.0
-     },
-     {
       "c": "UNIV 101",
       "cr": 2.0
+     },
+     {
+      "slot": "ge",
+      "label": "First-Year Writing",
+      "cr": 3.0
+     },
+     {
+      "slot": "rel-elective",
+      "label": "GE/Religion/elective hours",
+      "cr": 5.0
      }
     ],
     "total": 15.0
@@ -3294,11 +3946,6 @@
     "year": 1,
     "season": "W",
     "items": [
-     {
-      "slot": "ge",
-      "label": "First-Year Writing or A HTG 100",
-      "cr": 3.0
-     },
      {
       "c": "TMA 122",
       "cr": 2.0
@@ -3309,8 +3956,8 @@
      },
      {
       "slot": "rel-elective",
-      "label": "GE, religion, or elective",
-      "cr": 7.0
+      "label": "GE/Religion/elective hours",
+      "cr": 10.0
      }
     ],
     "total": 14.0
@@ -3329,7 +3976,7 @@
      },
      {
       "slot": "rel-elective",
-      "label": "GE, religion, or elective",
+      "label": "GE/Religion/elective hours",
       "cr": 6.0
      }
     ],
@@ -3345,6 +3992,10 @@
       "cr": 4.0
      },
      {
+      "c": "TMA 377A",
+      "cr": 2.0
+     },
+     {
       "c": "TMA 260",
       "cr": 1.0
      },
@@ -3358,11 +4009,11 @@
      },
      {
       "slot": "rel-elective",
-      "label": "GE, religion, or elective courses",
+      "label": "GE/Religion/elective hours",
       "cr": 2.0
      }
     ],
-    "total": 13.0
+    "total": 14.0
    },
    {
     "year": 3,
@@ -3371,10 +4022,6 @@
      {
       "slot": "major",
       "label": "ThEd Electives (content, design)",
-      "cr": 2.0
-     },
-     {
-      "c": "TMA 355",
       "cr": 2.0
      },
      {
@@ -3386,16 +4033,15 @@
       "cr": 2.0
      },
      {
-      "c": "TMA 395",
+      "c": "TMA 377C",
       "cr": 3.0
      },
      {
-      "slot": "rel-elective",
-      "label": "GE, religion, or elective courses",
-      "cr": 4.0
+      "c": "TMA 395",
+      "cr": 3.0
      }
     ],
-    "total": 16.0
+    "total": 13.0
    },
    {
     "year": 3,
@@ -3404,20 +4050,19 @@
      {
       "slot": "major",
       "label": "ThEd Electives (content, design)",
-      "cr": 6.0
+      "cr": 5.0
      },
      {
-      "c": "TMA 377B",
-      "cr": 2.0
+      "c": "TMA 377D",
+      "cr": 3.0
      },
      {
-      "slot": "major",
-      "label": "TMA 377 C",
-      "cr": 2.0
+      "c": "TMA 457",
+      "cr": 3.0
      },
      {
       "c": "SC ED 353",
-      "cr": 3.0
+      "cr": 2.0
      }
     ],
     "total": 13.0
@@ -3429,19 +4074,19 @@
      {
       "slot": "major",
       "label": "ThEd Electives (content, design)",
-      "cr": 6.0
+      "cr": 4.0
      },
      {
       "c": "TMA 377B",
-      "cr": 2.0
+      "cr": 3.0
      },
      {
-      "slot": "major",
-      "label": "TMA 377 C",
-      "cr": 2.0
+      "c": "SC ED 375",
+      "cr": 3.0
      },
      {
-      "c": "SC ED 353",
+      "slot": "rel-elective",
+      "label": "GE/Religion/elective hours",
       "cr": 3.0
      }
     ],
@@ -3457,30 +4102,25 @@
       "cr": 5.0
      },
      {
-      "c": "TMA 255",
-      "cr": 1.0
-     },
-     {
       "c": "TMA 491",
       "cr": 2.0
      },
      {
-      "c": "SC ED 375",
-      "cr": 2.0
-     },
-     {
       "slot": "rel-elective",
-      "label": "GE, religion, or elective",
-      "cr": 2.0
+      "label": "GE/Religion/elective hours",
+      "cr": 6.0
      },
      {
       "c": "TMA 476",
       "cr": 12.0
      }
     ],
-    "total": 14.0
+    "total": 13.0
    }
   ],
-  "_src": "files/form/1742503043768/N2MmtkJmXke8.pdf"
+  "admit": {
+   "sem": 8
+  },
+  "_src": "files/form/1793821713182/cWQKkCHF8Ycd.pdf"
  }
 }
